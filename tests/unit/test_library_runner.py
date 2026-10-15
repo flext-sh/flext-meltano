@@ -52,6 +52,7 @@ class TestsFlextMeltanoLibraryRunner:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return meltano.execute_complete_elt_pipeline(
             tap_name="tap-csv",
@@ -65,6 +66,7 @@ class TestsFlextMeltanoLibraryRunner:
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         return meltano.run_dbt_transformation(models=["model1"])
 
@@ -75,6 +77,7 @@ class TestsFlextMeltanoLibraryRunner:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return meltano.run_elt_pipeline("tap-csv", "target-jsonl")
 

@@ -66,8 +66,12 @@ class FlextMeltanoModelsTransformations:
         ) -> t.FlatContainerMapping:
             """Expose DBT project mappings as read-only values.
 
+            Args:
+                value: The validated DBT project mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -79,7 +83,8 @@ class FlextMeltanoModelsTransformations:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If name cannot be empty; or if profile cannot be empty.
+                ValueError: If the name is empty, or the profile is empty.
+
             """
             if not self.name or not self.name.strip():
                 msg = "name cannot be empty"
@@ -124,6 +129,7 @@ class FlextMeltanoModelsTransformations:
 
             Returns:
                 The resulting ``bool``.
+
             """
             default_paths = {"models", "analysis", "tests", "seeds", "macros"}
             all_paths = {
@@ -137,10 +143,11 @@ class FlextMeltanoModelsTransformations:
 
         @m.computed_field
         def project_structure_complexity(self) -> str:
-            """Project structure complexity.
+            """Assess the project structure complexity.
 
             Returns:
                 The resulting ``str``.
+
             """
             # Use u.count() for unified counting (DSL pattern)
             total_path_count = (
@@ -158,10 +165,11 @@ class FlextMeltanoModelsTransformations:
 
         @m.computed_field
         def total_path_count(self) -> int:
-            """Total number of configured paths.
+            """Return the total number of configured paths.
 
             Returns:
                 The resulting ``int``.
+
             """
             # Use u.count() for unified counting (DSL pattern)
             return (
@@ -180,7 +188,8 @@ class FlextMeltanoModelsTransformations:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Project must have at least one model path.
+                ValueError: If the project has no model paths.
+
             """
             if not self.model_paths:
                 msg = "Project must have at least one model path"
@@ -213,19 +222,21 @@ class FlextMeltanoModelsTransformations:
 
         @m.computed_field
         def exclude_count(self) -> int:
-            """Number of models to exclude.
+            """Return the number of models to exclude.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.exclude)
 
         @m.computed_field
         def execution_complexity(self) -> str:
-            """Execution complexity assessment.
+            """Assess the execution complexity.
 
             Returns:
                 The resulting ``str``.
+
             """
             total_scope = len(self.models) + len(self.exclude)
             if total_scope == 0:
@@ -242,16 +253,18 @@ class FlextMeltanoModelsTransformations:
 
             Returns:
                 The resulting ``bool``.
+
             """
             threads: int = self.threads
             return threads > 1
 
         @m.computed_field
         def model_count(self) -> int:
-            """Number of models to execute.
+            """Return the number of models to execute.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.models)
 
@@ -263,8 +276,9 @@ class FlextMeltanoModelsTransformations:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Thread count cannot exceed; or if Models cannot be both
-                    included and excluded.
+                ValueError: If the thread count exceeds the configured limit, or a
+                    model is both included and excluded.
+
             """
             max_threads = (
                 c.Meltano.VALIDATION_MAX_WORKERS_THRESHOLD // 3

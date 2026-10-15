@@ -3,9 +3,6 @@
 This example demonstrates the actual working functionality that exists,
 using only classes and functions that are actually exported from flext_meltano.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -32,6 +29,7 @@ def serialization_example() -> None:
             or if Serialized nested configuration exposed sensitive input; or if
             Serialization changed a configuration list; or if Serialized configuration
             list violated its contract.
+
     """
     marker = "serialization-input-marker"
     connection = {
@@ -138,6 +136,7 @@ def simple_runtime_example() -> None:
 
     Raises:
         RuntimeError: If The actual Meltano runtime command failed.
+
     """
     command = meltano.execute_meltano_command([
         c.Meltano.CMD_BINARY,

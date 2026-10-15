@@ -61,17 +61,22 @@ class FlextMeltanoModelsProjectsPlugin:
         ) -> t.FlatContainerMapping:
             """Expose plugin settings as a read-only mapping.
 
+            Args:
+                value: The validated settings mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
         @m.computed_field
         def full_plugin_name(self) -> str:
-            """Full plugin name with namespace.
+            """Return the full plugin name with namespace.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.namespace}.{self.name}"
 
@@ -81,15 +86,17 @@ class FlextMeltanoModelsProjectsPlugin:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return self.executable is not None
 
         @m.computed_field
         def plugin_complexity(self) -> str:
-            """Plugin complexity assessment.
+            """Assess the plugin complexity.
 
             Returns:
                 The resulting ``str``.
+
             """
             settings_keys = list(self.settings.keys())
             settings_count = u.count(settings_keys)
@@ -103,10 +110,11 @@ class FlextMeltanoModelsProjectsPlugin:
 
         @m.computed_field
         def settings_count(self) -> int:
-            """Number of plugin settings.
+            """Return the number of plugin settings.
 
             Returns:
                 The resulting ``int``.
+
             """
             keys: t.StrSequence = list(self.settings.keys())
             return u.count(keys)
@@ -119,8 +127,9 @@ class FlextMeltanoModelsProjectsPlugin:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Plugin namespace cannot contain dots; or if Plugin must
-                    have either pip_url or executable.
+                ValueError: If the namespace contains dots, or the plugin has neither
+                    a pip URL nor an executable.
+
             """
             if "." in self.namespace:
                 msg = "Plugin namespace cannot contain dots"

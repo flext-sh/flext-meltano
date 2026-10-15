@@ -27,6 +27,7 @@ class TestsFlextMeltanoCliSmallManagers:
 
         Returns:
             The resulting ``FlextMeltanoCli``.
+
         """
         return FlextMeltanoCli()
 

@@ -2,9 +2,6 @@
 
 Domain-specific types (Dbt, Project, Bridge, CLI, ELT, Processing).
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -14,6 +11,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_cli import t
+
+from flext_meltano import c
 
 
 class FlextMeltanoTypingsDomains:
@@ -26,3 +25,9 @@ class FlextMeltanoTypingsDomains:
     type NestedStrMapping = Mapping[str, t.StrMapping]
     type DbtManifestData = t.JsonMapping
     type DbtProject = t.JsonMapping
+
+    PluginType = c.Meltano.PluginType
+
+    type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
+    """Environment selector input: a named environment or a full environment
+    configuration mapping."""

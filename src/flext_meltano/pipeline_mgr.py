@@ -27,7 +27,7 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services.executor import FlextMeltanoExecutor
+from flext_meltano.services import FlextMeltanoExecutor
 
 
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
@@ -56,6 +56,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``FlextMeltanoSettings``.
+
         """
         process_environment = u.resolve_process_environment()
         configured_root = process_environment.get(
@@ -159,6 +160,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Raises:
             OSError: If a ``OSError`` is caught.
+
         """
         try:
             os.kill(pid_value, sig)
@@ -182,6 +184,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         name_result = self._normalize_pipeline_name(pipeline_name)
         if name_result.failure:
@@ -220,6 +223,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         name_result = self._normalize_pipeline_name(pipeline_name)
         if name_result.failure:
@@ -245,6 +249,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         return flext_cli.list_directory_names(self._pipelines_root())
 
@@ -269,6 +274,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         name_result = self._normalize_pipeline_name(pipeline_name)
         if name_result.failure:
@@ -289,6 +295,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         name_result = self._normalize_pipeline_name(pipeline_name)
         if name_result.failure:
@@ -306,6 +313,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args or u.Meltano.requests_help(args):
             if self._cli is not None:
@@ -320,6 +328,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args:
             return r[str].fail(
@@ -348,6 +357,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args:
             return r[str].fail("Pipeline delete requires pipeline name")
@@ -358,6 +368,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         handlers: MappingProxyType[str, Callable[[t.StrSequence], p.Result[str]]] = (
             MappingProxyType({
@@ -381,6 +392,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args:
             return r[str].fail("Pipeline status requires pipeline name")
@@ -391,6 +403,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         return self.list_pipelines().map(
             lambda pipelines: ", ".join(pipelines) or "none",
@@ -401,6 +414,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args:
             return r[str].fail("Pipeline execution requires pipeline name")
@@ -413,6 +427,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         if not args:
             return r[str].fail("Pipeline stop requires pipeline name")

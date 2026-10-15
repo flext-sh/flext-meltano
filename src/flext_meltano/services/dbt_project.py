@@ -3,9 +3,6 @@
 Manifest parsing and model/test discovery.
 Converted from standalone FlextMeltanoDbtProjectManager to facade mixin.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -48,6 +45,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]``.
+
         """
         model_nodes_result = self._get_dbt_manifest_nodes(
             c.Meltano.DbtResourceType.MODEL,
@@ -75,6 +73,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]``.
+
         """
         test_nodes_result = self._get_dbt_manifest_nodes(c.Meltano.DbtResourceType.TEST)
         if test_nodes_result.failure:
@@ -136,6 +135,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.DbtManifestData]``.
+
         """
         resolved_manifest_path = manifest_path
 
@@ -184,6 +184,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.DbtProjectInfo]``.
+
         """
 
         def _run_load_dbt_project() -> p.Result[m.Meltano.DbtProjectInfo]:

@@ -7,9 +7,6 @@ instance with FLEXT service patterns (``r[T]``, typed settings, lifecycle).
 
 Consumer projects inherit this and override ``create_tap_instance()`` only.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -21,7 +18,7 @@ from abc import ABC, abstractmethod
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
+from flext_meltano.services import FlextMeltanoDeclarativeTap
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
@@ -74,6 +71,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Raises:
             SystemExit: If a ``c.EXC_OS_RUNTIME_TYPE`` is caught.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -94,6 +92,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -114,6 +113,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -133,6 +133,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -142,6 +143,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -154,6 +156,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Meltano.SingerTapInstance``.
+
         """
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()
@@ -173,6 +176,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Meltano.SingerTapInstance``.
+
         """
         return FlextMeltanoDeclarativeTap.build(spec, fetcher)
 
@@ -182,6 +186,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok({
             "service": self.tap_name,

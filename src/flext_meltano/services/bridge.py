@@ -3,9 +3,6 @@
 This module provides the FlextMeltanoBridge class for JSON-based communication
 between Go and Python components using the imported Meltano runtime.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -19,7 +16,7 @@ from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
-    """Go Bridge - JSON API para integração Go ↔ Python.
+    """Go Bridge - JSON API for Go and Python integration.
 
     Provides JSON-based communication between Go and Python components
     for Meltano operations.
@@ -31,6 +28,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.fetch_project_plugins()
@@ -53,7 +51,8 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             args: Optional key-value arguments passed as --key=value flags.
 
         Returns:
-            r with command execution results.
+            The resulting ``p.Result[t.JsonMapping]`` with the command execution
+            payload.
 
         """
         executor = FlextMeltanoExecutorBase()
@@ -75,6 +74,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         return FlextMeltanoExecutorBase.fetch_version()
 
@@ -84,6 +84,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 

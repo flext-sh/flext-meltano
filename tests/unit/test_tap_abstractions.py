@@ -9,6 +9,7 @@ from __future__ import annotations
 import tempfile
 
 from flext_core import r
+
 from flext_meltano.services import FlextMeltanoAbstractions
 from tests import c, m, t, tm
 
@@ -19,7 +20,7 @@ class TestsFlextMeltanoAbstractionsComplete:
     tap_abstractions: FlextMeltanoAbstractions
 
     def setup_method(self) -> None:
-        """Setup for each test."""
+        """Set up the abstractions under test for each test."""
         self.tap_abstractions = FlextMeltanoAbstractions()
 
     @staticmethod

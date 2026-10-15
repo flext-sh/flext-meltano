@@ -1,8 +1,5 @@
 """FLEXT Meltano Adapters - SOLID-compliant adapter classes following FLEXT patterns.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -23,6 +20,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 

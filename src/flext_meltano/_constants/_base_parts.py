@@ -1,4 +1,7 @@
-"""FLEXT Meltano enum constants — domain-specific enumerations.
+"""FLEXT Meltano base constants parts — domain-specific enumerations.
+
+Split parts of the ``_constants`` family base: the enumerations the family
+base and its settings part consume without importing a sibling family module.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

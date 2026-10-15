@@ -1,8 +1,5 @@
 """FLEXT Pipeline Validators - Generic business rule validators.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -29,6 +26,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             m.Meltano.PluginComponentConfig.model_validate(settings)
@@ -45,6 +43,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             m.Meltano.PipelineProjectModel.model_validate(settings)
@@ -58,6 +57,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         if not project_path.exists() or not project_path.is_dir():
             error_msg = (
@@ -91,6 +91,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return cls.validate_component_rules(settings)
 
@@ -103,6 +104,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             m.Meltano.TransformationProjectModel.model_validate(settings)
@@ -116,6 +118,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 

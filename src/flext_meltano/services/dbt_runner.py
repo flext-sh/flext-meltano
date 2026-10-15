@@ -3,9 +3,6 @@
 Programmatic DBT execution via subprocess. Implements actual dbt
 command execution (replaces previous stubs).
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -38,6 +35,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.MutableSequenceOf[str]``.
+
         """
         cmd: t.MutableSequenceOf[str] = [c.Meltano.DBT_BINARY, subcommand]
         if self._dbt_runner_project_root:
@@ -60,6 +58,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
 
         def _run__run_dbt_subprocess() -> p.Result[str]:
@@ -99,6 +98,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.RUN, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.RUN)
@@ -108,6 +108,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.TEST, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.TEST)
@@ -117,6 +118,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.COMPILE, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.COMPILE)
@@ -126,6 +128,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         cmd = self._build_dbt_command(
             c.Meltano.DbtCommand.DOCS,

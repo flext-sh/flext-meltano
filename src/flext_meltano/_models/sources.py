@@ -23,13 +23,12 @@ class FlextMeltanoModelsSources:
         type[FlextMeltanoModelsSourcesParams.StreamDefinition]
     ] = FlextMeltanoModelsSourcesParams.StreamDefinition
 
-    class TapConfig(
+    class _StreamConfigEntity(
         FlextMeltanoModelsCore.SensitiveConfigSerializer,
         m.Entity,
     ):
-        """Generic tap configuration for data extraction."""
+        """Shared connection/stream config fields and computed accessors."""
 
-        tap_type: Annotated[str, m.Field(description="Type of the tap")]
         connection_config: Annotated[
             t.FlatContainerMapping,
             m.Field(description="Connection configuration"),
@@ -41,14 +40,14 @@ class FlextMeltanoModelsSources:
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
         )
-        tap_version: Annotated[str, m.Field(description="Tap version")] = "latest"
 
         @m.computed_field
         def config_size(self) -> int:
-            """Total number of configuration parameters.
+            """Return the total number of configuration parameters.
 
             Returns:
                 The resulting ``int``.
+
             """
             return u.count(list(self.connection_config.keys())) + u.count(
                 list(self.stream_config.keys()),
@@ -60,17 +59,9 @@ class FlextMeltanoModelsSources:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return bool(self.stream_config)
-
-        @m.computed_field
-        def tap_identifier(self) -> str:
-            """Unique tap identifier.
-
-            Returns:
-                The resulting ``str``.
-            """
-            return f"{self.tap_type}:{self.tap_version}"
 
         @m.field_validator("stream_config", mode="after")
         @classmethod
@@ -80,10 +71,30 @@ class FlextMeltanoModelsSources:
         ) -> t.FlatContainerMapping:
             """Expose stream configuration as a read-only mapping.
 
+            Args:
+                value: The validated stream configuration mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
+
+    class TapConfig(_StreamConfigEntity):
+        """Generic tap configuration for data extraction."""
+
+        tap_type: Annotated[str, m.Field(description="Type of the tap")]
+        tap_version: Annotated[str, m.Field(description="Tap version")] = "latest"
+
+        @m.computed_field
+        def tap_identifier(self) -> str:
+            """Return the unique tap identifier.
+
+            Returns:
+                The resulting ``str``.
+
+            """
+            return f"{self.tap_type}:{self.tap_version}"
 
         @m.model_validator(mode="after")
         def validate_tap_config(self) -> Self:
@@ -93,8 +104,9 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If tap_type cannot be empty; or if Connection configuration
-                    cannot be empty.
+                ValueError: If the tap type is empty, or the connection configuration
+                    is empty.
+
             """
             if not self.tap_type or not self.tap_type.strip():
                 msg = "tap_type cannot be empty"
@@ -133,10 +145,11 @@ class FlextMeltanoModelsSources:
 
         @m.computed_field
         def config_size(self) -> int:
-            """Total number of configuration parameters.
+            """Return the total number of configuration parameters.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.connection_config)
 
@@ -146,15 +159,17 @@ class FlextMeltanoModelsSources:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return bool(self.connection_config)
 
         @m.computed_field
         def target_identifier(self) -> str:
-            """Unique target identifier.
+            """Return the unique target identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.target_type}:{self.target_version}"
 
@@ -166,8 +181,12 @@ class FlextMeltanoModelsSources:
         ) -> t.FlatContainerMapping:
             """Expose target connection configuration as read-only.
 
+            Args:
+                value: The validated connection configuration mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -179,77 +198,32 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If target_type cannot be empty.
+                ValueError: If the target type is empty.
+
             """
             if not self.target_type or not self.target_type.strip():
                 msg = "target_type cannot be empty"
                 raise ValueError(msg)
             return self
 
-    class DataSourceConfig(
-        FlextMeltanoModelsCore.SensitiveConfigSerializer,
-        m.Entity,
-    ):
+    class DataSourceConfig(_StreamConfigEntity):
         """Generic data source configuration with validation."""
 
         source_type: Annotated[str, m.Field(description="Type of the data source")]
-        connection_config: Annotated[
-            t.FlatContainerMapping,
-            m.Field(description="Connection configuration"),
-        ]
-        stream_config: Annotated[
-            t.FlatContainerMapping,
-            m.Field(description="Stream-specific configuration"),
-        ] = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Stream-specific configuration",
-        )
         source_version: Annotated[
             str,
             m.Field(default="latest", description="Source version"),
         ] = "latest"
 
         @m.computed_field
-        def config_size(self) -> int:
-            """Total number of configuration parameters.
-
-            Returns:
-                The resulting ``int``.
-            """
-            return u.count(list(self.connection_config.keys())) + u.count(
-                list(self.stream_config.keys()),
-            )
-
-        @m.computed_field
-        def has_stream_config(self) -> bool:
-            """Check if stream configuration is present.
-
-            Returns:
-                The resulting ``bool``.
-            """
-            return bool(self.stream_config)
-
-        @m.computed_field
         def source_identifier(self) -> str:
-            """Unique source identifier.
+            """Return the unique source identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.source_type}:{self.source_version}"
-
-        @m.field_validator("stream_config", mode="after")
-        @classmethod
-        def freeze_stream_config(
-            cls,
-            value: t.FlatContainerMapping,
-        ) -> t.FlatContainerMapping:
-            """Expose source stream configuration as read-only.
-
-            Returns:
-                The resulting ``t.FlatContainerMapping``.
-            """
-            return MappingProxyType(dict(value))
 
         @m.model_validator(mode="after")
         def validate_source_config(self) -> Self:
@@ -259,8 +233,9 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Source type cannot be empty; or if Connection
-                    configuration cannot be empty.
+                ValueError: If the source type is empty, or the connection
+                    configuration is empty.
+
             """
             if not self.source_type or not self.source_type.strip():
                 msg = "Source type cannot be empty"

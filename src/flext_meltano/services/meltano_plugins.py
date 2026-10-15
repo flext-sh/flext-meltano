@@ -1,8 +1,5 @@
 """FLEXT Pipeline Component Service - Single unified class for component operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -12,8 +9,8 @@ from __future__ import annotations
 from typing import override
 
 from flext_meltano import c, p, r, settings, t
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.meltano_plugin_discovery import (
+from flext_meltano.services import (
+    FlextMeltanoAbstractions,
     FlextMeltanoPluginDiscoveryMixin,
 )
 
@@ -31,6 +28,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
@@ -49,6 +47,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         return (
             self
@@ -72,6 +71,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
@@ -86,6 +86,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         plugin_result: t.StrMapping = {
             "success": "true" if addition_success else "false",
@@ -110,6 +111,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         plugin_config: t.JsonMapping = {
             "project_root": str(project.root_dir),
@@ -131,6 +133,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         self.logger.info(
             "Adding plugin using ProjectAddService",

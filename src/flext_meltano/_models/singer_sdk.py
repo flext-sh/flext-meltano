@@ -15,6 +15,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from abc import ABC
+
+import singer_sdk.singerlib as singer_sdk_singerlib
 import singer_sdk.typing as singer_sdk_typing
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
@@ -34,10 +37,10 @@ class FlextMeltanoModelsSingerSdk:
     class SingerTapBase(Tap):
         """Typed re-export: real nested class so mypy accepts it as a base."""
 
-    class SingerSinkBase(Sink):
+    class SingerSinkBase(Sink, ABC):
         """Typed re-export base: real nested class so mypy accepts it as a base."""
 
-    class SingerStreamBase(Stream):
+    class SingerStreamBase(Stream, ABC):
         """Typed re-export base: real nested class so mypy accepts it as a base."""
 
     class SingerTargetBase(Target):
@@ -45,6 +48,12 @@ class FlextMeltanoModelsSingerSdk:
 
     type SingerContext = Context
     type SingerRecord = Record
+
+    # Runtime re-export of the Singer wire-format schema class: the tap-facing
+    # object for ``isinstance`` and schema construction. ``t.Meltano.SingerSchema``
+    # is the PEP 695 alias used in type positions; this is its runtime owner.
+    SingerSchema = singer_sdk_singerlib.Schema
+
     SingerArrayType = singer_sdk_typing.ArrayType
     SingerBooleanType = singer_sdk_typing.BooleanType
     SingerCustomType = singer_sdk_typing.CustomType
