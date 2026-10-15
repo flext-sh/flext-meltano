@@ -149,3 +149,6 @@ class FlextMeltanoModelsDiscovery:
                     FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
             """
             return MappingProxyType(dict(value))
+
+
+__all__: list[str] = ["FlextMeltanoModelsDiscovery"]

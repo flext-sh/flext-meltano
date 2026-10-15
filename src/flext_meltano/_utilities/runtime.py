@@ -426,3 +426,6 @@ class FlextMeltanoUtilitiesRuntime:
             ].value
             return transform_label
         return normalized or plugin_type
+
+
+__all__: list[str] = ["FlextMeltanoUtilitiesRuntime"]

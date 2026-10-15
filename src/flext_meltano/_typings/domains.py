@@ -26,3 +26,6 @@ class FlextMeltanoTypingsDomains:
     type NestedStrMapping = Mapping[str, t.StrMapping]
     type DbtManifestData = t.JsonMapping
     type DbtProject = t.JsonMapping
+
+
+__all__: list[str] = ["FlextMeltanoTypingsDomains"]

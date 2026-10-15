@@ -296,3 +296,6 @@ class FlextMeltanoUtilitiesSinger:
                 exc,
                 result_type=r[m.Meltano.SingerCatalogEntry],
             )
+
+
+__all__: list[str] = ["FlextMeltanoUtilitiesSinger"]

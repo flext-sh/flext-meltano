@@ -160,3 +160,6 @@ class FlextMeltanoConstantsBase:
     VALIDATION_MATURITY_MATURE_ENV_COUNT: ClassVar[int] = 3
     VALIDATION_STRUCTURE_MODERATE_MAX_PATHS: ClassVar[int] = 10
     VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS: ClassVar[int] = 5
+
+
+__all__: list[str] = ["FlextMeltanoConstantsBase"]

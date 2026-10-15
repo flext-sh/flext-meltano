@@ -16,3 +16,6 @@ class FlextMeltanoModelsConfig:
         """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
 
         model_config = m.ConfigDict(extra="allow", frozen=True)
+
+
+__all__: list[str] = ["FlextMeltanoModelsConfig"]

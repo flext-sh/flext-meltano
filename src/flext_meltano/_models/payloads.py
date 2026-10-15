@@ -93,3 +93,6 @@ class FlextMeltanoModelsPayloads:
             t.FlatContainerMapping | None,
             m.Field(default=None, description="Pipeline config"),
         ] = None
+
+
+__all__: list[str] = ["FlextMeltanoModelsPayloads"]

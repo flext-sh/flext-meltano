@@ -170,3 +170,6 @@ class FlextMeltanoModelsResults:
                 raise ValueError(msg)
 
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsResults"]

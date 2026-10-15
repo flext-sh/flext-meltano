@@ -269,3 +269,6 @@ class FlextMeltanoModelsSources:
                 msg = "Connection configuration cannot be empty"
                 raise ValueError(msg)
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsSources"]

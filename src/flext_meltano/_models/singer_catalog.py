@@ -187,3 +187,6 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeFloat,
             m.Field(description="Execution duration"),
         ]
+
+
+__all__: list[str] = ["FlextMeltanoModelsSingerCatalog"]

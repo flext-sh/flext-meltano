@@ -12,3 +12,6 @@ from __future__ import annotations
 
 class FlextMeltanoUtilitiesBase:
     """Base utilities for flext-meltano."""
+
+
+__all__: list[str] = ["FlextMeltanoUtilitiesBase"]

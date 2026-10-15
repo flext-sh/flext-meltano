@@ -170,3 +170,6 @@ class FlextMeltanoModelsResultsDbt:
             str | None,
             m.Field(description="Payload key for execution_time, or None to omit"),
         ] = "execution_time"
+
+
+__all__: list[str] = ["FlextMeltanoModelsResultsDbt"]

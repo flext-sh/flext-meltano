@@ -261,3 +261,6 @@ class FlextMeltanoModelsInstances:
                 The resulting ``int``.
             """
             return len(self.streams)
+
+
+__all__: list[str] = ["FlextMeltanoModelsInstances"]

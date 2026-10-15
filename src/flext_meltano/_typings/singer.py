@@ -41,3 +41,6 @@ class FlextMeltanoTypingsSinger:
     SingerObjectType = singer_sdk_typing.ObjectType
     SingerPropertiesList = singer_sdk_typing.PropertiesList
     SingerTimeType = singer_sdk_typing.TimeType
+
+
+__all__: list[str] = ["FlextMeltanoTypingsSinger"]

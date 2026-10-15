@@ -279,3 +279,6 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             The resulting ``t.StrSequence``.
         """
         return [*self._stream_registry.keys()]
+
+
+__all__: list[str] = ["FlextMeltanoAbstractionsBase"]

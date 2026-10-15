@@ -130,3 +130,6 @@ class FlextMeltanoModelsCore:
             if isinstance(value, (list, tuple, set)):
                 return tuple(str(item) for item in value if item is not None)
             return ()
+
+
+__all__: list[str] = ["FlextMeltanoModelsCore"]

@@ -58,3 +58,6 @@ class FlextMeltanoProtocolsBase:
         def status_manager(self) -> FlextMeltanoProtocolsServices.StatusManager: ...
 
         def show_banner(self) -> None: ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsBase"]

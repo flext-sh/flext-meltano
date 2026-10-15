@@ -230,3 +230,6 @@ class FlextMeltanoModelsSinger:
             default_factory=tuple[t.JsonMapping, ...],
             description="Fetched records",
         )
+
+
+__all__: list[str] = ["FlextMeltanoModelsSinger"]

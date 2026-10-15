@@ -176,3 +176,6 @@ class FlextMeltanoProtocolsServices:
         def show_target_help(self) -> None:
             """Show target help."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsServices"]
