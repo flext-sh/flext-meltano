@@ -21,6 +21,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         try:
             executor = FlextMeltanoExecutor()
@@ -46,6 +47,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.VERSION])
         return result.map(
@@ -65,6 +67,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.HELP])
         return result.map(
@@ -83,6 +86,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         if not args:
             return r[t.JsonMapping].fail("Arguments cannot be empty")
@@ -93,6 +97,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         if args is None or not args:
             ready_payload: t.JsonMapping = {
@@ -108,6 +113,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[int]``.
+
         """
         if not args:
             return r[int].ok(1)
@@ -122,6 +128,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
@@ -137,6 +144,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self.fetch_version().map(
             lambda ver: {
@@ -158,6 +166,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
 
         def _run__route_command() -> p.Result[t.JsonMapping]:

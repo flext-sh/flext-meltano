@@ -29,6 +29,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
 
         def _run_process_source() -> p.Result[bool]:
@@ -63,6 +64,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             self.logger.debug(

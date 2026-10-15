@@ -23,6 +23,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         instance: Self = cls()
         ok_result: p.Result[Self] = r.ok(instance)
@@ -38,6 +39,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.DataSourceInstance]``.
+
         """
 
         def _run_create_source_instance() -> p.Result[m.Meltano.DataSourceInstance]:

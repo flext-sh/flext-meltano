@@ -10,8 +10,8 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, ClassVar, Self
 
 from flext_cli import c
-
 from flext_core import FlextSettings
+
 from flext_meltano._constants.base import FlextMeltanoConstantsEnums
 
 if TYPE_CHECKING:
@@ -67,6 +67,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
 
         Returns:
             The resulting ``bool``.
+
         """
         return object.__eq__(self, other)
 
@@ -75,6 +76,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
 
         Returns:
             The resulting ``int``.
+
         """
         return object.__hash__(self)
 

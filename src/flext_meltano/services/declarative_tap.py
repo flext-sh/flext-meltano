@@ -42,6 +42,7 @@ class FlextMeltanoDeclarativeTap:
 
             Returns:
                 The resulting ``int``.
+
             """
             command = self._tap_class.get_singer_command()
             try:
@@ -59,6 +60,7 @@ class FlextMeltanoDeclarativeTap:
 
             Returns:
                 The resulting ``t.SequenceOf[p.Meltano.SingerStreamInfo]``.
+
             """
             streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap_class(
                 config=None,

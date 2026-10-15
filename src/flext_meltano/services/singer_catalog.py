@@ -41,6 +41,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.SingerCatalog]``.
+
         """
         try:
             self._singer_catalog = tap.discover()
@@ -61,6 +62,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         try:
             for entry in self._singer_catalog.streams:
@@ -77,6 +79,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.SingerCatalog]``.
+
         """
         try:
             if not catalog_file.exists():
@@ -109,6 +112,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
@@ -132,6 +136,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.SingerCatalog]``.
+
         """
         try:
             selected = [

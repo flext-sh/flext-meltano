@@ -45,6 +45,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             match value:
                 case Mapping():
@@ -60,6 +61,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -84,6 +86,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``t.VariadicTuple[t.FlatContainerMapping]``.
+
             """
             if isinstance(value, (list, tuple)):
                 return tuple(
@@ -108,6 +111,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``t.JsonMapping``.
+
             """
             if isinstance(value, Mapping):
                 return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -120,6 +124,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``t.JsonMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -138,6 +143,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``Path``.
+
             """
             if value is None:
                 return Path()
@@ -158,6 +164,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``str``.
+
             """
             match value:
                 case Mapping():
@@ -185,6 +192,7 @@ class FlextMeltanoModelsPayloadsData:
 
             Returns:
                 The resulting ``str | t.StrSequence | t.ScalarMapping | None``.
+
             """
             match value:
                 case None:

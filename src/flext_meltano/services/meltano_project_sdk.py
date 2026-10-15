@@ -39,6 +39,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
         """
         try:
             if not self._sdk_project:
@@ -65,6 +66,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.OptionalScalarMap]``.
+
         """
 
         def _run_initialize_sdk_project() -> p.Result[t.Meltano.OptionalScalarMap]:
@@ -98,6 +100,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.OptionalScalarMap]``.
+
         """
         try:
             if not root.exists():
@@ -127,6 +130,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         plugins: t.MutableSequenceOf[t.JsonMapping] = []
         if self._sdk_project is None:
@@ -152,6 +156,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         plugins: t.MutableSequenceOf[t.JsonMapping] = []
         for plugin in sdk_plugins_service.plugins():

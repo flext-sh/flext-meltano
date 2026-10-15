@@ -41,6 +41,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         if not project_name or not project_name.strip():
             return e.fail_validation(
@@ -67,6 +68,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         if not prefix or not prefix.strip():
             return e.fail_validation(
@@ -84,6 +86,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         if not project_root.exists():
             return e.fail_not_found(
@@ -99,6 +102,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return FlextMeltanoValidators.validate_pipeline_project_structure(project_path)
 
@@ -111,6 +115,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         params_r = self._validate_project_creation_params(project_name, project_dir)
         if params_r.failure:
@@ -161,6 +166,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.DbtProject]``.
+
         """
         params_r = self._validate_project_parameters(project_id, prefix)
         if params_r.failure:
@@ -217,6 +223,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
             meltano_config.model_dump(),
@@ -234,6 +241,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         result = self.build_service_execution_payload(
             "flext_meltano_project_service",
@@ -250,6 +258,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.DbtProject]``.
+
         """
         vpath_r = self._validate_project_path(project_root)
         if vpath_r.failure:
@@ -279,6 +288,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         result: t.StrMapping = {
             "success": "true",
@@ -301,6 +311,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         return self._abstractions.find_project(project_path)
 
@@ -309,6 +320,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         return self._abstractions.find_project(project_root)
 

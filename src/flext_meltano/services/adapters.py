@@ -20,6 +20,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 

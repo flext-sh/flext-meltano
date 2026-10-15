@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
 from flext_core import FlextSettings, m
+
 from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 

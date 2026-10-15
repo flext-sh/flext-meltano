@@ -70,6 +70,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Raises:
             SystemExit: If ``drain_result.failure``; or if ``flush_result.failure``.
+
         """
         _ = args
         drain_result = u.Meltano.process_stdin(self)
@@ -87,6 +88,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         sink_result = self.fetch_or_create_sink(
             message.stream,
@@ -101,6 +103,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return self.process_record(message.stream, message.record, {})
 
@@ -109,6 +112,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         _ = message
         return self.flush()
@@ -126,6 +130,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[p.Meltano.SingerDrainSink]``.
+
         """
         try:
             if stream_name in self._sinks:
@@ -142,6 +147,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             targets = (
@@ -171,6 +177,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         sink_result = self.fetch_or_create_sink(stream_name, schema)
         if sink_result.failure:
@@ -193,6 +200,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[int]``.
+
         """
         processed = 0
         for record in records:
@@ -212,6 +220,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -220,6 +229,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         self._sinks.clear()
         return r[bool].ok(value=True)
@@ -230,6 +240,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok({
             "service": self.target_name,

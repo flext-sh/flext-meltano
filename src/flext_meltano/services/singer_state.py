@@ -35,6 +35,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         try:
             stream_state = self._singer_state.value.get(stream_name)
@@ -65,6 +66,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.SingerStateMessage]``.
+
         """
         try:
             if state_file and state_file.exists():
@@ -94,6 +96,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
@@ -123,6 +126,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
 
         def _run_update_bookmark() -> p.Result[bool]:

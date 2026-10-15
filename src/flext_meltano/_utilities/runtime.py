@@ -30,6 +30,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
 
         def _strip_part(part: str) -> str:
@@ -47,6 +48,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         normalized = FlextMeltanoUtilitiesRuntime._normalized_parts(command)
         if normalized and normalized[0] == c.Meltano.CMD_BINARY:
@@ -67,6 +69,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``str | None``.
+
         """
         if plugin_type is None:
             return None
@@ -89,6 +92,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``Path | None``.
+
         """
         if isinstance(settings, Mapping):
             raw = settings.get("project_root")
@@ -113,6 +117,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``str``.
+
         """
         raw_environment_name = "" if environment_name is None else environment_name
         normalized = u.normalize(
@@ -131,6 +136,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         return FlextMeltanoUtilitiesRuntime._normalized_parts([
             c.Meltano.CMD_ELT,
@@ -147,6 +153,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         command = [
             c.Meltano.CMD_INVOKE,
@@ -165,6 +172,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         command_args = FlextMeltanoUtilitiesRuntime._normalized_parts([command])
         if args is None:
@@ -185,6 +193,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrMapping | None``.
+
         """
         name_val = raw_plugin.get("name", "")
         plugin_name = str(name_val).strip() if name_val is not None else ""
@@ -216,6 +225,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrMapping | None``.
+
         """
         plugin_mapping: t.JsonMapping = {
             "name": raw_plugin.name,
@@ -238,6 +248,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``list[t.StrMapping]``.
+
         """
         discovered: list[t.StrMapping] = []
         for raw_type, raw_plugins in current_plugins.items():
@@ -262,6 +273,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
 
         def _extract_name(plugin: t.StrMapping) -> str:
@@ -286,6 +298,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.StrMapping``.
+
         """
         variants_str = (
             u.join(list(source.variants.keys()), separator=",")
@@ -320,6 +333,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``str``.
+
         """
         return success_status if success else failure_status
 
@@ -334,6 +348,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         field_policy = policy or m.Meltano.CommandPayloadFieldPolicy()
         payload: t.MutableJsonMapping = {
@@ -368,6 +383,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``t.JsonDict``.
+
         """
         return dict(
             FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
@@ -387,6 +403,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``str``.
+
         """
         error_text = u.to_str(command_result.error).strip()
         if u.chk(error_text, empty=False):
@@ -402,6 +419,7 @@ class FlextMeltanoUtilitiesRuntime:
 
         Returns:
             The resulting ``str``.
+
         """
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
         if normalized == c.Meltano.PluginType.EXTRACTORS.value:

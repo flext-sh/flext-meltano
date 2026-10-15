@@ -159,6 +159,7 @@ class FlextMeltanoModelsSinger:
             Raises:
                 ValueError: If bookmark_key and bookmark_value must both be set or both
                     be None.
+
             """
             if (self.bookmark_key is None) != (self.bookmark_value is None):
                 msg = "bookmark_key and bookmark_value must both be set or both be None"
@@ -217,6 +218,7 @@ class FlextMeltanoModelsSinger:
 
             Returns:
                 The resulting ``t.JsonMapping``.
+
             """
             return MappingProxyType(dict(value))
 

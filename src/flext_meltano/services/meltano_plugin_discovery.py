@@ -19,6 +19,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``bool``.
+
         """
         if value is None:
             return False
@@ -34,6 +35,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.StrMapping``.
+
         """
         source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
         return u.Meltano.build_plugin_discovery_item(plugin_name, plugin_type, source)
@@ -48,6 +50,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
             "plugins": plugins_data,
@@ -72,6 +75,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.StrMapping]]``.
+
         """
         try:
             return self._discover_plugins(project)
@@ -88,6 +92,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.StrMapping]]``.
+
         """
         self.logger.info("Discovering Meltano plugins")
         working_project: t.JsonPayload | t.Meltano.DbtProject
@@ -139,6 +144,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
 
         def _run_fetch_plugin_info() -> p.Result[t.StrMapping]:

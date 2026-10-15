@@ -30,6 +30,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.DataSinkDefinition]``.
+
         """
         try:
             self.logger.info(
@@ -60,6 +61,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.DataSinkInstance]``.
+
         """
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
@@ -83,6 +85,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.DataSinkInstance]``.
+
         """
         try:
             self.logger.info(
@@ -110,6 +113,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
@@ -121,6 +125,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             self.logger.debug(

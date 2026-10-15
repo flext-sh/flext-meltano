@@ -48,6 +48,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
@@ -61,6 +62,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -76,6 +78,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``str``.
+
             """
             normalized = "" if value is None else str(value)
             return normalized.strip()
@@ -102,6 +105,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
@@ -115,6 +119,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -125,6 +130,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``str``.
+
             """
             normalized = "unknown" if value is None else str(value)
             return normalized.strip() or "unknown"
@@ -144,6 +150,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.StrMapping``.
+
             """
             match value:
                 case Mapping():
@@ -162,6 +169,7 @@ class FlextMeltanoModelsContext:
 
             Returns:
                 The resulting ``t.StrMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -186,6 +194,7 @@ class FlextMeltanoModelsContext:
                 ValueError: If Plugin name cannot be empty; or if Target plugin names
                     must be at least 8 characters; or if Source component names must be
                     at least 5 characters.
+
             """
             v = v.strip()
             if not v:

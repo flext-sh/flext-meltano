@@ -58,6 +58,7 @@ class FlextMeltano(
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return type(self).create_source_service(name, **settings)
 
@@ -66,6 +67,7 @@ class FlextMeltano(
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return type(self).create_sink_service(name, **settings)
 
@@ -74,6 +76,7 @@ class FlextMeltano(
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return type(self).create_transformation_service(name, **settings)
 
@@ -83,6 +86,7 @@ class FlextMeltano(
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         handlers_payload: t.JsonValueList = [
             handler.value for handler in c.Meltano.HANDLER_ALL

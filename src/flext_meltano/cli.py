@@ -35,6 +35,7 @@ class FlextMeltanoCli:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return cli.execute_app(self._app, prog_name=self.app_name, args=args)
 
@@ -355,6 +356,7 @@ def main() -> int:
 
     Returns:
         The resulting ``int``.
+
     """
     result = FlextMeltanoCli().run(sys.argv[1:])
     return cli.finalize_result(result)

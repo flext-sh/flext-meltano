@@ -39,6 +39,7 @@ class TestsFlextMeltanoExecutionResult:
 
         Returns:
             The resulting ``m.Meltano.CommandExecutionResult``.
+
         """
         command, success, exit_code, output, error, execution_time = case
         return m.Meltano.CommandExecutionResult(

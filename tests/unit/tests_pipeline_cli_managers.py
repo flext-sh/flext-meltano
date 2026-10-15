@@ -33,6 +33,7 @@ class TestsFlextMeltanoPipelineCliManagers:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         result = meltano_cli.run([
             c.Meltano.CliCommand.PIPELINE,
@@ -52,6 +53,7 @@ class TestsFlextMeltanoPipelineCliManagers:
 
         Returns:
             The resulting ``FlextMeltanoCli``.
+
         """
         # mro-wkii.17 (codex): tests exercise the public Result boundary, never
         # the private framework runner or application object.

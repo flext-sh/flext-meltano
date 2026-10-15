@@ -35,6 +35,7 @@ class FlextMeltanoModelsPayloads:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 

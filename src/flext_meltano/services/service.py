@@ -32,6 +32,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.JsonDict | None``.
+
         """
         if not config:
             return None
@@ -60,6 +61,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         try:
             instance: Self = cls.model_validate({
@@ -98,6 +100,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return cls._create_component_service(
             sink_name,
@@ -116,6 +119,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return cls._create_component_service(
             source_name,
@@ -134,6 +138,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         return cls._create_component_service(
             transformation_name,
@@ -151,6 +156,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.ServicePayload]``.
+
         """
         if not environment_name:
             return r[t.Meltano.ServicePayload].fail("Environment name is required")
@@ -184,6 +190,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         payload: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
@@ -203,6 +210,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.ServicePayload]``.
+
         """
         if not component_type or not component_name:
             return r[t.Meltano.ServicePayload].fail(
@@ -227,6 +235,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         if not isinstance(settings, dict):
             return r[bool].fail("Configuration must be a dictionary")
@@ -238,6 +247,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         handlers_payload: t.JsonValueList = [
             handler.value for handler in c.Meltano.HANDLER_ALL
@@ -256,6 +266,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
@@ -265,6 +276,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.OptionalScalarMap]``.
+
         """
         return r[t.Meltano.OptionalScalarMap].ok({
             "name": c.Meltano.METADATA_APPLICATION_NAME,
@@ -278,6 +290,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return self.validate_service_config(settings.model_dump())
 

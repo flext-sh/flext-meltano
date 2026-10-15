@@ -9,6 +9,7 @@ from __future__ import annotations
 import tempfile
 
 from flext_core import r
+
 from flext_meltano.services import FlextMeltanoAbstractions
 from tests import c, m, t, tm
 

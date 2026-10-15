@@ -28,6 +28,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         if not command:
             return r[t.JsonMapping].fail("Invalid command: must be non-empty list")
@@ -58,6 +59,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         command: t.MutableSequenceOf[str] = [
             c.Meltano.DBT_BINARY,
@@ -83,6 +85,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[tuple[t.StrSequence, t.StrSequence]]``.
+
         """
         source_command: t.MutableSequenceOf[str] = [params.source_name]
         if params.source_config:
@@ -104,6 +107,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         command: t.MutableSequenceOf[str] = [params.source_name]
         if params.discover:
@@ -127,6 +131,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         command: t.MutableSequenceOf[str] = [params.sink_name]
         if params.config_file:

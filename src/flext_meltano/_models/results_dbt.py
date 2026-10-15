@@ -124,6 +124,7 @@ class FlextMeltanoModelsResultsDbt:
 
             Returns:
                 The resulting ``str``.
+
             """
             return u.generate_iso_timestamp()
 

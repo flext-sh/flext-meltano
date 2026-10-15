@@ -152,6 +152,7 @@ class FlextMeltanoUtilitiesSinger:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         stripped = line.strip()
         if not stripped:
@@ -171,6 +172,7 @@ class FlextMeltanoUtilitiesSinger:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         msg_type = raw.get("type", "")
         if msg_type == c.Meltano.SingerMessageType.SCHEMA:
@@ -190,6 +192,7 @@ class FlextMeltanoUtilitiesSinger:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
         result = handler.handle_schema(schema_msg)
@@ -210,6 +213,7 @@ class FlextMeltanoUtilitiesSinger:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
         result = handler.handle_record(record_msg)
@@ -230,6 +234,7 @@ class FlextMeltanoUtilitiesSinger:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
         result = handler.handle_state(state_msg)

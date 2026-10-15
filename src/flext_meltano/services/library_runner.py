@@ -41,6 +41,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         Returns:
             The resulting ``p.Result[t.JsonMapping]`` carrying the payload, or the
             executor failure.
+
         """
         result = self._elt_executor.execute_pipeline(tap_name, target_name, settings)
         if result.failure:
@@ -63,6 +64,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
 
         def _run_execute_complete_elt_pipeline() -> p.Result[t.JsonMapping]:
@@ -108,6 +110,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         executor = (
             FlextMeltanoExecutor(
@@ -130,6 +133,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         try:
             self.logger.info(

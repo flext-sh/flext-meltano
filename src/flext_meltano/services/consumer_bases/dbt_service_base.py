@@ -67,6 +67,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``list[str]``.
+
         """
         return list(args) if args else sys.argv[1:]
 
@@ -79,6 +80,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         models: t.StrSequence | None = rest or None
         match subcommand:
@@ -105,6 +107,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Raises:
             SystemExit: If ``result.failure``.
+
         """
         if result.failure:
             self.logger.warning(
@@ -123,6 +126,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Raises:
             SystemExit: If a ``c.EXC_OS_RUNTIME_TYPE`` is caught.
+
         """
         try:
             command_args = self._cli_arguments(args)
@@ -150,6 +154,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         # NOTE (multi-agent, bead mro-wfc8.3.9): delegate to the single typed
         # executor (FlextMeltanoExecutorBase.execute_dbt_command) — no parallel
@@ -167,6 +172,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
@@ -178,6 +184,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
@@ -189,6 +196,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
 
@@ -197,6 +205,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         return self._run_dbt_cmd(
             c.Meltano.DbtCommand.DOCS,
@@ -212,6 +221,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         if not root.exists():
             return r[bool].fail(str(root))
@@ -223,6 +233,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         if manifest_path is not None:
             return r[Path].ok(manifest_path)
@@ -240,6 +251,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.Meltano.DbtManifestData]``.
+
         """
         parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
         if parsed_result.failure:
@@ -258,6 +270,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.Meltano.DbtManifestData]``.
+
         """
         try:
             path_result = self._resolve_manifest_path(manifest_path)
@@ -275,6 +288,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]``.
+
         """
         manifest_result = self.load_manifest()
         if manifest_result.failure:
@@ -313,6 +327,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok({
             "service": self.dbt_project_name,

@@ -26,6 +26,7 @@ class TestsFlextMeltanoDbtConnectionProfile:
 
         Returns:
             The resulting ``p.Meltano.DbtConnectionProfile``.
+
         """
         return profile
 

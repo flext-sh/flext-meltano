@@ -71,6 +71,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Raises:
             SystemExit: If a ``c.EXC_OS_RUNTIME_TYPE`` is caught.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -91,6 +92,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -111,6 +113,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         try:
             tap = self._get_or_create_tap()
@@ -130,6 +133,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -139,6 +143,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -151,6 +156,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Meltano.SingerTapInstance``.
+
         """
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()
@@ -170,6 +176,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Meltano.SingerTapInstance``.
+
         """
         return FlextMeltanoDeclarativeTap.build(spec, fetcher)
 
@@ -179,6 +186,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok({
             "service": self.tap_name,

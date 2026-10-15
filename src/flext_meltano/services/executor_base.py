@@ -80,6 +80,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``Path | None``.
+
         """
         active_settings = (
             self.runtime_settings
@@ -103,6 +104,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Project]``.
+
         """
         return u.try_(
             lambda: ProjectInitService(project_root).init(activate=False, force=force),
@@ -123,6 +125,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Project]``.
+
         """
         search_root = self._project_search_root(_cwd)
         return u.try_(
@@ -164,6 +167,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         active_settings = (
             self.runtime_settings
@@ -192,6 +196,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         config_data: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.READY,
@@ -212,6 +217,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         if timeout <= 0:
             return r[m.Meltano.CommandExecutionResult].fail(
@@ -328,6 +334,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         try:
             return self.execute_meltano_command(
@@ -346,6 +353,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         prepared_command: t.StrSequence | None = None
         completed_result: m.Meltano.CommandExecutionResult | None = None

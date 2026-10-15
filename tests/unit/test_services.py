@@ -25,6 +25,7 @@ class TestsFlextMeltanoServices:
 
         Raises:
             ValueError: If Unsupported Meltano component kind.
+
         """
         component_kind, component_name, attribute_name = meltano_component_case
         match component_kind:
@@ -58,6 +59,7 @@ class TestsFlextMeltanoServices:
 
         Raises:
             ValueError: If Unsupported Meltano component kind.
+
         """
         match component_kind:
             case "tap":

@@ -14,6 +14,7 @@ from collections.abc import Mapping
 from typing import Annotated, Self, override
 
 from flext_core import FlextService, FlextSettings
+
 from flext_meltano import FlextMeltanoSettings, c, m, p, t, u
 
 
@@ -75,6 +76,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
         Returns:
             The resulting ``t.MappingKV[str, t.JsonPayload | p.Base | type | None] |
                 Self``.
+
         """
         if isinstance(data, cls) or not isinstance(data, Mapping):
             return data

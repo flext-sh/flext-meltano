@@ -63,6 +63,7 @@ class TestsFlextMeltanoDeclarativeTap:
 
         Returns:
             The resulting ``tuple[p.Meltano.SingerTapInstance, Path, io.StringIO]``.
+
         """
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
