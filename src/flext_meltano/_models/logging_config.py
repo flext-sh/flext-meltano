@@ -209,3 +209,6 @@ class FlextMeltanoModelsLogging:
                 "memory": self.transform_memory,
                 "lineage": self.transform_lineage,
             }
+
+
+__all__: list[str] = ["FlextMeltanoModelsLogging"]

@@ -188,3 +188,6 @@ class FlextMeltanoModelsSourcesParams:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"
                 raise ValueError(msg)
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsSourcesParams"]

@@ -260,3 +260,6 @@ class FlextMeltanoModelsProjects:
                 msg = f"Project root directory does not exist: {self.project_root}"
                 raise ValueError(msg)
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsProjects"]

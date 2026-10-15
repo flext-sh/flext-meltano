@@ -213,3 +213,6 @@ class FlextMeltanoModelsContext:
                 msg = "Source component names must be at least 5 characters"
                 raise ValueError(msg)
             return v
+
+
+__all__: list[str] = ["FlextMeltanoModelsContext"]

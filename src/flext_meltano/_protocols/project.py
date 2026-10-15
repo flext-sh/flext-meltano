@@ -105,3 +105,6 @@ class FlextMeltanoProtocolsProject:
         def variants(self) -> t.ConfigurationMapping | None:
             """Available variants."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsProject"]

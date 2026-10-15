@@ -256,3 +256,6 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # BatchDefaults
     BATCH_DEFAULT_COMMAND_TIMEOUT: ClassVar[int] = 300
     BATCH_DEFAULT_DEFAULT_BATCH_SIZE: ClassVar[int] = 1000
+
+
+__all__: list[str] = ["FlextMeltanoConstantsSettings"]

@@ -276,3 +276,6 @@ class FlextMeltanoProtocolsSinger:
         def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[bool]:
             """Handle a STATE message."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsSinger"]

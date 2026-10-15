@@ -210,3 +210,6 @@ class FlextMeltanoModelsResultsPipeline:
                 self.overall_status = c.Meltano.OperationStatus.SUCCESS
 
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsResultsPipeline"]

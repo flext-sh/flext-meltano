@@ -9,3 +9,6 @@ from __future__ import annotations
 
 class FlextMeltanoModelsBase:
     """Base family holder for flext-meltano models."""
+
+
+__all__: list[str] = ["FlextMeltanoModelsBase"]

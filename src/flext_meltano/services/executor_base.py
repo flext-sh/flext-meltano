@@ -430,3 +430,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 "Pipeline execution result missing",
             )
         return r[m.Meltano.CommandExecutionResult].ok(completed_result)
+
+
+__all__: list[str] = ["FlextMeltanoExecutorBase"]

@@ -50,3 +50,6 @@ class FlextMeltanoProtocolsPlugin:
         def sync_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Sync records from the stream. # INTERFACE."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsPlugin"]

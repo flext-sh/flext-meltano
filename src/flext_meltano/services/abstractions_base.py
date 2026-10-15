@@ -297,3 +297,6 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         """
         return [*self._stream_registry.keys()]
+
+
+__all__: list[str] = ["FlextMeltanoAbstractionsBase"]

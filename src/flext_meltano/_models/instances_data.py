@@ -308,3 +308,6 @@ class FlextMeltanoModelsInstancesData:
 
             """
             return self.status == "configured" and self.adapter is not None
+
+
+__all__: list[str] = ["FlextMeltanoModelsInstancesData"]

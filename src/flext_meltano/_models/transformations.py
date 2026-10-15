@@ -295,3 +295,6 @@ class FlextMeltanoModelsTransformations:
                 raise ValueError(msg)
 
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsTransformations"]

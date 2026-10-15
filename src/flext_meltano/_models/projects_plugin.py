@@ -138,3 +138,6 @@ class FlextMeltanoModelsProjectsPlugin:
                 msg = "Plugin must have either pip_url or executable"
                 raise ValueError(msg)
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsProjectsPlugin"]

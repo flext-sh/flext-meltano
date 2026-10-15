@@ -366,3 +366,6 @@ class FlextMeltanoConstantsEnums:
         SCHEMA = "schema"
         STRING = "string"
         TYPE = "type"
+
+
+__all__: list[str] = ["FlextMeltanoConstantsEnums"]

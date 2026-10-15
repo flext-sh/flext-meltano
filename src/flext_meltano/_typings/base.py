@@ -36,3 +36,6 @@ class FlextMeltanoTypingsBase:
 
     type MutableContainerValueMapping = t.MutableFlatContainerMapping
     """Mutable container bridge for Singer SDK record/context mappings."""
+
+
+__all__: list[str] = ["FlextMeltanoTypingsBase"]

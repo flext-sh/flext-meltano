@@ -155,3 +155,6 @@ class FlextMeltanoModelsDiscovery:
 
             """
             return MappingProxyType(dict(value))
+
+
+__all__: list[str] = ["FlextMeltanoModelsDiscovery"]

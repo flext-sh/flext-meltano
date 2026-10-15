@@ -213,3 +213,6 @@ class FlextMeltanoModelsPayloadsData:
                     return result
                 case _:
                     return str(value)
+
+
+__all__: list[str] = ["FlextMeltanoModelsPayloadsData"]
