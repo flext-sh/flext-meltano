@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Utilities - Domain-specific Meltano utilities.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -8,9 +9,11 @@ from __future__ import annotations
 
 from flext_cli import FlextCliUtilities
 
-from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
-from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
+from flext_meltano._utilities import (
+    FlextMeltanoUtilitiesBase,
+    FlextMeltanoUtilitiesRuntime,
+    FlextMeltanoUtilitiesSinger,
+)
 
 
 class FlextMeltanoUtilities(FlextCliUtilities):

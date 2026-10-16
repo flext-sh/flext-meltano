@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Protocols - All protocol definitions for the domain.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -8,11 +9,13 @@ from __future__ import annotations
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano._protocols.base import FlextMeltanoProtocolsBase
-from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
-from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
-from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
-from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
+from flext_meltano._protocols import (
+    FlextMeltanoProtocolsBase,
+    FlextMeltanoProtocolsPlugin,
+    FlextMeltanoProtocolsProject,
+    FlextMeltanoProtocolsServices,
+    FlextMeltanoProtocolsSinger,
+)
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):
