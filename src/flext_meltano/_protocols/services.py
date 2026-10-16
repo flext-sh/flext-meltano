@@ -1,8 +1,5 @@
 """FLEXT Meltano Protocols - Service, CLI, and Manager protocols.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -176,3 +173,6 @@ class FlextMeltanoProtocolsServices:
         def show_target_help(self) -> None:
             """Show target help."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsServices"]

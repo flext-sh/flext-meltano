@@ -11,8 +11,7 @@ from typing import ClassVar
 
 from flext_cli import cli
 
-from flext_meltano import FlextMeltano, c, e, m, p, r, t, u
-from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
+from flext_meltano import FlextMeltano, FlextMeltanoPipelineManager, c, e, m, p, r, t, u
 
 
 class FlextMeltanoCli:
@@ -36,6 +35,7 @@ class FlextMeltanoCli:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return cli.execute_app(self._app, prog_name=self.app_name, args=args)
 
@@ -356,6 +356,7 @@ def main() -> int:
 
     Returns:
         The resulting ``int``.
+
     """
     result = FlextMeltanoCli().run(sys.argv[1:])
     return cli.finalize_result(result)

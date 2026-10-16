@@ -107,7 +107,7 @@ class FlextMeltanoModelsSinger:
             t.MutableFlatContainerMapping,
             m.Field(description="Singer state bookmark payload"),
         ] = m.Field(
-            default_factory=dict[str, t.JsonValue],
+            default_factory=dict,
             description="Singer state bookmark payload",
         )
 
@@ -159,6 +159,7 @@ class FlextMeltanoModelsSinger:
             Raises:
                 ValueError: If bookmark_key and bookmark_value must both be set or both
                     be None.
+
             """
             if (self.bookmark_key is None) != (self.bookmark_value is None):
                 msg = "bookmark_key and bookmark_value must both be set or both be None"
@@ -217,6 +218,7 @@ class FlextMeltanoModelsSinger:
 
             Returns:
                 The resulting ``t.JsonMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -230,3 +232,6 @@ class FlextMeltanoModelsSinger:
             default_factory=tuple[t.JsonMapping, ...],
             description="Fetched records",
         )
+
+
+__all__: list[str] = ["FlextMeltanoModelsSinger"]

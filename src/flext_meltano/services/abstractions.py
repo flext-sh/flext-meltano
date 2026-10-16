@@ -1,8 +1,5 @@
 """FLEXT Pipeline Abstractions - Tap-specific Meltano runtime operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -24,6 +21,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[Self]``.
+
         """
         instance: Self = cls()
         ok_result: p.Result[Self] = r.ok(instance)
@@ -39,6 +37,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.TapConfig]``.
+
         """
         return r[m.Meltano.TapConfig].ok(settings)
 
@@ -48,6 +47,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         return {
             c.Meltano.PayloadKey.TAP_ID: tap_instance.tap_id,
@@ -62,6 +62,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
 
         def _run_discover_streams() -> p.Result[t.JsonMapping]:
@@ -116,6 +117,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
 
         def _run_sync_stream() -> p.Result[t.JsonMapping]:
@@ -171,6 +173,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.TapInstance]``.
+
         """
         try:
             tap_cfg = m.Meltano.TapConfig(
@@ -200,6 +203,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
@@ -233,6 +237,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
@@ -256,6 +261,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonDict]``.
+
         """
         return u.json_dict_sequence_adapter().validate_python(
             raw.get(c.Meltano.PayloadKey.STREAMS, []),

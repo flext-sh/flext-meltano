@@ -40,6 +40,7 @@ class FlextMeltanoModelsSingerCatalog:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -50,6 +51,7 @@ class FlextMeltanoModelsSingerCatalog:
 
             Returns:
                 The resulting ``t.JsonDict``.
+
             """
             return dict(value)
 
@@ -170,6 +172,7 @@ class FlextMeltanoModelsSingerCatalog:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -180,6 +183,7 @@ class FlextMeltanoModelsSingerCatalog:
 
             Returns:
                 The resulting ``t.JsonDict``.
+
             """
             return dict(value)
 
@@ -187,3 +191,6 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeFloat,
             m.Field(description="Execution duration"),
         ]
+
+
+__all__: list[str] = ["FlextMeltanoModelsSingerCatalog"]

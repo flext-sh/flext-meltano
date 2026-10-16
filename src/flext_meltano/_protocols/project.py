@@ -1,8 +1,5 @@
 """FLEXT Meltano Protocols - Project, Adapter, and IndexedPlugin protocols.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -108,3 +105,6 @@ class FlextMeltanoProtocolsProject:
         def variants(self) -> t.ConfigurationMapping | None:
             """Available variants."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsProject"]

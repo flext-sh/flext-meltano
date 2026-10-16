@@ -4,9 +4,6 @@ Centralizes access to configuration singleton while maintaining inheritance
 aligned with `s` from flext-core, avoiding duplication of initialization
 across library services.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -16,10 +13,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated, Self, override
 
-from flext_cli import u
-
 from flext_core import FlextService, FlextSettings
-from flext_meltano import FlextMeltanoSettings, c, m, p, t
+
+from flext_meltano import FlextMeltanoSettings, c, m, p, t, u
 
 
 class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
@@ -80,6 +76,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
         Returns:
             The resulting ``t.MappingKV[str, t.JsonPayload | p.Base | type | None] |
                 Self``.
+
         """
         if isinstance(data, cls) or not isinstance(data, Mapping):
             return data

@@ -10,9 +10,6 @@ Exercises the public contract of ``u.Cli.cli_args_to_model`` when targeting
 
 Pure in-memory dict -> model conversion; no file, network, or database I/O.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

@@ -62,6 +62,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``t.ConfigurationMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -71,6 +72,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``t.StrSequence``.
+
             """
             return [
                 stage
@@ -88,6 +90,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``float``.
+
             """
             total_stages = 3
             completed = 0
@@ -107,6 +110,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``bool``.
+
             """
             s = c.Meltano.OperationStatus.SUCCESS
             return bool(
@@ -127,6 +131,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return self._all_stages_successful()
 
@@ -136,6 +141,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Returns:
                 The resulting ``float``.
+
             """
             total = 0.0
             if self.source_result and self.source_result.duration_seconds:
@@ -159,6 +165,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Raises:
                 ValueError: If Overall status must be one of.
+
             """
             valid_statuses = [
                 c.Meltano.OperationStatus.PENDING,
@@ -181,6 +188,7 @@ class FlextMeltanoModelsResultsPipeline:
 
             Raises:
                 ValueError: If Total records inconsistent with stage results.
+
             """
             total_from_stages = 0
             if self.source_result:
@@ -202,3 +210,6 @@ class FlextMeltanoModelsResultsPipeline:
                 self.overall_status = c.Meltano.OperationStatus.SUCCESS
 
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsResultsPipeline"]

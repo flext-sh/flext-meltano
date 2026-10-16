@@ -54,6 +54,7 @@ class FlextMeltanoSingerTapAdapter:
 
         Returns:
             The resulting ``t.JsonValue``.
+
         """
         if value is None:
             return None
@@ -80,6 +81,7 @@ class FlextMeltanoSingerTapAdapter:
 
         Returns:
             The resulting ``int``.
+
         """
         try:
             singer_command = self._tap.get_singer_command()
@@ -94,6 +96,7 @@ class FlextMeltanoSingerTapAdapter:
 
         Returns:
             The resulting ``t.SequenceOf[p.Meltano.SingerStreamInfo]``.
+
         """
         streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap.discover_streams()
         return streams

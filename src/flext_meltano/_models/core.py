@@ -25,6 +25,7 @@ class FlextMeltanoModelsCore:
 
         Returns:
             The resulting ``t.FlatContainerMapping``.
+
         """
         match value:
             case Mapping():
@@ -41,6 +42,7 @@ class FlextMeltanoModelsCore:
 
         Returns:
             The resulting ``t.FlatContainerMapping``.
+
         """
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -71,6 +73,7 @@ class FlextMeltanoModelsCore:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         validated: FlextMeltanoModelsCore.StringListValue = (
             FlextMeltanoModelsCore.StringListValue.model_validate({"items": value})
@@ -95,6 +98,7 @@ class FlextMeltanoModelsCore:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -105,6 +109,7 @@ class FlextMeltanoModelsCore:
 
             Returns:
                 The resulting ``t.JsonDict``.
+
             """
             return dict(value)
 
@@ -126,7 +131,11 @@ class FlextMeltanoModelsCore:
 
             Returns:
                 The resulting ``t.StrTuple``.
+
             """
             if isinstance(value, (list, tuple, set)):
                 return tuple(str(item) for item in value if item is not None)
             return ()
+
+
+__all__: list[str] = ["FlextMeltanoModelsCore"]

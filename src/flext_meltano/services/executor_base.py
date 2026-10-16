@@ -1,8 +1,5 @@
 """FLEXT Meltano Executor - Base class with core command execution.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -18,14 +15,9 @@ from pathlib import Path
 from typing import Annotated, override
 
 from flext_cli import cli
-
-# Why: upstream Meltano ships no type stubs for these modules; the fleet
-# stub-file rule forbids authoring stubs in-repo, so the untyped third-party
-# import is admitted explicitly and narrowly per module.
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
-from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_init_service import (
     ProjectInitService,
@@ -87,6 +79,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``Path | None``.
+
         """
         active_settings = (
             self.runtime_settings
@@ -110,6 +103,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Project]``.
+
         """
         return u.try_(
             lambda: ProjectInitService(project_root).init(activate=False, force=force),
@@ -130,6 +124,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Project]``.
+
         """
         search_root = self._project_search_root(_cwd)
         return u.try_(
@@ -171,6 +166,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         active_settings = (
             self.runtime_settings
@@ -199,6 +195,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         config_data: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.READY,
@@ -219,6 +216,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         if timeout <= 0:
             return r[m.Meltano.CommandExecutionResult].fail(
@@ -276,7 +274,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 CliError,
                 EmptyMeltanoFileException,
                 MeltanoError,
-                PluginNotFoundError,
                 ProjectNotFound,
                 ValueError,
                 TypeError,
@@ -335,6 +332,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         try:
             return self.execute_meltano_command(
@@ -353,6 +351,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+
         """
         prepared_command: t.StrSequence | None = None
         completed_result: m.Meltano.CommandExecutionResult | None = None
@@ -429,3 +428,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 "Pipeline execution result missing",
             )
         return r[m.Meltano.CommandExecutionResult].ok(completed_result)
+
+
+__all__: list[str] = ["FlextMeltanoExecutorBase"]

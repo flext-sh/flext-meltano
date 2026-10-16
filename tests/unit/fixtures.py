@@ -38,6 +38,7 @@ def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.Componen
 
     Returns:
         The resulting ``MeltanoComponentCase``.
+
     """
     case_index: int = request.param
     tm.that(case_index, is_=int)
@@ -59,6 +60,7 @@ def meltano_project_dir() -> Generator[Path]:
 
     Yields:
         Each ``Path``.
+
     """
     with tf().temporary_directory() as temp_dir:
         project_dir = temp_dir / "test_meltano_project"
@@ -72,6 +74,7 @@ def meltano_yml_config() -> t.JsonMapping:
 
     Returns:
         The resulting ``t.JsonMapping``.
+
     """
     return {
         "requires_meltano": c.Meltano.VERSION_MELTANO_REQUIREMENT,
@@ -138,6 +141,7 @@ def meltano_project(
 
     Returns:
         The resulting ``t.Meltano.ProjectEnv``.
+
     """
     meltano_yml = meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
@@ -157,6 +161,7 @@ def singer_state() -> t.JsonMapping:
 
     Returns:
         The resulting ``t.JsonMapping``.
+
     """
     return {
         "type": "STATE",
@@ -177,6 +182,7 @@ def docker_manager() -> FlextTestsDocker:
 
     Returns:
         The resulting ``FlextTestsDocker``.
+
     """
     return FlextTestsDocker.stack(
         c.Meltano.Tests.COMPOSE_FILE,
@@ -212,6 +218,7 @@ def docker_services(
 
     Returns:
         The resulting ``FlextTestsDocker``.
+
     """
     result = docker_manager.execute()
     if result.failure:
@@ -238,6 +245,7 @@ def postgres_service(docker_services: FlextTestsDocker) -> str:
 
     Returns:
         The resulting ``str``.
+
     """
     return require_docker_service(
         docker_services,
@@ -252,6 +260,7 @@ def redis_service(docker_services: FlextTestsDocker) -> str:
 
     Returns:
         The resulting ``str``.
+
     """
     return require_docker_service(docker_services, c.Meltano.Tests.REDIS_PORT, "Redis")
 
@@ -262,6 +271,7 @@ def meltano_service(docker_services: FlextTestsDocker) -> str:
 
     Returns:
         The resulting ``str``.
+
     """
     info = docker_services.fetch_container_info(c.Meltano.Tests.PRIMARY_CONTAINER_NAME)
     if info.failure:

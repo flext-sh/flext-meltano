@@ -46,10 +46,11 @@ class FlextMeltanoModelsInstancesData:
 
         @m.computed_field
         def max_records_capacity(self) -> int:
-            """Maximum records capacity.
+            """Return the maximum records capacity.
 
             Returns:
                 The resulting ``int``.
+
             """
             batch_size: int = self.batch_size
             max_batches: int = self.max_batches
@@ -57,10 +58,11 @@ class FlextMeltanoModelsInstancesData:
 
         @m.computed_field
         def processing_efficiency(self) -> str:
-            """Processing efficiency assessment.
+            """Classify the processing efficiency tier.
 
             Returns:
                 The resulting ``str``.
+
             """
             if (
                 self.batch_size
@@ -76,10 +78,11 @@ class FlextMeltanoModelsInstancesData:
 
         @m.computed_field
         def sink_identifier(self) -> str:
-            """Unique sink identifier.
+            """Return the unique sink identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.sink_type}:batch_{self.batch_size}"
 
@@ -91,8 +94,9 @@ class FlextMeltanoModelsInstancesData:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Sink type must be non-empty string; or if Batch size too
-                    large (max.
+                ValueError: If the sink type is empty, or the batch size exceeds the
+                    configured maximum.
+
             """
             if not self.sink_type or not self.sink_type.strip():
                 msg = "Sink type must be non-empty string"
@@ -155,9 +159,13 @@ class FlextMeltanoModelsInstancesData:
         ) -> Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition]:
             """Expose discovered streams as a read-only mapping.
 
+            Args:
+                value: The validated stream mapping.
+
             Returns:
                 The resulting ``Mapping[str,
                     FlextMeltanoModelsSourcesParams.StreamDefinition]``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -169,17 +177,22 @@ class FlextMeltanoModelsInstancesData:
         ) -> t.ConfigurationMapping:
             """Expose source metadata as a read-only mapping.
 
+            Args:
+                value: The validated metadata mapping.
+
             Returns:
                 The resulting ``t.ConfigurationMapping``.
+
             """
             return MappingProxyType(dict(value))
 
         @m.computed_field
         def active_stream_count(self) -> int:
-            """Number of active streams.
+            """Return the number of active streams.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len([
                 stream
@@ -193,6 +206,7 @@ class FlextMeltanoModelsInstancesData:
 
             Returns:
                 The resulting ``bool``.
+
             """
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
                 list(self.streams.values())
@@ -205,19 +219,21 @@ class FlextMeltanoModelsInstancesData:
 
         @m.computed_field
         def stream_count(self) -> int:
-            """Number of discovered streams.
+            """Return the number of discovered streams.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.streams)
 
         @m.computed_field
         def total_records_extracted(self) -> int:
-            """Total records extracted across all streams.
+            """Return the total records extracted across all streams.
 
             Returns:
                 The resulting ``int``.
+
             """
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
                 list(self.streams.values())
@@ -237,8 +253,9 @@ class FlextMeltanoModelsInstancesData:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Source type must match between instance and config; or if
-                    Discovered source must have at least one stream.
+                ValueError: If the source type differs between instance and config, or
+                    a discovered source has no streams.
+
             """
             if self.settings.source_type != self.source_type:
                 msg = "Source type must match between instance and config"
@@ -288,5 +305,9 @@ class FlextMeltanoModelsInstancesData:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return self.status == "configured" and self.adapter is not None
+
+
+__all__: list[str] = ["FlextMeltanoModelsInstancesData"]

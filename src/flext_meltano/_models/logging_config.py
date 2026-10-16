@@ -139,6 +139,7 @@ class FlextMeltanoModelsLogging:
 
             Returns:
                 The resulting ``t.BoolMapping``.
+
             """
             return {
                 "operations": self.extract_operations,
@@ -157,6 +158,7 @@ class FlextMeltanoModelsLogging:
 
             Returns:
                 The resulting ``t.BoolMapping``.
+
             """
             return {
                 "operations": self.load_operations,
@@ -175,6 +177,7 @@ class FlextMeltanoModelsLogging:
 
             Returns:
                 The resulting ``t.BoolMapping``.
+
             """
             return {
                 "execution": self.pipeline_execution,
@@ -194,6 +197,7 @@ class FlextMeltanoModelsLogging:
 
             Returns:
                 The resulting ``t.BoolMapping``.
+
             """
             return {
                 "operations": self.transform_operations,
@@ -205,3 +209,6 @@ class FlextMeltanoModelsLogging:
                 "memory": self.transform_memory,
                 "lineage": self.transform_lineage,
             }
+
+
+__all__: list[str] = ["FlextMeltanoModelsLogging"]

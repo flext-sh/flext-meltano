@@ -7,9 +7,6 @@ exposes, which legacy nested namespaces and duplicate aliases it refuses,
 where runtime Singer SDK wrappers live, and the public model behavior of
 the exported Singer catalog model.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

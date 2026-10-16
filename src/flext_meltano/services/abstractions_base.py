@@ -1,8 +1,5 @@
 """FLEXT Pipeline Abstractions - Base class with in-process Meltano operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -13,8 +10,16 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano._settings import FlextMeltanoSettings
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
@@ -39,6 +44,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``FlextMeltanoSettings``.
+
         """
         return FlextMeltanoSettings.fetch_global()
 
@@ -47,6 +53,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         cwd = Path(self._settings().Meltano.project_root)
         run_result: p.Result[m.Meltano.CommandExecutionResult] = (
@@ -68,6 +75,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -94,6 +102,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``Path | None``.
+
         """
         if isinstance(project, Mapping):
             project_mapping = t.Cli.JSON_MAPPING_ADAPTER.validate_python(project)
@@ -112,6 +121,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.Meltano.NestedStrMapping]``.
+
         """
         try:
             cwd = self._resolve_project_root(_project)
@@ -146,6 +156,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.HeaderMapping]``.
+
         """
 
         def _run_execute_singer_pipeline() -> p.Result[t.HeaderMapping]:
@@ -188,6 +199,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         try:
             if not project_root.exists() or not project_root.is_dir():
@@ -204,6 +216,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         project_root = self._settings().Meltano.project_root
         if not project_root:
@@ -219,6 +232,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         meltano_settings = self._settings().Meltano
         payload: t.JsonMapping = {
@@ -237,6 +251,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[m.Meltano.SingerCatalogEntry]``.
+
         """
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": stream.stream_name,
@@ -255,6 +270,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         if settings.stream_config and stream_name in settings.stream_config:
             val = settings.stream_config[stream_name]
@@ -268,6 +284,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``str``.
+
         """
         tap_type: str = tap_instance.tap_type
         return tap_type
@@ -277,5 +294,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         return [*self._stream_registry.keys()]
+
+
+__all__: list[str] = ["FlextMeltanoAbstractionsBase"]

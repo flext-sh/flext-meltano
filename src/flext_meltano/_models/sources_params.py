@@ -113,6 +113,7 @@ class FlextMeltanoModelsSourcesParams:
 
             Returns:
                 The resulting ``bool``.
+
             """
             records_extracted: int = self.records_extracted
             return records_extracted > 0
@@ -123,15 +124,17 @@ class FlextMeltanoModelsSourcesParams:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return self.status in c.Meltano.ACTIVE_STATUSES
 
         @m.computed_field
         def schema_properties_count(self) -> int:
-            """Number of schema properties.
+            """Return the number of schema properties.
 
             Returns:
                 The resulting ``int``.
+
             """
             properties = self.stream_schema.get("properties", {})
             match properties:
@@ -147,8 +150,12 @@ class FlextMeltanoModelsSourcesParams:
         ) -> t.FlatContainerMapping:
             """Normalize stream schema structure.
 
+            Args:
+                value: The stream schema mapping to normalize.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             result: t.JsonDict = dict(value)
             if "properties" not in result:
@@ -166,8 +173,9 @@ class FlextMeltanoModelsSourcesParams:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Stream schema must contain properties; or if Status must
-                    be one of.
+                ValueError: If the stream schema has no properties, or the status is
+                    not one of the valid statuses.
+
             """
             if "properties" not in self.stream_schema:
                 msg = "Stream schema must contain properties"
@@ -180,3 +188,6 @@ class FlextMeltanoModelsSourcesParams:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"
                 raise ValueError(msg)
             return self
+
+
+__all__: list[str] = ["FlextMeltanoModelsSourcesParams"]

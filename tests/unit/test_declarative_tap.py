@@ -55,15 +55,26 @@ class TestsFlextMeltanoDeclarativeTap:
             streams=(stream,),
         )
 
-    def test_discover_emits_catalog_with_declared_stream(self, tmp_path: Path) -> None:
-        """A flat ``--config --discover`` run emits the declared stream catalog."""
+    def _setup(
+        self,
+        tmp_path: Path,
+    ) -> tuple[p.Meltano.SingerTapInstance, Path, io.StringIO]:
+        """Build the tap instance and write the CLI config for one flat run.
+
+        Returns:
+            The resulting ``tuple[p.Meltano.SingerTapInstance, Path, io.StringIO]``.
+
+        """
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
         config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
         tm.ok(config_result)
         config_path.write_text(config_result.value)
+        return instance, config_path, io.StringIO()
 
-        buffer = io.StringIO()
+    def test_discover_emits_catalog_with_declared_stream(self, tmp_path: Path) -> None:
+        """A flat ``--config --discover`` run emits the declared stream catalog."""
+        instance, config_path, buffer = self._setup(tmp_path)
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
                 ["--config", str(config_path), "--discover"],
@@ -82,13 +93,7 @@ class TestsFlextMeltanoDeclarativeTap:
 
     def test_sync_emits_fetched_record(self, tmp_path: Path) -> None:
         """A flat ``--config`` run emits the fetcher's validated Singer record."""
-        instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
-        config_path = tmp_path / "config.json"
-        config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
-        tm.ok(config_result)
-        config_path.write_text(config_result.value)
-
-        buffer = io.StringIO()
+        instance, config_path, buffer = self._setup(tmp_path)
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(["--config", str(config_path)], "tap-sample")
 

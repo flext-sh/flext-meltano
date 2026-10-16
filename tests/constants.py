@@ -7,9 +7,6 @@ Inheritance hierarchy:
 - FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
 - c.Meltano inner namespace - Provides .Meltano.* from production constants
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

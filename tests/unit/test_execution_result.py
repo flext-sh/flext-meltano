@@ -32,6 +32,26 @@ class TestsFlextMeltanoExecutionResult:
         timestamp: str
 
     @staticmethod
+    def _build_result(
+        case: _ExecutionResultCase,
+    ) -> m.Meltano.CommandExecutionResult:
+        """Construct the public result from one parametrized case tuple.
+
+        Returns:
+            The resulting ``m.Meltano.CommandExecutionResult``.
+
+        """
+        command, success, exit_code, output, error, execution_time = case
+        return m.Meltano.CommandExecutionResult(
+            command=command,
+            success=success,
+            exit_code=exit_code,
+            output=output,
+            error=error,
+            execution_time=execution_time,
+        )
+
+    @staticmethod
     @pytest.mark.parametrize(
         "case",
         [
@@ -59,14 +79,7 @@ class TestsFlextMeltanoExecutionResult:
     ) -> None:
         """Public fields expose exactly the values supplied at construction."""
         command, success, exit_code, output, error, execution_time = case
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=success,
-            exit_code=exit_code,
-            output=output,
-            error=error,
-            execution_time=execution_time,
-        )
+        result = TestsFlextMeltanoExecutionResult._build_result(case)
         tm.that(list(result.command), eq=list(command))
         tm.that(result.success, eq=success)
         tm.that(result.exit_code, eq=exit_code)
@@ -115,14 +128,7 @@ class TestsFlextMeltanoExecutionResult:
     ) -> None:
         """``to_dict`` mirrors every public field plus an ISO timestamp."""
         command, success, exit_code, output, error, execution_time = case
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=success,
-            exit_code=exit_code,
-            output=output,
-            error=error,
-            execution_time=execution_time,
-        )
+        result = TestsFlextMeltanoExecutionResult._build_result(case)
         result_dict = result.to_dict()
         tm.that(result_dict["command"], eq=command)
         tm.that(result_dict["success"], eq=success)
@@ -167,14 +173,7 @@ class TestsFlextMeltanoExecutionResult:
     ) -> None:
         """Serialized JSON validates back into the documented public shape."""
         command, success, exit_code, output, error, execution_time = case
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=success,
-            exit_code=exit_code,
-            output=output,
-            error=error,
-            execution_time=execution_time,
-        )
+        result = TestsFlextMeltanoExecutionResult._build_result(case)
         json_str = result.model_dump_json()
         fixture = TestsFlextMeltanoExecutionResult.ExecutionResultJsonFixture
         parsed = fixture.model_validate_json(json_str)

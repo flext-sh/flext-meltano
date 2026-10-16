@@ -3,9 +3,6 @@
 Consumer packages import these from ``flext_meltano`` (package root ABI).
 Implementations live under ``flext_meltano.services.consumer_bases``.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

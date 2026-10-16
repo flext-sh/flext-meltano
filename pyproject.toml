@@ -2,7 +2,7 @@
 # @flext-owner: flext-infra/config/codegen.yaml + flext-infra/src/flext_infra/templates/project/base/pyproject.toml.j2
 # @flext-adjust: MANAGED=conflict_sections + overwrite_project_keys. CUSTOM=preserve_project_keys and [tool.*] outside conflict_sections. Never edit this projection.
 # @flext-regenerate: make gen
-
+# @flext-rendered-by: flext-infra 0.12.0
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling"]
@@ -30,7 +30,7 @@ dependencies = [
   "pydantic-settings>=2.15.0",
   "pyyaml>=6.0.3",
   "redis>=8.1.0",
-  "singer-sdk>=0.54.7",
+  "singer-sdk>=0.54.8",
   "sqlalchemy>=2.0.54",
   "structlog>=26.1.0,<27",
   "typing-extensions>=4.16.0",
@@ -66,10 +66,9 @@ Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 Homepage = "https://github.com/flext-sh/flext"
 Repository = "https://github.com/flext-sh/flext"
 
+[project.optional-dependencies]
+
 [dependency-groups]
-codegen = [
-  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
-]
 dev = [
   "actionlint-py>=1.7.12.24",
   "bandit>=1.9.4",
@@ -131,6 +130,9 @@ dev = [
   "vulture>=2.16",
   "yamlfix>=1.19.1",
 ]
+codegen = [
+  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
+]
 
 [tool.codespell]
 check-filenames = true
@@ -155,8 +157,8 @@ omit = [
 ]
 
 [tool.deptry]
-known_first_party = ["flext_core", "flext_meltano"]
-pep621_dev_dependency_groups = ["dev"]
+known_first_party = ["flext_meltano"]
+optional_dependencies_dev_groups = ["dev"]
 
 [tool.flext.docs]
 package_name = "flext_meltano"
@@ -173,8 +175,14 @@ include = ["/src/flext_meltano/**"]
 [tool.hatch.build.targets.wheel.sources]
 "src/flext_meltano" = "flext_meltano"
 
+[tool.hatch.build.targets.wheel.force-include]
+"pyproject.toml" = "flext_meltano/pyproject.toml"
+
 [tool.hatch.build.targets.sdist]
 include = ["/src/flext_meltano/**"]
+
+[tool.hatch.build.targets.sdist.force-include]
+"pyproject.toml" = "pyproject.toml"
 
 [tool.mypy]
 mypy_path = ["src"]
@@ -368,7 +376,7 @@ addopts = [
   "--strict-markers",
   "--markdown-docs",
   "--durations=10",
-  "--timeout=10",
+  "--flext-enforce-strict",
 ]
 flext_slow_timeout_seconds = "30"
 asyncio_default_fixture_loop_scope = "function"
@@ -432,6 +440,7 @@ extend-safe-fixes = [
   "relative-imports",
   "typing-only-first-party-import",
 ]
+extend-select = ["missing-blank-line-after-last-section"]
 ignore = [
   "camelcase-imported-as-lowercase",
   "implicit-namespace-package",
@@ -444,15 +453,11 @@ ignore = [
 ]
 select = ["ALL"]
 unfixable = [
-  "duplicate-value",
   "multi-value-repeated-key-literal",
   "multi-value-repeated-key-variable",
-  "outdated-version-block",
   "p-print",
   "print",
   "pytest-duplicate-parametrize-test-cases",
-  "redefined-while-unused",
-  "unused-variable",
 ]
 
 [tool.ruff.lint.flake8-copyright]
@@ -476,31 +481,32 @@ runtime-evaluated-base-classes = [
   "flext_meltano._constants.settings.FlextMeltanoConstantsSettings",
   "flext_meltano._models.cli_params.CatalogStateParams",
   "flext_meltano._models.payloads.FrozenConfigPayload",
+  "flext_meltano._models.sources._StreamConfigEntity",
   "flext_meltano.m.Value",
-  "flext_meltano.services.abstractions.FlextMeltanoAbstractions",
+  "flext_meltano.services.FlextMeltanoAbstractions",
+  "flext_meltano.services.FlextMeltanoAdapter",
+  "flext_meltano.services.FlextMeltanoBridge",
+  "flext_meltano.services.FlextMeltanoComponentService",
+  "flext_meltano.services.FlextMeltanoDbtProjectMixin",
+  "flext_meltano.services.FlextMeltanoDbtRunnerMixin",
+  "flext_meltano.services.FlextMeltanoExecutor",
+  "flext_meltano.services.FlextMeltanoLibraryRunner",
+  "flext_meltano.services.FlextMeltanoPluginDiscoveryMixin",
+  "flext_meltano.services.FlextMeltanoProjectManager",
+  "flext_meltano.services.FlextMeltanoProjectService",
+  "flext_meltano.services.FlextMeltanoService",
+  "flext_meltano.services.FlextMeltanoSingerCatalogMixin",
+  "flext_meltano.services.FlextMeltanoSingerCliTranslator",
+  "flext_meltano.services.FlextMeltanoSingerStateMixin",
+  "flext_meltano.services.FlextMeltanoTapAbstractions",
+  "flext_meltano.services.FlextMeltanoTapSourceMixin",
+  "flext_meltano.services.FlextMeltanoTargetAbstractions",
+  "flext_meltano.services.FlextMeltanoValidators",
   "flext_meltano.services.abstractions_base.FlextMeltanoAbstractionsBase",
-  "flext_meltano.services.adapters.FlextMeltanoAdapter",
-  "flext_meltano.services.bridge.FlextMeltanoBridge",
-  "flext_meltano.services.consumer_bases.dbt_service_base.FlextMeltanoDbtServiceBase",
-  "flext_meltano.services.consumer_bases.tap_service_base.FlextMeltanoTapServiceBase",
-  "flext_meltano.services.consumer_bases.target_service_base.FlextMeltanoTargetServiceBase",
-  "flext_meltano.services.dbt_project.FlextMeltanoDbtProjectMixin",
-  "flext_meltano.services.dbt_runner.FlextMeltanoDbtRunnerMixin",
-  "flext_meltano.services.executor.FlextMeltanoExecutor",
+  "flext_meltano.services.consumer_bases.FlextMeltanoDbtServiceBase",
+  "flext_meltano.services.consumer_bases.FlextMeltanoTapServiceBase",
+  "flext_meltano.services.consumer_bases.FlextMeltanoTargetServiceBase",
   "flext_meltano.services.executor_base.FlextMeltanoExecutorBase",
-  "flext_meltano.services.library_runner.FlextMeltanoLibraryRunner",
-  "flext_meltano.services.meltano_plugin_discovery.FlextMeltanoPluginDiscoveryMixin",
-  "flext_meltano.services.meltano_plugins.FlextMeltanoComponentService",
-  "flext_meltano.services.meltano_project_sdk.FlextMeltanoProjectManager",
-  "flext_meltano.services.project_service.FlextMeltanoProjectService",
-  "flext_meltano.services.service.FlextMeltanoService",
-  "flext_meltano.services.singer_catalog.FlextMeltanoSingerCatalogMixin",
-  "flext_meltano.services.singer_state.FlextMeltanoSingerStateMixin",
-  "flext_meltano.services.singer_tap.FlextMeltanoTapAbstractions",
-  "flext_meltano.services.singer_target.FlextMeltanoTargetAbstractions",
-  "flext_meltano.services.singer_translator.FlextMeltanoSingerCliTranslator",
-  "flext_meltano.services.tap_source_mixin.FlextMeltanoTapSourceMixin",
-  "flext_meltano.services.validators.FlextMeltanoValidators",
   "flext_tests.FlextTestsServiceBase",
   "flext_tests.FlextTestsSettings",
   "flext_tests.FlextTestsUtilities.Tests",
@@ -529,7 +535,7 @@ msg = "Use cli.create_app_with_common_params / cli.register_command from flext_c
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false
-known-first-party = ["flext_core", "flext_meltano"]
+known-first-party = ["flext_meltano"]
 split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]

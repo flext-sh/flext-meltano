@@ -43,6 +43,7 @@ class FlextMeltanoModelsDiscovery:
 
             Returns:
                 The resulting ``str``.
+
             """
             return "" if value is None else str(value)
 
@@ -56,6 +57,7 @@ class FlextMeltanoModelsDiscovery:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
@@ -69,6 +71,7 @@ class FlextMeltanoModelsDiscovery:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -110,6 +113,7 @@ class FlextMeltanoModelsDiscovery:
             Returns:
                 The resulting ``Mapping[str,
                     FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
+
             """
             return MappingProxyType[
                 str,
@@ -133,6 +137,7 @@ class FlextMeltanoModelsDiscovery:
 
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
@@ -147,5 +152,9 @@ class FlextMeltanoModelsDiscovery:
             Returns:
                 The resulting ``Mapping[str,
                     FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
+
             """
             return MappingProxyType(dict(value))
+
+
+__all__: list[str] = ["FlextMeltanoModelsDiscovery"]

@@ -1,8 +1,5 @@
 """FLEXT Meltano Protocols - Plugin and Stream protocols.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -53,3 +50,6 @@ class FlextMeltanoProtocolsPlugin:
         def sync_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Sync records from the stream. # INTERFACE."""
             ...
+
+
+__all__: list[str] = ["FlextMeltanoProtocolsPlugin"]

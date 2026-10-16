@@ -146,3 +146,6 @@ class FlextMeltanoModelsCliParams:
             bool,
             m.Field(default=False, description="Run with full refresh"),
         ] = False
+
+
+__all__: list[str] = ["FlextMeltanoModelsCliParams"]

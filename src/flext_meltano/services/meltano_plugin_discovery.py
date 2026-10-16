@@ -1,8 +1,5 @@
 """Plugin discovery operations for FlextMeltanoComponentService.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -10,8 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.project_service import FlextMeltanoProjectService
+from flext_meltano.services import FlextMeltanoAbstractions, FlextMeltanoProjectService
 
 
 class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
@@ -23,6 +19,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``bool``.
+
         """
         if value is None:
             return False
@@ -38,6 +35,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``t.StrMapping``.
+
         """
         source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
         return u.Meltano.build_plugin_discovery_item(plugin_name, plugin_type, source)
@@ -52,6 +50,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
         plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
             "plugins": plugins_data,
@@ -76,6 +75,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.StrMapping]]``.
+
         """
         try:
             return self._discover_plugins(project)
@@ -92,6 +92,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.StrMapping]]``.
+
         """
         self.logger.info("Discovering Meltano plugins")
         working_project: t.JsonPayload | t.Meltano.DbtProject
@@ -143,6 +144,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         Returns:
             The resulting ``p.Result[t.StrMapping]``.
+
         """
 
         def _run_fetch_plugin_info() -> p.Result[t.StrMapping]:
