@@ -18,7 +18,6 @@ from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
-from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_init_service import (
     ProjectInitService,
@@ -275,7 +274,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 CliError,
                 EmptyMeltanoFileException,
                 MeltanoError,
-                PluginNotFoundError,
                 ProjectNotFound,
                 ValueError,
                 TypeError,
