@@ -13,24 +13,22 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano.services import consumer_bases
+    from flext_meltano.services import consumer_bases as consumer_bases
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+    from flext_meltano.services.abstractions_base import FlextMeltanoAbstractionsBase
     from flext_meltano.services.adapters import FlextMeltanoAdapter
     from flext_meltano.services.bridge import FlextMeltanoBridge
-    from flext_meltano.services.consumer_bases.dbt_service_base import (
+    from flext_meltano.services.consumer_bases import (
+        FlextMeltanoConsumerBases,
         FlextMeltanoDbtServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.facade import FlextMeltanoConsumerBases
-    from flext_meltano.services.consumer_bases.tap_service_base import (
         FlextMeltanoTapServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.target_service_base import (
         FlextMeltanoTargetServiceBase,
     )
     from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
     from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
     from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
     from flext_meltano.services.executor import FlextMeltanoExecutor
+    from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
     from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
     from flext_meltano.services.meltano_plugin_discovery import (
         FlextMeltanoPluginDiscoveryMixin,
@@ -57,6 +55,7 @@ if TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "FlextMeltanoAbstractions",
+    "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoComponentService",
@@ -66,6 +65,7 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoDbtServiceBase",
     "FlextMeltanoDeclarativeTap",
     "FlextMeltanoExecutor",
+    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoProjectManager",
@@ -93,6 +93,7 @@ install_lazy_exports(
     globals(),
     MappingProxyType({
         "FlextMeltanoAbstractions": ".abstractions",
+        "FlextMeltanoAbstractionsBase": ".abstractions_base",
         "FlextMeltanoAdapter": ".adapters",
         "FlextMeltanoBridge": ".bridge",
         "FlextMeltanoComponentService": ".meltano_plugins",
@@ -102,6 +103,7 @@ install_lazy_exports(
         "FlextMeltanoDbtServiceBase": ".consumer_bases.dbt_service_base",
         "FlextMeltanoDeclarativeTap": ".declarative_tap",
         "FlextMeltanoExecutor": ".executor",
+        "FlextMeltanoExecutorBase": ".executor_base",
         "FlextMeltanoLibraryRunner": ".library_runner",
         "FlextMeltanoPluginDiscoveryMixin": ".meltano_plugin_discovery",
         "FlextMeltanoProjectManager": ".meltano_project_sdk",

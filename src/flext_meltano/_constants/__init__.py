@@ -17,9 +17,14 @@ if TYPE_CHECKING:
         FlextMeltanoConstantsBase,
         FlextMeltanoConstantsEnums,
     )
+    from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 
-__all__: tuple[str, ...] = ("FlextMeltanoConstantsBase", "FlextMeltanoConstantsEnums")
+__all__: tuple[str, ...] = (
+    "FlextMeltanoConstantsBase",
+    "FlextMeltanoConstantsEnums",
+    "FlextMeltanoConstantsSettings",
+)
 
 install_lazy_exports(
     __name__,
@@ -27,6 +32,7 @@ install_lazy_exports(
     MappingProxyType({
         "FlextMeltanoConstantsBase": ".base",
         "FlextMeltanoConstantsEnums": ".base",
+        "FlextMeltanoConstantsSettings": ".settings",
     }),
     public_exports=__all__,
 )
