@@ -160,11 +160,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         """
         if not environment_name:
             return r[t.Meltano.ServicePayload].fail("Environment name is required")
-        normalized_environment = str(
-            c.Meltano.ENVIRONMENT_ALIASES.get(
-                environment_name.strip().lower(),
-                environment_name.strip().lower(),
-            ),
+        normalized_environment = c.Meltano.ENVIRONMENT_ALIASES.get(
+            environment_name.strip().lower(),
+            environment_name.strip().lower(),
         )
         if normalized_environment not in c.Meltano.ENVIRONMENTS_VALID:
             return r[t.Meltano.ServicePayload].fail(

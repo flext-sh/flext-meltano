@@ -18,32 +18,32 @@ import pytest
 from flext_meltano import m, meltano, p, t
 from tests import tm
 
-# Keys every command-execution payload must expose per the public contract
-# (u.Meltano.build_command_execution_payload): status/success/output/error/
-# exit_code plus the execution_time duration field.
-_BASE_PAYLOAD_KEYS: t.VariadicTuple[str] = (
-    "status",
-    "success",
-    "output",
-    "error",
-    "exit_code",
-    "execution_time",
-)
-
-# Attributes the typed CommandExecutionResult exposes per the public contract.
-_COMMAND_RESULT_ATTRIBUTES: t.VariadicTuple[str] = (
-    "command",
-    "success",
-    "output",
-    "error",
-    "exit_code",
-    "execution_time",
-)
-
 
 @pytest.mark.docker
 class TestsFlextMeltanoLibraryRunner:
     """Assert the public library-runner contract via the ``meltano`` facade."""
+
+    # Keys every command-execution payload must expose per the public contract
+    # (u.Meltano.build_command_execution_payload): status/success/output/error/
+    # exit_code plus the execution_time duration field.
+    _BASE_PAYLOAD_KEYS: t.VariadicTuple[str] = (
+        "status",
+        "success",
+        "output",
+        "error",
+        "exit_code",
+        "execution_time",
+    )
+
+    # Attributes the typed CommandExecutionResult exposes per the public contract.
+    _COMMAND_RESULT_ATTRIBUTES: t.VariadicTuple[str] = (
+        "command",
+        "success",
+        "output",
+        "error",
+        "exit_code",
+        "execution_time",
+    )
 
     @pytest.fixture(scope="class")
     @staticmethod

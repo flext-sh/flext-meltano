@@ -17,20 +17,20 @@ from flext_tests import FlextTestsTypes, tm
 from flext_meltano import FlextMeltanoTypes
 from tests import TestsFlextMeltanoTypes, t
 
-# (alias name, resolved __value__ repr fragment) — real public contract table.
-_MELTANO_TYPE_ALIASES: tuple[tuple[str, str], ...] = (
-    ("DbtManifestData", "JsonMapping"),
-    ("DbtProject", "JsonMapping"),
-    ("EnvironmentInput", "Environment"),
-    ("NestedStrMapping", "Mapping"),
-    ("OptionalScalarMap", "Scalar"),
-    ("ServicePayload", "JsonMapping"),
-    ("ValidatorInput", "JsonValue"),
-)
-
 
 class TestsFlextMeltanoSingerTypes:
     """Behavioral contract for the Meltano Singer typing namespace."""
+
+    # (alias name, resolved __value__ repr fragment) — real public contract table.
+    _MELTANO_TYPE_ALIASES: tuple[tuple[str, str], ...] = (
+        ("DbtManifestData", "JsonMapping"),
+        ("DbtProject", "JsonMapping"),
+        ("EnvironmentInput", "Environment"),
+        ("NestedStrMapping", "Mapping"),
+        ("OptionalScalarMap", "Scalar"),
+        ("ServicePayload", "JsonMapping"),
+        ("ValidatorInput", "JsonValue"),
+    )
 
     @staticmethod
     def test_t_is_the_public_tests_meltano_types_facade() -> None:

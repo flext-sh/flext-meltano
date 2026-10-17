@@ -14,11 +14,11 @@ from flext_cli import config as cli_config
 from flext_meltano import FlextMeltanoConfig, config, m, meltano, settings
 from tests import tm, u
 
-pytestmark = pytest.mark.unit
-
 
 class TestsFlextMeltanoServiceSettingsContract:
     """Tests for the settings contract of ``FlextMeltanoServiceBase`` services."""
+
+    pytestmark = [pytest.mark.unit]
 
     class YamlConfig(FlextMeltanoConfig):
         """Real config subclass consuming the typed SSOT round-trip payload."""

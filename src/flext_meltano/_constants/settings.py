@@ -13,6 +13,7 @@ from flext_cli import c
 from flext_core import FlextSettings
 
 from flext_meltano._constants.base import FlextMeltanoConstantsEnums
+from flext_meltano._settings import FlextMeltanoSettings
 
 if TYPE_CHECKING:
     from flext_cli import t
@@ -90,6 +91,8 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     SERVICE_MIN_NAME_LENGTH: ClassVar[int] = 3
 
     # Environments
+    # Settings-owned environment facts live in the layer-zero ``_settings``
+    # module; the constants facade re-exports the same single home (SSOT).
     ENVIRONMENTS_VALID: ClassVar[frozenset[FlextMeltanoConstantsEnums.Environment]] = (
         frozenset({
             FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
@@ -98,26 +101,12 @@ class FlextMeltanoConstantsSettings(FlextSettings):
             FlextMeltanoConstantsEnums.Environment.TESTING,
         })
     )
-    SETTINGS_ENVIRONMENTS: ClassVar[
-        tuple[FlextMeltanoConstantsEnums.Environment, ...]
-    ] = (
-        FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
-        FlextMeltanoConstantsEnums.Environment.TESTING,
-        FlextMeltanoConstantsEnums.Environment.PRODUCTION,
+    SETTINGS_ENVIRONMENTS: ClassVar[tuple[str, ...]] = (
+        FlextMeltanoSettings.SETTINGS_ENVIRONMENTS
     )
-    ENVIRONMENT_ALIASES: ClassVar[
-        t.MappingKV[str, FlextMeltanoConstantsEnums.Environment]
-    ] = MappingProxyType({
-        FlextMeltanoConstantsEnums.EnvironmentAlias.DEV: (
-            FlextMeltanoConstantsEnums.Environment.DEVELOPMENT
-        ),
-        FlextMeltanoConstantsEnums.EnvironmentAlias.TEST: (
-            FlextMeltanoConstantsEnums.Environment.TESTING
-        ),
-        FlextMeltanoConstantsEnums.EnvironmentAlias.PROD: (
-            FlextMeltanoConstantsEnums.Environment.PRODUCTION
-        ),
-    })
+    ENVIRONMENT_ALIASES: ClassVar[t.MappingKV[str, str]] = (
+        FlextMeltanoSettings.ENVIRONMENT_ALIASES
+    )
     ENVIRONMENT_RUNTIME_ALIASES: ClassVar[t.StrMapping] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV

@@ -12,13 +12,13 @@ import pytest
 
 from tests import m, t, tm
 
-_ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
-
-_ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
-
 
 class TestsFlextMeltanoExecutionResult:
     """Behavioral contract of ``m.Meltano.CommandExecutionResult``."""
+
+    _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
+
+    _ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
 
     class ExecutionResultJsonFixture(m.BaseModel):
         """Fixture model mirroring the ``CommandExecutionResult`` JSON shape."""
@@ -33,7 +33,7 @@ class TestsFlextMeltanoExecutionResult:
 
     @staticmethod
     def _build_result(
-        case: _ExecutionResultCase,
+        case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
     ) -> m.Meltano.CommandExecutionResult:
         """Construct the public result from one parametrized case tuple.
 
@@ -75,7 +75,7 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_public_fields_reflect_constructor_arguments(
-        case: _ExecutionResultCase,
+        case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
     ) -> None:
         """Public fields expose exactly the values supplied at construction."""
         command, success, exit_code, output, error, execution_time = case
@@ -98,7 +98,10 @@ class TestsFlextMeltanoExecutionResult:
             error="",
             execution_time=0.2,
         )
-        tm.that(result.timestamp, match=_ISO_TIMESTAMP.pattern)
+        tm.that(
+            result.timestamp,
+            match=TestsFlextMeltanoExecutionResult._ISO_TIMESTAMP.pattern,
+        )
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -124,7 +127,7 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_to_dict_carries_full_public_contract(
-        case: _ExecutionResultCase,
+        case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
     ) -> None:
         """``to_dict`` mirrors every public field plus an ISO timestamp."""
         command, success, exit_code, output, error, execution_time = case
@@ -136,7 +139,10 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result_dict["output"], eq=output)
         tm.that(result_dict["error"], eq=error)
         tm.that(result_dict["execution_time"], eq=execution_time)
-        tm.that(str(result_dict["timestamp"]), match=_ISO_TIMESTAMP.pattern)
+        tm.that(
+            str(result_dict["timestamp"]),
+            match=TestsFlextMeltanoExecutionResult._ISO_TIMESTAMP.pattern,
+        )
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -169,7 +175,7 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_model_dump_json_round_trips_through_public_schema(
-        case: _ExecutionResultCase,
+        case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
     ) -> None:
         """Serialized JSON validates back into the documented public shape."""
         command, success, exit_code, output, error, execution_time = case
@@ -183,7 +189,10 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(parsed.output, eq=output)
         tm.that(parsed.error, eq=error)
         tm.that(abs(parsed.execution_time - execution_time), lt=1e-9)
-        tm.that(parsed.timestamp, match=_ISO_TIMESTAMP.pattern)
+        tm.that(
+            parsed.timestamp,
+            match=TestsFlextMeltanoExecutionResult._ISO_TIMESTAMP.pattern,
+        )
 
     @staticmethod
     def test_special_characters_survive_serialization() -> None:

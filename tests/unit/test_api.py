@@ -13,11 +13,11 @@ import pytest
 from flext_meltano import meltano
 from tests import c, tm
 
-pytestmark = pytest.mark.unit
-
 
 class TestsFlextMeltanoApi:
     """Behavioral test suite for the public Meltano facade."""
+
+    pytestmark = [pytest.mark.unit]
 
     @staticmethod
     def test_public_facade_contract() -> None:

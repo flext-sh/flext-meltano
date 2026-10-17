@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_meltano import m, p, u
+from tests import tm
 
 
 class TestsFlextMeltanoDbtConnectionProfile:
@@ -40,4 +41,4 @@ class TestsFlextMeltanoDbtConnectionProfile:
 
         accepted = TestsFlextMeltanoDbtConnectionProfile._accept_profile(profile)
 
-        assert accepted.model_dump() == {"type": "test", "project": "dbt-test"}
+        tm.that(accepted.model_dump(), eq={"type": "test", "project": "dbt-test"})

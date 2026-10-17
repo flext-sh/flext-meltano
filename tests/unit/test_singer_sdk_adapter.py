@@ -17,15 +17,15 @@ from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
 from tests import tm
 
-_FACTORY_CASES: tuple[tuple[str, str, str], ...] = (
-    ("tap", "tap-csv", "source_name"),
-    ("target", "target-jsonl", "sink_name"),
-    ("dbt", "analytics", "transformation_name"),
-)
-
 
 class TestsFlextMeltanoSingerSdkAdapter:
     """Validate the public tap/target/dbt factory contract."""
+
+    _FACTORY_CASES: tuple[tuple[str, str, str], ...] = (
+        ("tap", "tap-csv", "source_name"),
+        ("target", "target-jsonl", "sink_name"),
+        ("dbt", "analytics", "transformation_name"),
+    )
 
     @staticmethod
     def test_tap_factory_binds_source_role_only() -> None:

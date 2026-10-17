@@ -31,3 +31,6 @@ class FlextMeltanoTypingsDomains:
     type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
     """Environment selector input: a named environment or a full environment
     configuration mapping."""
+
+
+__all__: list[str] = ["FlextMeltanoTypingsDomains"]

@@ -278,18 +278,18 @@ class TestsFlextMeltanoModelsUnit:
                     payload["connection_config"],
                 )
                 tm.that(exported["display_name"], eq=connection["display_name"])
-                assert marker not in exported.values()
+                tm.that(list(exported.values()), lacks=marker)
                 exported_database = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     exported["database"],
                 )
-                assert exported_database["password"] != marker
+                tm.that(exported_database["password"], ne=marker)
                 tm.that(exported_database["name"], eq=database["name"])
                 exported_options = exported["options"]
                 assert isinstance(exported_options, list)
                 exported_option = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     exported_options[0],
                 )
-                assert exported_option["token"] != marker
+                tm.that(exported_option["token"], ne=marker)
                 tm.that(exported_option["label"], eq=option["label"])
             tm.that(config.connection_config, eq=connection)
         tm.that(connection["password"], eq=marker)
@@ -348,10 +348,6 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(tap_config.stream_config, has=stream.stream_name)
         tm.that(stream.key_properties, has="id")
 
-
-class TestsFlextMeltanoModelsStreamInfo:
-    """StreamInfo model contract tests."""
-
     @staticmethod
     def test_stream_definition_exports_a_schema_for_real_record_validation() -> None:
         """The exported schema accepts integer IDs and rejects protocol violations."""
@@ -381,7 +377,7 @@ class TestsFlextMeltanoModelsStreamInfo:
             assert not validator.is_valid({})
             assert not validator.is_valid([{"id": 1}])
         tm.that(stream.stream_schema, eq=schema_input)
-        assert "type" not in schema_input
+        tm.that(schema_input, lacks="type")
 
     # ---- StreamInfo --------------------------------------------------------
 

@@ -105,17 +105,17 @@ class TestsFlextMeltanoConstantsUnit:
     @staticmethod
     def test_maturity_thresholds_are_strictly_ordered() -> None:
         """Mature environments require strictly more envs than developing."""
-        assert (
-            c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT
-            > c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT
+        tm.that(
+            c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT,
+            gt=c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT,
         )
 
     @staticmethod
     def test_complexity_thresholds_are_ordered() -> None:
         """Simple-max setting count is above the minimal-settings floor."""
-        assert (
-            c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS
-            > c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS
+        tm.that(
+            c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS,
+            gt=c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS,
         )
 
     @staticmethod
@@ -152,8 +152,9 @@ class TestsFlextMeltanoConstantsUnit:
     @staticmethod
     def test_singer_schema_and_record_are_distinct() -> None:
         """Schema and record message identifiers are not interchangeable."""
-        assert (
-            c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA != c.Meltano.SINGER_MESSAGE_TYPE_RECORD
+        tm.that(
+            c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA,
+            ne=c.Meltano.SINGER_MESSAGE_TYPE_RECORD,
         )
 
     @staticmethod

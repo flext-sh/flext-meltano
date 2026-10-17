@@ -7,21 +7,16 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
 from flext_meltano import t
 from flext_meltano._models.core import FlextMeltanoModelsCore
-from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsSources:
     """Source and configuration models."""
-
-    StreamDefinition: ClassVar[
-        type[FlextMeltanoModelsSourcesParams.StreamDefinition]
-    ] = FlextMeltanoModelsSourcesParams.StreamDefinition
 
     class _StreamConfigEntity(
         FlextMeltanoModelsCore.SensitiveConfigSerializer,

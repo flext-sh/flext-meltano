@@ -138,7 +138,7 @@ class TestsFlextMeltanoAbstractionsComplete:
         tm.that(isinstance(users_config, dict), eq=True)
         tm.that(bool(users_config["selected"]), eq=True)
         tm.that(not (bool(orders_config["selected"])), eq=True)
-        assert missing_config == {}
+        tm.that(missing_config, eq={})
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
