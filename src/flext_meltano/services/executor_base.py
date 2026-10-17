@@ -209,7 +209,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def execute_meltano_command(
         self,
         command: t.StrSequence,
-        timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
+        timeout: int = c.Meltano.DEFAULT_TIMEOUT_SECONDS,
         _cwd: Path | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a Meltano runtime command in-process and capture its output.

@@ -93,7 +93,6 @@ class FlextMeltanoConstantsBase:
 
     # Network
     NETWORK_DEFAULT_TIMEOUT: ClassVar[int] = c.DEFAULT_TIMEOUT_SECONDS
-    NETWORK_MELTANO_DEFAULT_TIMEOUT: ClassVar[int] = 300
 
     # DatabasePorts
 
