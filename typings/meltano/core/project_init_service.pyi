@@ -1,3 +1,5 @@
+# Copyright (c) 2026 FLEXT Team. All rights reserved.
+
 from os import PathLike
 
 from meltano.core.project import Project

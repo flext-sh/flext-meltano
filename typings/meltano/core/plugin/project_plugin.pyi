@@ -1,3 +1,5 @@
+# Copyright (c) 2026 FLEXT Team. All rights reserved.
+
 from meltano.core.plugin.base import PluginType
 
 class PluginRef:
