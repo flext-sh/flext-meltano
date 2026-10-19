@@ -12,7 +12,7 @@ from pathlib import Path
 from types import MappingProxyType
 
 import pytest
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError, validate
 
 from tests import c, m, t, tm, u
 
@@ -363,11 +363,10 @@ class TestsFlextMeltanoModelsUnit:
                 payload["stream_schema"],
             )
             Draft202012Validator.check_schema(schema)
-            validator = Draft202012Validator(schema)
-            validator.validate({"id": 1})
-            assert not validator.is_valid({"id": "not-an-integer"})
-            assert not validator.is_valid({})
-            assert not validator.is_valid([{"id": 1}])
+            validate({"id": 1}, schema, cls=Draft202012Validator)
+            for invalid in ({"id": "not-an-integer"}, {}, [{"id": 1}]):
+                with pytest.raises(ValidationError):
+                    validate(invalid, schema, cls=Draft202012Validator)
         tm.that(stream.stream_schema, eq=schema_input)
         tm.that(schema_input, lacks="type")
 
