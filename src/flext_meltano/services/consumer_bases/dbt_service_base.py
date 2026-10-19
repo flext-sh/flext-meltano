@@ -36,7 +36,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     dbt_project_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical dbt project name"),
+        m.Field(description="Canonical dbt project name"),
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = m.PrivateAttr(default_factory=lambda: None)

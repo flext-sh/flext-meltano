@@ -42,7 +42,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     service_name: Annotated[
         t.NonEmptyStr,
-        u.Field(
+        m.Field(
             default="FlextMeltanoExecutor",
             description="Canonical Meltano executor service name",
         ),

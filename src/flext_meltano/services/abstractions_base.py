@@ -27,7 +27,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: t.NonEmptyStr = u.Field(
+    service_name: t.NonEmptyStr = m.Field(
         default="FlextMeltanoAbstractions",
         description="Canonical Meltano abstractions service name.",
         validate_default=True,

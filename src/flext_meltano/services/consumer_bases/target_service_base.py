@@ -35,7 +35,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
     target_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical target name (e.g. target-oracle)"),
+        m.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(

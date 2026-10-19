@@ -17,7 +17,7 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 from flext_meltano.services import FlextMeltanoDeclarativeTap
 
 
@@ -38,7 +38,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     tap_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical tap name (e.g. tap-oracle)"),
+        m.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
     _tap_instance: p.Meltano.SingerTapInstance | None = m.PrivateAttr(
