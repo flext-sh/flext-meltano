@@ -28,8 +28,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     (initialize, load, get plugins).
     """
 
-    _sdk_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
-    _sdk_project: Project | None = u.PrivateAttr(default_factory=lambda: None)
+    _sdk_project_root: Path | None = m.PrivateAttr(default_factory=lambda: None)
+    _sdk_project: Project | None = m.PrivateAttr(default_factory=lambda: None)
 
     def fetch_sdk_plugins(
         self,
@@ -181,7 +181,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 "value": variant_raw,
             })
             json_variant = (
-                t.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)
+                u.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)
                 if variant_payload.value is not None
                 else None
             )

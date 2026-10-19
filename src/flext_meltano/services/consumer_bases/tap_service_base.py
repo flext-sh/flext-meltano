@@ -41,7 +41,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         u.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
-    _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
+    _tap_instance: p.Meltano.SingerTapInstance | None = m.PrivateAttr(
         default_factory=lambda: None,
     )
 

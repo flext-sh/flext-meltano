@@ -33,7 +33,7 @@ from flext_meltano.services import FlextMeltanoExecutor
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     """Pipeline manager for FLEXT Meltano CLI."""
 
-    _cli: p.Meltano.PipelineCli | None = u.PrivateAttr(default_factory=lambda: None)
+    _cli: p.Meltano.PipelineCli | None = m.PrivateAttr(default_factory=lambda: None)
 
     def __init__(
         self,

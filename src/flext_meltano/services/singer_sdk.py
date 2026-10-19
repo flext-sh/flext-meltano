@@ -14,7 +14,7 @@ from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
 
-from flext_meltano import c, m, p, t
+from flext_meltano import c, m, p, t, u
 
 
 class FlextMeltanoSingerTapAdapter:
@@ -74,7 +74,7 @@ class FlextMeltanoSingerTapAdapter:
                 FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
                 for sequence_value in value
             ]
-        return t.Cli.JSON_VALUE_ADAPTER.validate_python(value)
+        return u.Cli.JSON_VALUE_ADAPTER.validate_python(value)
 
     def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
         """Execute the Singer CLI and normalize ``SystemExit`` into an int.

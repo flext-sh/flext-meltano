@@ -23,8 +23,8 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     Manages DBT project manifests and model/test discovery.
     """
 
-    _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
-    _dbt_manifest: t.Meltano.DbtManifestData | None = u.PrivateAttr(
+    _dbt_project_root: Path | None = m.PrivateAttr(default_factory=lambda: None)
+    _dbt_manifest: t.Meltano.DbtManifestData | None = m.PrivateAttr(
         default_factory=lambda: None,
     )
 

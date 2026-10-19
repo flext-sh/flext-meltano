@@ -39,8 +39,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         u.Field(description="Canonical dbt project name"),
     ] = c.Meltano.ServiceType.DBT
 
-    _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
-    _executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
+    _dbt_project_root: Path | None = m.PrivateAttr(default_factory=lambda: None)
+    _executor: p.Meltano.MeltanoExecutor = m.PrivateAttr(
         default_factory=FlextMeltanoExecutor,
     )
 

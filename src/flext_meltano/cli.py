@@ -211,7 +211,7 @@ class FlextMeltanoCli:
             )
             .flat_map(
                 lambda payload: u.Cli.json_dumps(
-                    list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload)),
+                    list(u.Cli.JSON_LIST_ADAPTER.validate_python(payload)),
                 ),
             )
         )

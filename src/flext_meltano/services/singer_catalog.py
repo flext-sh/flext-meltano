@@ -26,7 +26,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     Internal state ``_singer_catalog`` is initialized as empty catalog.
     """
 
-    _singer_catalog: m.Meltano.SingerCatalog = u.PrivateAttr(
+    _singer_catalog: m.Meltano.SingerCatalog = m.PrivateAttr(
         default_factory=m.Meltano.SingerCatalog,
     )
 
