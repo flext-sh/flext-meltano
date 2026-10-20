@@ -103,7 +103,7 @@ class TestsFlextMeltanoAbstractionsComplete:
         result = self.tap_abstractions.process_tap_config(config)
         tm.that(result, is_=r)
         config_result = self.tap_abstractions.process_tap_config(config)
-        tm.that(config_result.success, eq=True)
+        tm.ok(config_result.success)
 
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
@@ -135,9 +135,9 @@ class TestsFlextMeltanoAbstractionsComplete:
         users_config = self.tap_abstractions.fetch_stream_config(config, "users")
         orders_config = self.tap_abstractions.fetch_stream_config(config, "orders")
         missing_config = self.tap_abstractions.fetch_stream_config(config, "missing")
-        tm.that(isinstance(users_config, dict), eq=True)
-        tm.that(bool(users_config["selected"]), eq=True)
-        tm.that(not (bool(orders_config["selected"])), eq=True)
+        tm.ok(isinstance(users_config, dict))
+        tm.ok(bool(users_config["selected"]))
+        tm.ok(not (bool(orders_config["selected"])))
         tm.that(missing_config, eq={})
 
     def test_create_tap_from_config_success(self) -> None:
@@ -187,9 +187,9 @@ class TestsFlextMeltanoAbstractionsComplete:
         valid_result = self.tap_abstractions.process_tap_config(valid_instance.settings)
         tm.that(valid_result, is_=r)
         if valid_result.success:
-            tm.that(bool(valid_result.value), eq=True)
+            tm.ok(bool(valid_result.value))
         if invalid_result.success:
-            tm.that(not (bool(invalid_result.value)), eq=True)
+            tm.ok(not (bool(invalid_result.value)))
 
     def test_fetch_tap_type(self) -> None:
         """Test fetch_tap_type method using flext_tests."""
@@ -208,7 +208,7 @@ class TestsFlextMeltanoAbstractionsComplete:
     def test_fetch_registered_streams(self) -> None:
         """Test fetch_registered_streams method using flext_tests."""
         initial_streams = self.tap_abstractions.fetch_registered_streams()
-        tm.that(isinstance(initial_streams, list), eq=True)
+        tm.ok(isinstance(initial_streams, list))
 
     @staticmethod
     def test_create_instance_factory() -> None:
@@ -248,4 +248,4 @@ class TestsFlextMeltanoAbstractionsComplete:
         tm.that(result, is_=r)
         if result.success:
             value = result.value
-            tm.that(isinstance(value, dict), eq=True)
+            tm.ok(isinstance(value, dict))

@@ -138,4 +138,4 @@ class TestsFlextMeltanoTargetAbstractions:
         result = meltano.validate_sink_config(sink_config)
 
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)

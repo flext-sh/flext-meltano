@@ -39,7 +39,7 @@ class TestsFlextMeltanoCliIntegration:
         )
 
         tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.discover, eq=False)
+        tm.fail(model.discover)
         tm.that(model.config_file, none=True)
         tm.that(model.catalog_file, none=True)
         tm.that(model.state_file, none=True)
@@ -54,7 +54,7 @@ class TestsFlextMeltanoCliIntegration:
             u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args),
         )
 
-        tm.that(model.discover, eq=False)
+        tm.fail(model.discover)
 
     @staticmethod
     @pytest.mark.parametrize("discover", [True, False])

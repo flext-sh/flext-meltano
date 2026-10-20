@@ -429,4 +429,4 @@ class TestsFlextMeltanoSingerCliTranslator:
         # The boundary timeout genuinely interrupts the subprocess: the call
         # returns promptly instead of waiting out the command's full runtime.
         timeout_budget_ceiling = 4
-        tm.that(elapsed < timeout_budget_ceiling, eq=True)
+        tm.ok(elapsed < timeout_budget_ceiling)

@@ -211,7 +211,7 @@ class TestsFlextMeltanoExecutionResult:
         result_dict = result.to_dict()
         tm.that(result_dict["error"], eq=error)
         tm.that(result_dict["command"], eq=["meltano", "run", "tap-postgres"])
-        tm.that(result_dict["success"], eq=False)
+        tm.fail(result_dict["success"])
 
     @staticmethod
     def test_negative_execution_time_is_rejected() -> None:

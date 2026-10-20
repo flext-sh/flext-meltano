@@ -70,7 +70,7 @@ class TestsFlextMeltanoSingerTypes:
     ) -> None:
         """Each type alias is a PEP 695 alias resolving to its contracted target."""
         alias = getattr(t.Meltano, alias_name)
-        tm.that(hasattr(alias, "__value__"), eq=True)
+        tm.ok(hasattr(alias, "__value__"))
         tm.that(str(alias.__value__), has=value_fragment)
 
     @staticmethod

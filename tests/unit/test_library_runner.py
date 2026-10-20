@@ -94,7 +94,7 @@ class TestsFlextMeltanoLibraryRunner:
     ) -> None:
         """A complete ELT run reports a successful ``r[T]`` outcome."""
         tm.ok(elt_result)
-        tm.that(elt_result.failure, eq=False)
+        tm.fail(elt_result.failure)
 
     @staticmethod
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)

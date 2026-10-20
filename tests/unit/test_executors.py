@@ -146,8 +146,8 @@ class TestsFlextMeltanoExecutors:
 
         tm.ok(prefixed_result)
         tm.ok(unprefixed_result)
-        tm.that(prefixed_result.value.success, eq=True)
-        tm.that(unprefixed_result.value.success, eq=True)
+        tm.ok(prefixed_result.value.success)
+        tm.ok(unprefixed_result.value.success)
         tm.that(prefixed_result.value.command[0], eq="--version")
         tm.that(unprefixed_result.value.command[0], eq="--help")
 
@@ -179,4 +179,4 @@ class TestsFlextMeltanoExecutors:
         result = cli_instance.run(["version"])
 
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)

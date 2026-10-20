@@ -514,7 +514,7 @@ def test_operation_failure_path():
     # Setup failure scenario
     result = service.run_invalid_operation()
 
-    assert result.failure
+    tm.fail(result)
     error = result.error_value
     assert isinstance(error, FlextMeltanoError)
 ```

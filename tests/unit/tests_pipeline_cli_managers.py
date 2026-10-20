@@ -186,7 +186,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.that(status_output, has="stopped")
         tm.that(run_output.lower(), has="usage:")
         tm.that(stored_payload.values, eq={"command": ["help"]})
-        tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
+        tm.fail((tmp_path / "pipelines" / pipeline_name).exists())
 
     def test_pipeline_create_requires_runtime_configuration(
         self,
@@ -266,4 +266,4 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.ok(stop_result)
         tm.that(running_output, has="running")
         tm.that(stop_output, has="stopped")
-        tm.that(pid_path.exists(), eq=False)
+        tm.fail(pid_path.exists())

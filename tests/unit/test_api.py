@@ -22,10 +22,10 @@ class TestsFlextMeltanoApi:
     @staticmethod
     def test_public_facade_contract() -> None:
         """The public singleton stays callable and stable."""
-        tm.that(type(meltano).fetch_global() is meltano, eq=True)
-        tm.that(callable(meltano.tap), eq=True)
-        tm.that(callable(meltano.target), eq=True)
-        tm.that(callable(meltano.dbt), eq=True)
+        tm.ok(type(meltano).fetch_global() is meltano)
+        tm.ok(callable(meltano.tap))
+        tm.ok(callable(meltano.target))
+        tm.ok(callable(meltano.dbt))
         tm.that(meltano.service_name, none=False, empty=False)
 
     @staticmethod
@@ -58,12 +58,12 @@ class TestsFlextMeltanoApi:
         payload = result.value
         tm.that(payload, is_=dict)
         project_path = Path(payload["project_path"])
-        tm.that((project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists(), eq=True)
+        tm.ok((project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists())
         config_text = (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).read_text(
             encoding="utf-8",
         )
         tm.that(config_text, has="requires_meltano")
-        tm.that("version:" in config_text, eq=False)
+        tm.fail("version:" in config_text)
 
     @staticmethod
     def test_validate_project_missing_path_fails(tmp_path: Path) -> None:

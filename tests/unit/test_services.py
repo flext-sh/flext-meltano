@@ -107,9 +107,9 @@ class TestsFlextMeltanoServices:
         tm.that(tap_service.source_name, eq="tap-a")
         tm.that(target_service.sink_name, eq="target-a")
         tm.that(dbt_service.transformation_name, eq="dbt-a")
-        tm.that(tap_service is not target_service, eq=True)
-        tm.that(target_service is not dbt_service, eq=True)
-        tm.that(dbt_service is not tap_service, eq=True)
+        tm.ok(tap_service is not target_service)
+        tm.ok(target_service is not dbt_service)
+        tm.ok(dbt_service is not tap_service)
 
     @staticmethod
     def test_execute_returns_active_status_payload() -> None:
@@ -121,8 +121,8 @@ class TestsFlextMeltanoServices:
         tm.that(payload["status"], eq="active")
         tm.that(payload["service_name"], eq=meltano.service_name)
         tm.that(payload["version"], eq=meltano.service_version)
-        tm.that("timestamp" in payload, eq=True)
-        tm.that("handlers" in payload, eq=True)
+        tm.ok("timestamp" in payload)
+        tm.ok("handlers" in payload)
 
     @staticmethod
     def test_execute_is_idempotent_across_calls() -> None:

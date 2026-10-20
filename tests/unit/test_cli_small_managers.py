@@ -39,8 +39,8 @@ class TestsFlextMeltanoCliSmallManagers:
         """Test version command succeeds and prints version string."""
         result = meltano_cli.run([c.Meltano.CliCommand.VERSION])
 
-        tm.that(result.success, eq=True)
-        tm.that("." in capsys.readouterr().out, eq=True)
+        tm.ok(result.success)
+        tm.ok("." in capsys.readouterr().out)
 
     @staticmethod
     def test_status_show_succeeds_with_ready_status_payload(
@@ -50,7 +50,7 @@ class TestsFlextMeltanoCliSmallManagers:
         """Test status show succeeds with ready status payload."""
         result = meltano_cli.run([c.Meltano.CliCommand.STATUS, "show"])
 
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
 
         payload = u.Cli.JSON_MAPPING_ADAPTER.validate_json(capsys.readouterr().out)
         tm.that(payload.get("status"), eq=c.Meltano.OperationStatus.READY)
@@ -66,10 +66,10 @@ class TestsFlextMeltanoCliSmallManagers:
             c.Meltano.ExecutorCommand.HEALTH,
         ])
 
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
 
         payload = u.Cli.JSON_MAPPING_ADAPTER.validate_json(capsys.readouterr().out)
-        tm.that("status" in payload, eq=True)
+        tm.ok("status" in payload)
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -83,7 +83,7 @@ class TestsFlextMeltanoCliSmallManagers:
         """Test unsupported extractor operation reports failure."""
         result = meltano_cli.run([command, "--operation", "run", "--args", "demo"])
 
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_plugin_info_without_plugin_type_reports_failure(
@@ -95,7 +95,7 @@ class TestsFlextMeltanoCliSmallManagers:
             c.Meltano.ExecutorCommand.INFO,
         ])
 
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_plugin_install_is_unsupported_and_reports_failure(
@@ -109,7 +109,7 @@ class TestsFlextMeltanoCliSmallManagers:
             "tap-demo",
         ])
 
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error, has="not supported")
 
     @staticmethod
@@ -120,5 +120,5 @@ class TestsFlextMeltanoCliSmallManagers:
         """Test dbt help option succeeds and prints dbt help."""
         result = meltano_cli.run([c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])
 
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(capsys.readouterr().out, has="DBT")

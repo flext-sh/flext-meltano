@@ -96,7 +96,7 @@ class TestsFlextMeltanoModelsUnit:
         )
         # config_size = connection_config keys + stream_config keys
         tm.that(settings.config_size, eq=3)
-        tm.that(settings.has_stream_config, eq=True)
+        tm.ok(settings.has_stream_config)
         tm.that(settings.tap_identifier, eq="tap-postgres:2.1.0")
 
     @staticmethod
@@ -106,7 +106,7 @@ class TestsFlextMeltanoModelsUnit:
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
         )
-        tm.that(settings.has_stream_config, eq=False)
+        tm.fail(settings.has_stream_config)
         tm.that(settings.config_size, eq=1)
 
     @staticmethod
@@ -187,14 +187,14 @@ class TestsFlextMeltanoModelsUnit:
             target_version="3.0.0",
         )
         tm.that(settings.config_size, eq=2)
-        tm.that(settings.has_connection_config, eq=True)
+        tm.ok(settings.has_connection_config)
         tm.that(settings.target_identifier, eq="target-postgres:3.0.0")
 
     @staticmethod
     def test_target_config_has_connection_config_false_when_empty() -> None:
         """Test target config has connection config false when empty."""
         settings = m.Meltano.TargetConfig(target_type="target-csv")
-        tm.that(settings.has_connection_config, eq=False)
+        tm.fail(settings.has_connection_config)
         tm.that(settings.config_size, eq=0)
 
     @staticmethod
@@ -412,7 +412,7 @@ class TestsFlextMeltanoModelsUnit:
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.average_records_per_batch, eq=0.0)
-        tm.that(stream.has_processed_data, eq=False)
+        tm.fail(stream.has_processed_data)
         tm.that(stream.processing_status, eq=str(c.Meltano.StreamStatus.PENDING))
 
     @staticmethod
@@ -426,7 +426,7 @@ class TestsFlextMeltanoModelsUnit:
             batches_processed=2,
         )
         tm.that(stream.average_records_per_batch, eq=5.0)
-        tm.that(stream.has_processed_data, eq=True)
+        tm.ok(stream.has_processed_data)
 
     @staticmethod
     @pytest.mark.parametrize(

@@ -40,8 +40,8 @@ class TestsFlextMeltanoValidators:
         }
         result = meltano.validate_plugin_config(settings)
         tm.ok(result)
-        tm.that(result.value, eq=True)
-        tm.that(result.unwrap(), eq=True)
+        tm.ok(result.value)
+        tm.ok(result.unwrap())
 
     @staticmethod
     def test_plugin_config_missing_required_fields_fails() -> None:
@@ -89,7 +89,7 @@ class TestsFlextMeltanoValidators:
         }
         result = meltano.validate_plugin_config(settings)
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -128,7 +128,7 @@ class TestsFlextMeltanoValidators:
         settings: t.ScalarMapping = {"schema_version": 1, "project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)
 
     @staticmethod
     def test_pipeline_project_defaults_schema_version_when_omitted() -> None:
@@ -136,7 +136,7 @@ class TestsFlextMeltanoValidators:
         settings: t.ScalarMapping = {"project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)
 
     @staticmethod
     def test_pipeline_project_missing_project_id_fails() -> None:
@@ -168,7 +168,7 @@ class TestsFlextMeltanoValidators:
         }
         result = meltano.validate_transformation_business_rules(dbt_config)
         tm.ok(result)
-        tm.that(result.value, eq=True)
+        tm.ok(result.value)
 
     @staticmethod
     def test_transformation_config_missing_required_fails() -> None:
