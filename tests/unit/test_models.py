@@ -187,14 +187,14 @@ class TestsFlextMeltanoModelsUnit:
             target_version="3.0.0",
         )
         tm.that(settings.config_size, eq=2)
-        tm.ok(settings.has_connection_config)
+        tm.that(settings.has_connection_config, truth=True)
         tm.that(settings.target_identifier, eq="target-postgres:3.0.0")
 
     @staticmethod
     def test_target_config_has_connection_config_false_when_empty() -> None:
         """Test target config has connection config false when empty."""
         settings = m.Meltano.TargetConfig(target_type="target-csv")
-        tm.fail(settings.has_connection_config)
+        tm.that(settings.has_connection_config, truth=False)
         tm.that(settings.config_size, eq=0)
 
     @staticmethod

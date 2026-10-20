@@ -45,8 +45,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     @abstractmethod
     def create_sink(
         self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        _stream_name: str,
+        _schema: t.JsonMapping,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
