@@ -164,7 +164,7 @@ def test_custom_tap_extension():
 
     # Test custom business logic
     result = custom_tap.extract_data()
-    assert result.success
+    tm.ok(result.success)
     assert custom_tap.validate_business_rules(result.data)
 ```
 

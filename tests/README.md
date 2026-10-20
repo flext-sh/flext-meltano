@@ -202,7 +202,7 @@ class TestModuleFunctionality:
         **Then**: Expected outcomes
         """
         # Implementation with clear assertions
-        assert result.success
+        tm.ok(result.success)
         assert expected_value in result.data
 ```
 

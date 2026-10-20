@@ -204,8 +204,8 @@ def test_complete_data_pipeline_e2e():
     result = bridge.run_pipeline("tap-postgres", "target-csv")
 
     # Step 3: Validate pipeline execution
-    assert result.success
-    assert result.data["status"] == "success"
+    tm.ok(result.success)
+    tm.that(result.data["status"], eq="success")
 
     # Step 4: Validate output data
     output_files = glob.glob("output/*.csv")

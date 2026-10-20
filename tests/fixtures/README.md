@@ -395,7 +395,7 @@ def test_csv_processing(sample_users_csv):
     processor = CSVProcessor(sample_users_csv["file_path"])
     results = processor.process()
 
-    assert len(results) == sample_users_csv["records"]
+    tm.that(len(results), eq=sample_users_csv["records"])
     assert all("email" in record for record in results)
 
 
@@ -408,7 +408,7 @@ def test_meltano_integration(meltano_test_project, flext_meltano_config):
     bridge = FlextMeltanoBridge(settings)
     result = bridge.get_version()
 
-    assert result.success
+    tm.ok(result.success)
 ```
 
 ### **Advanced Fixture Composition**

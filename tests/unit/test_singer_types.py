@@ -12,10 +12,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import FlextTestsTypes, tm
+from flext_tests import FlextTestsTypes
 
 from flext_meltano import FlextMeltanoTypes
-from tests import TestsFlextMeltanoTypes, t
+from tests import TestsFlextMeltanoTypes, t, tm
 
 
 class TestsFlextMeltanoSingerTypes:

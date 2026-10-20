@@ -292,7 +292,7 @@ def test_operation_success():
 
     result = service.discover_plugins()
 
-    assert result.success
+    tm.ok(result.success)
     plugins = result.unwrap()
     assert isinstance(plugins, list)
 
@@ -334,7 +334,7 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 
     result = service.execute_pipeline("tap-csv", "target-postgres")
 
-    assert result.success
+    tm.ok(result.success)
     mock_meltano_adapter.return_value.run_tap.assert_called_once()
 ```
 

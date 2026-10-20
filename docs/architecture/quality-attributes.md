@@ -3439,7 +3439,7 @@ def test_entity_processing():
 
     result = service.process_entity(entity)
 
-    assert result.success
+    tm.ok(result.success)
     assert result.value.tags == ["important", "test"]
 ```
 
@@ -3513,7 +3513,7 @@ def test_complex_pipeline_operation():
 
         result = service.execute_pipeline(context["pipeline"])
 
-        assert result.success
+        tm.ok(result.success)
         # Context automatically cleaned up
 ```
 
@@ -3548,8 +3548,8 @@ class PropertyBasedTests:
         # Then either succeeds or fails with validation error
         if result.success:
             pipeline = result.unwrap()
-            assert pipeline.name == name
-            assert pipeline.settings == settings
+            tm.that(pipeline.name, eq=name)
+            tm.that(pipeline.settings, eq=settings)
         else:
             # Must be a validation error
             assert isinstance(result.error, ValidationError)
@@ -3575,7 +3575,7 @@ class PropertyBasedTests:
         result2 = processor.process_batch(records)
 
         # Then results should be identical
-        assert result1 == result2
+        tm.that(result1, eq=result2)
 
     @given(st.datetimes(), st.datetimes())
     def test_time_range_validation(self, start_time: datetime, end_time: datetime):
@@ -3623,7 +3623,7 @@ class ContractTests:
         with consumer:
             # Make actual API call
             response = requests.get("http://localhost:8000/api/v1/pipelines/123")
-            assert response.status_code == 200
+            tm.that(response.status_code, eq=200)
 
     def test_data_transformation_contract(self):
         """Test data transformation contract."""
@@ -3663,9 +3663,9 @@ class ContractTests:
         result = transformer.transform(test_input)
 
         # Verify output matches contract
-        assert result["user_id"] == 123
-        assert result["full_name"] == "John Doe"
-        assert result["contact_email"] == "john@example.com"
+        tm.that(result["user_id"], eq=123)
+        tm.that(result["full_name"], eq="John Doe")
+        tm.that(result["contact_email"], eq="john@example.com")
         assert "processed_at" in result
 
         # Verify schema compliance
