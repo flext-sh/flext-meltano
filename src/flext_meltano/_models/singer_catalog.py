@@ -10,7 +10,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated, Literal
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import c, t
 
@@ -44,7 +44,7 @@ class FlextMeltanoModelsSingerCatalog:
             """
             return MappingProxyType(dict(value))
 
-        @u.field_serializer("metadata", when_used="json")
+        @m.field_serializer("metadata", when_used="json")
         @classmethod
         def serialize_metadata(cls, value: t.FlatContainerMapping) -> t.JsonDict:
             """Emit frozen metadata as a plain JSON mapping.
@@ -176,7 +176,7 @@ class FlextMeltanoModelsSingerCatalog:
             """
             return MappingProxyType(dict(value))
 
-        @u.field_serializer("state", when_used="json")
+        @m.field_serializer("state", when_used="json")
         @classmethod
         def serialize_state(cls, value: t.FlatContainerMapping) -> t.JsonDict:
             """Emit frozen state as a plain JSON mapping.

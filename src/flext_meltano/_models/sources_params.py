@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Annotated, Self
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import c, t
 
@@ -143,7 +143,7 @@ class FlextMeltanoModelsSourcesParams:
                 case _:
                     return 0
 
-        @u.field_serializer("stream_schema")
+        @m.field_serializer("stream_schema")
         @staticmethod
         def serialize_stream_schema(
             value: t.FlatContainerMapping,

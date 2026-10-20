@@ -89,7 +89,7 @@ class FlextMeltanoModelsCore:
         bases so the pydantic decorator machinery collects it through the MRO.
         """
 
-        @u.field_serializer("connection_config")
+        @m.field_serializer("connection_config")
         @staticmethod
         def serialize_connection_config(
             value: t.FlatContainerMapping,
@@ -102,7 +102,7 @@ class FlextMeltanoModelsCore:
             """
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
-        @u.field_serializer("stream_config", check_fields=False)
+        @m.field_serializer("stream_config", check_fields=False)
         @staticmethod
         def serialize_stream_config(value: t.FlatContainerMapping) -> t.JsonDict:
             """Export readonly stream mappings without changing their stored values.
