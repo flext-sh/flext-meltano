@@ -89,7 +89,7 @@ class TestsFlextMeltanoAbstractionsComplete:
     def test_tap_abstractions_initialization() -> None:
         """Test FlextMeltanoAbstractions initialization."""
         tap_abs = FlextMeltanoAbstractions()
-        assert tap_abs is not None
+        tm.not_none(tap_abs)
         tm.that(tap_abs.service_name, eq="FlextMeltanoAbstractions")
         tm.that(tap_abs.fetch_registered_streams(), is_=list)
 

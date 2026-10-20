@@ -308,14 +308,10 @@ variance-mismatch = "error"
 [tool.pyright]
 exclude = [
   "**/*.bak",
-  "**/*.bak/**",
   "**/*.egg-info/**",
   "**/*.orig",
-  "**/*.orig/**",
   "**/*.rej",
-  "**/*.rej/**",
   "**/*.swp",
-  "**/*.swp/**",
   "**/.*",
   "**/.agents-sync-home/**",
   "**/.agents/**",
@@ -378,8 +374,8 @@ exclude = [
   ".venv",
   "vendor",
 ]
-include = ["conftest.py", "examples", "src", "tests", "typings"]
 extraPaths = ["src", "."]
+include = ["conftest.py", "examples", "src", "tests", "typings"]
 pythonPlatform = "Linux"
 pythonVersion = "3.13"
 reportCallIssue = "error"
@@ -397,26 +393,27 @@ reportUnusedFunction = "error"
 reportUnusedImport = "error"
 reportUnusedVariable = "error"
 typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
 
 [[tool.pyright.executionEnvironments]]
+extraPaths = [".", "src"]
+reportPrivateUsage = "error"
 root = "examples"
-reportPrivateUsage = "error"
-extraPaths = [".", "src"]
 
 [[tool.pyright.executionEnvironments]]
-root = "src"
-reportPrivateUsage = "error"
 extraPaths = ["src"]
+reportPrivateUsage = "error"
+root = "src"
 
 [[tool.pyright.executionEnvironments]]
+extraPaths = [".", "src"]
+reportPrivateUsage = "error"
 root = "tests"
-reportPrivateUsage = "error"
-extraPaths = [".", "src"]
 
 [[tool.pyright.executionEnvironments]]
-root = "typings"
-reportPrivateUsage = "error"
 extraPaths = [".", "src"]
+reportPrivateUsage = "error"
+root = "typings"
 
 [tool.pytest.ini_options]
 addopts = [
