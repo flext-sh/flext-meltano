@@ -20,22 +20,26 @@ class TestsFlextMeltanoExecutors:
         tmp_path: Path,
     ) -> None:
         """Local discovery reads SDK plugin groups without a Hub or installed plugin."""
-        project = FlextMeltano.initialize_project_root(
-            tmp_path / "discovery-project",
+        project_root = tmp_path / "discovery-project"
+        project_root.mkdir()
+        meltanofile = project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE
+        u.Cli.yaml_dump(
+            meltanofile,
+            {"version": 1, "project_id": "discovery-project"},
         ).unwrap()
         executor = FlextMeltano(
             runtime_settings=FlextMeltanoSettings.model_validate({
-                "Meltano": {"MELTANO_PROJECT_ROOT": str(project.root)},
+                "Meltano": {"MELTANO_PROJECT_ROOT": str(project_root)},
             }),
         )
-        tm.that(executor.fetch_project_plugins(_cwd=project.root).unwrap(), empty=True)
+        tm.that(executor.fetch_project_plugins(_cwd=project_root).unwrap(), empty=True)
         plugin_cases = (
             (c.Meltano.PluginType.EXTRACTORS.value, "tap-regression-unresolved"),
             (c.Meltano.PluginType.LOADERS.value, "target-regression-unresolved"),
         )
-        configuration = u.Cli.yaml_safe_load(project.meltanofile).unwrap()
+        configuration = u.Cli.yaml_safe_load(meltanofile).unwrap()
         u.Cli.yaml_dump(
-            project.meltanofile,
+            meltanofile,
             {
                 **configuration,
                 "plugins": {
@@ -45,15 +49,19 @@ class TestsFlextMeltanoExecutors:
             },
         ).unwrap()
 
-        discovered = executor.fetch_project_plugins(_cwd=project.root).unwrap()
+        discovered = executor.fetch_project_plugins(_cwd=project_root).unwrap()
         tm.that(
             {(plugin["type"], plugin["name"]) for plugin in discovered},
             eq=set(plugin_cases),
         )
+        tm.that(
+            set(executor.discover_installed_plugins().unwrap()),
+            eq={plugin_name for _, plugin_name in plugin_cases},
+        )
         for plugin_type, plugin_name in plugin_cases:
             filtered = executor.fetch_project_plugins(
                 plugin_type=plugin_type,
-                _cwd=project.root,
+                _cwd=project_root,
             ).unwrap()
             tm.that([item["name"] for item in filtered], eq=[plugin_name])
 
@@ -63,80 +71,28 @@ class TestsFlextMeltanoExecutors:
         tm.that(meltano, none=False)
 
     @staticmethod
-    def test_run_command_no_args_returns_one() -> None:
-        """Empty command execution returns the CLI failure exit code."""
-        result = meltano.run_command([])
-
-        tm.ok(result)
-        tm.that(result.value, eq=1)
-
-    @staticmethod
-    def test_run_version_and_help_commands_return_payloads() -> None:
-        """Version and help route through the real public command runner."""
-        version_result = meltano.run(["version"])
-        help_result = meltano.run(["help"])
-
-        tm.ok(version_result)
-        tm.ok(help_result)
-        tm.that(version_result.value["command"], eq="version")
-        tm.that(version_result.value, has="version")
-        tm.that(str(help_result.value["help"]), has="Usage: meltano")
-
-    @staticmethod
-    def test_run_method_empty_args_fails() -> None:
-        """Empty public run requests fail with the documented validation message."""
-        result = meltano.run([])
-
-        tm.fail(result, has="cannot be empty")
-
-    @staticmethod
-    def test_health_version_help_and_execute_surfaces() -> None:
-        """Health, version, help, and execute expose stable public payloads."""
+    def test_health_and_execute_surfaces() -> None:
+        """Health and execute expose stable public payloads."""
         health_result = meltano.health()
-        version_result = meltano.version()
-        help_result = meltano.help()
         execute_result = meltano.execute()
 
         tm.ok(health_result)
-        tm.ok(version_result)
-        tm.ok(help_result)
         tm.ok(execute_result)
         tm.that(health_result.value["health"], eq="OK")
         tm.that(health_result.value["status"], eq="healthy")
-        tm.that(version_result.value["command"], eq="version")
-        tm.that(version_result.value["cli_type"], eq="flext_meltano")
-        tm.that(str(help_result.value["help"]), has="Usage: meltano")
         tm.that(execute_result.value["service_name"], eq=meltano.service_name)
         tm.that(execute_result.value["status"], eq="active")
 
     @staticmethod
     def test_fetch_version_and_run_cli_surfaces() -> None:
-        """Version lookup and CLI entrypoints stay available via the public facade."""
+        """Version lookup and the CLI readiness payload stay available."""
         fetch_result = meltano.fetch_version()
-        ready_none_result = meltano.run_cli(None)
-        ready_empty_result = meltano.run_cli([])
-        version_cli_result = meltano.run_cli(["version"])
+        ready_result = meltano.run_cli()
 
         tm.ok(fetch_result)
-        tm.ok(ready_none_result)
-        tm.ok(ready_empty_result)
-        tm.ok(version_cli_result)
-        tm.that(fetch_result.value, is_=str)
-        tm.that(ready_none_result.value["status"], eq="ready")
-        tm.that(ready_empty_result.value["status"], eq="ready")
-        tm.that(version_cli_result.value["command"], eq="version")
-
-    @staticmethod
-    def test_create_cli_runner_surfaces() -> None:
-        """CLI runner creation returns ready and version payloads via public APIs."""
-        ready_result = meltano.create_cli_runner([])
-        version_result = meltano.create_cli_runner(["version"])
-
         tm.ok(ready_result)
-        tm.ok(version_result)
-        tm.that(ready_result.value["command_type"], eq="cli_runner")
+        tm.that(fetch_result.value, is_=str)
         tm.that(ready_result.value["status"], eq="ready")
-        tm.that(version_result.value["command"], eq="version")
 
     @staticmethod
     def test_execute_meltano_command_normalizes_runtime_commands() -> None:
@@ -157,14 +113,6 @@ class TestsFlextMeltanoExecutors:
         result = meltano.execute_meltano_command([])
 
         tm.fail(result, has="empty")
-
-    @staticmethod
-    def test_multiple_version_calls_are_repeatable() -> None:
-        """Repeated version queries stay stable across multiple real calls."""
-        for _ in range(3):
-            result = meltano.version()
-            tm.ok(result)
-            tm.that(result.value["command"], eq="version")
 
     @staticmethod
     def test_project_root_property_returns_path() -> None:

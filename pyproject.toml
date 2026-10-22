@@ -598,6 +598,42 @@ msg = "Use cli.render_table from flext_cli."
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."
 
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "flext_cli.FlextCliConfig",
+  "flext_cli.FlextCliModels",
+  "flext_cli.m.ArbitraryTypesModel",
+  "flext_cli.m.BaseModel",
+  "flext_cli.m.Entity",
+  "flext_cli.m.FlexibleModel",
+  "flext_cli.m.FrozenModel",
+  "flext_core.FlextService",
+  "flext_core.FlextSettings",
+  "flext_core.m.BaseModel",
+  "flext_meltano.FlextMeltanoConfig",
+  "flext_meltano.FlextMeltanoConstants.Meltano",
+  "flext_meltano.FlextMeltanoModels",
+  "flext_meltano.FlextMeltanoServiceBase",
+  "flext_meltano.FlextMeltanoSettings",
+  "flext_meltano._constants.settings.FlextMeltanoConstantsSettings",
+  "flext_meltano.m.Value",
+  "flext_meltano.services.FlextMeltanoAbstractions",
+  "flext_meltano.services.FlextMeltanoExecutor",
+  "flext_meltano.services.FlextMeltanoLibraryRunner",
+  "flext_meltano.services.FlextMeltanoPluginDiscoveryMixin",
+  "flext_meltano.services.FlextMeltanoService",
+  "flext_meltano.services.consumer_bases.FlextMeltanoDbtServiceBase",
+  "flext_meltano.services.consumer_bases.FlextMeltanoTapServiceBase",
+  "flext_meltano.services.consumer_bases.FlextMeltanoTargetServiceBase",
+  "flext_meltano.services.executor_base.FlextMeltanoExecutorBase",
+  "flext_tests.FlextTestsModels",
+  "flext_tests.FlextTestsModels.Tests",
+  "flext_tests.FlextTestsServiceBase",
+  "flext_tests.FlextTestsSettings",
+  "pydantic.BaseModel",
+  "tests.m.BaseModel",
+]
+
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false

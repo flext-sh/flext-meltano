@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from flext_core import FlextSettings
 
 from flext_meltano._constants.base import FlextMeltanoConstantsEnums
-from flext_meltano._settings import FlextMeltanoSettings
 
 if TYPE_CHECKING:
     from flext_cli import t
@@ -80,18 +79,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
         """
         return object.__hash__(self)
 
-    # Logging
-    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: ClassVar[int] = 10000
-
     # Environments
-    # Settings-owned environment facts live in the layer-zero ``_settings``
-    # module; the constants facade re-exports the same single home (SSOT).
-    SETTINGS_ENVIRONMENTS: ClassVar[tuple[str, ...]] = (
-        FlextMeltanoSettings.SETTINGS_ENVIRONMENTS
-    )
-    ENVIRONMENT_ALIASES: ClassVar[t.MappingKV[str, str]] = (
-        FlextMeltanoSettings.ENVIRONMENT_ALIASES
-    )
     ENVIRONMENT_RUNTIME_ALIASES: ClassVar[t.StrMapping] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
@@ -103,27 +91,9 @@ class FlextMeltanoConstantsSettings(FlextSettings):
             FlextMeltanoConstantsEnums.ProjectEnvironment.PROD
         ),
     })
-    PRODUCTION_ENVIRONMENT_MARKERS: ClassVar[
-        frozenset[FlextMeltanoConstantsEnums.ProductionEnvironmentToken]
-    ] = frozenset({
-        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.PROD,
-        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.PRODUCTION,
-        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.LIVE,
-    })
-
-    # ComponentTypes
-    COMPONENT_TYPES_VALID: ClassVar[
-        frozenset[FlextMeltanoConstantsEnums.ComponentType]
-    ] = frozenset({
-        FlextMeltanoConstantsEnums.ComponentType.SOURCES,
-        FlextMeltanoConstantsEnums.ComponentType.SINKS,
-        FlextMeltanoConstantsEnums.ComponentType.TRANSFORMERS,
-        FlextMeltanoConstantsEnums.ComponentType.ORCHESTRATORS,
-    })
 
     # Defaults
     DEFAULT_SERVICE_VERSION: ClassVar[str] = "0.9.9"
-    DEFAULT_API_VERSION: ClassVar[str] = "0.9.0"
     DEFAULT_TIMEOUT_SECONDS: ClassVar[int] = 300
 
     # CliDefaults
@@ -132,13 +102,6 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     CLI_DEFAULT_PIPELINE_PID_FILE: ClassVar[str] = "pipeline.pid"
 
     # Capabilities
-    SUPPORTED_PLUGIN_TYPES: ClassVar[
-        tuple[FlextMeltanoConstantsEnums.PluginType, ...]
-    ] = (
-        FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
-        FlextMeltanoConstantsEnums.PluginType.LOADERS,
-        FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
-    )
     PLUGIN_GROUP_ALIASES: ClassVar[
         t.MappingKV[str, FlextMeltanoConstantsEnums.PluginType]
     ] = MappingProxyType({
@@ -168,18 +131,6 @@ class FlextMeltanoConstantsSettings(FlextSettings):
         FlextMeltanoConstantsEnums.HandlerType.SOURCE,
         FlextMeltanoConstantsEnums.HandlerType.SINK,
         FlextMeltanoConstantsEnums.HandlerType.PIPELINE,
-    )
-
-    # FilePaths
-    FILE_PATH_STANDARD_DIRS: ClassVar[
-        tuple[FlextMeltanoConstantsEnums.PipelineDirectory, ...]
-    ] = (
-        FlextMeltanoConstantsEnums.PipelineDirectory.EXTRACT,
-        FlextMeltanoConstantsEnums.PipelineDirectory.LOAD,
-        FlextMeltanoConstantsEnums.PipelineDirectory.TRANSFORM,
-        FlextMeltanoConstantsEnums.PipelineDirectory.ANALYZE,
-        FlextMeltanoConstantsEnums.PipelineDirectory.NOTEBOOK,
-        FlextMeltanoConstantsEnums.PipelineDirectory.ORCHESTRATE,
     )
 
     # BatchDefaults

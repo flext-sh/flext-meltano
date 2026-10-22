@@ -98,15 +98,6 @@ class FlextMeltanoConstantsEnums:
         TEST = "test"
 
     @unique
-    class ComponentType(StrEnum):
-        """Supported service component groups."""
-
-        ORCHESTRATORS = "orchestrators"
-        SINKS = "sinks"
-        SOURCES = "sources"
-        TRANSFORMERS = "transformers"
-
-    @unique
     class DbtCommand(StrEnum):
         """dbt CLI commands used across Meltano integrations."""
 
@@ -116,23 +107,6 @@ class FlextMeltanoConstantsEnums:
         GENERATE = "generate"
         RUN = "run"
         TEST = "test"
-
-    @unique
-    class DbtPathName(StrEnum):
-        """Canonical dbt project path names."""
-
-        ANALYSIS = "analysis"
-        MACROS = "macros"
-        MODELS = "models"
-        SEEDS = "seeds"
-        TESTS = "tests"
-
-    @unique
-    class DbtFileName(StrEnum):
-        """Canonical dbt file names."""
-
-        MANIFEST = "manifest.json"
-        PROJECT = "dbt_project.yml"
 
     @unique
     class SingerMessageType(StrEnum):
@@ -153,30 +127,11 @@ class FlextMeltanoConstantsEnums:
         SOURCE = "source"
 
     @unique
-    class PipelineDirectory(StrEnum):
-        """Standard directory layout for generated Meltano projects."""
-
-        ANALYZE = "analyze"
-        EXTRACT = "extract"
-        LOAD = "load"
-        NOTEBOOK = "notebook"
-        ORCHESTRATE = "orchestrate"
-        TRANSFORM = "transform"
-
-    @unique
     class ServiceType(StrEnum):
         """Service identity tokens reported by Meltano service metadata."""
 
         DBT = "dbt"
         PIPELINE = "pipeline_service"
-
-    @unique
-    class ProductionEnvironmentToken(StrEnum):
-        """Tokens that indicate production-like runtime presence."""
-
-        LIVE = "live"
-        PROD = "prod"
-        PRODUCTION = "production"
 
     @unique
     class StreamStatus(StrEnum):
@@ -216,18 +171,6 @@ class FlextMeltanoConstantsEnums:
         RUN = "run"
         STATUS = "status"
         STOP = "stop"
-
-    @unique
-    class Command(StrEnum):
-        """Top-level CLI command routing identifiers."""
-
-        DBT = "dbt"
-        PIPELINE = "pipeline"
-        PLUGIN = "plugin"
-        STATUS = "status"
-        TAP = "tap"
-        TARGET = "target"
-        VERSION = "version"
 
     @unique
     class ExecutorCommand(StrEnum):

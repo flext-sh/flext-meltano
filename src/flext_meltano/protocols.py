@@ -11,9 +11,6 @@ from flext_cli import FlextCliProtocols
 
 from flext_meltano._protocols import (
     FlextMeltanoProtocolsBase,
-    FlextMeltanoProtocolsPlugin,
-    FlextMeltanoProtocolsProject,
-    FlextMeltanoProtocolsServices,
     FlextMeltanoProtocolsSinger,
 )
 
@@ -22,9 +19,6 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     """Unified Meltano protocols extending FlextCliProtocols."""
 
     class Meltano(
-        FlextMeltanoProtocolsPlugin,
-        FlextMeltanoProtocolsProject,
-        FlextMeltanoProtocolsServices,
         FlextMeltanoProtocolsSinger,
         FlextMeltanoProtocolsBase,
     ):

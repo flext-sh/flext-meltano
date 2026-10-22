@@ -23,12 +23,8 @@ class TestsFlextMeltanoSingerTypes:
 
     # (alias name, resolved __value__ repr fragment) — real public contract table.
     _MELTANO_TYPE_ALIASES: tuple[tuple[str, str], ...] = (
-        ("DbtManifestData", "JsonMapping"),
         ("DbtProject", "JsonMapping"),
-        ("EnvironmentInput", "Environment"),
         ("NestedStrMapping", "Mapping"),
-        ("OptionalScalarMap", "Scalar"),
-        ("ServicePayload", "JsonMapping"),
         ("ValidatorInput", "JsonValue"),
     )
 
@@ -45,10 +41,9 @@ class TestsFlextMeltanoSingerTypes:
 
     @staticmethod
     def test_meltano_namespace_composes_singer_surface() -> None:
-        """Documented contract: Singer typing surface is composed into t.Meltano."""
-        assert hasattr(t.Meltano, "SingerArrayType")
-        assert hasattr(t.Meltano, "SingerBooleanType")
-        assert hasattr(t.Meltano, "SingerPropertiesList")
+        """Singer schema alias is composed into t.Meltano; SDK wrappers live on m."""
+        assert hasattr(t.Meltano, "SingerSchema")
+        assert not hasattr(t.Meltano, "SingerArrayType")
 
     @staticmethod
     def test_meltano_namespace_exposes_tests_subnamespace() -> None:

@@ -18,9 +18,6 @@ class FlextMeltanoTypingsBase:
 
     type ValidatorInput = t.JsonValue
 
-    type VariantValue = str | t.StrSequence | t.ScalarMapping | None
-    """Normalized plugin variant: string, string list, scalar mapping, or null."""
-
     type NormalizedValue = t.Scalar
     """Canonical scalar value after normalization (string, number, boolean, or null)."""
 

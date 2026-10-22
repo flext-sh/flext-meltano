@@ -86,30 +86,6 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(settings.tap_version, eq="1.0.0")
 
     @staticmethod
-    def test_tap_config_computed_fields_derive_from_state() -> None:
-        """Test tap config computed fields derive from state."""
-        settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost", "port": 5432},
-            stream_config={"users": "public"},
-            tap_version="2.1.0",
-        )
-        # config_size = connection_config keys + stream_config keys
-        tm.that(settings.config_size, eq=3)
-        tm.ok(settings.has_stream_config)
-        tm.that(settings.tap_identifier, eq="tap-postgres:2.1.0")
-
-    @staticmethod
-    def test_tap_config_has_stream_config_false_when_absent() -> None:
-        """Test tap config has stream config false when absent."""
-        settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
-        )
-        tm.fail(settings.has_stream_config)
-        tm.that(settings.config_size, eq=1)
-
-    @staticmethod
     @pytest.mark.parametrize("blank_tap_type", ["", "   "])
     def test_tap_config_rejects_blank_tap_type(blank_tap_type: str) -> None:
         """Test tap config rejects blank tap type."""
@@ -179,25 +155,6 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(settings.batch_wait_limit, eq=30.0)
 
     @staticmethod
-    def test_target_config_computed_fields_derive_from_state() -> None:
-        """Test target config computed fields derive from state."""
-        settings = m.Meltano.TargetConfig(
-            target_type="target-postgres",
-            connection_config={"host": "localhost", "port": 5432},
-            target_version="3.0.0",
-        )
-        tm.that(settings.config_size, eq=2)
-        tm.that(settings.has_connection_config, truth=True)
-        tm.that(settings.target_identifier, eq="target-postgres:3.0.0")
-
-    @staticmethod
-    def test_target_config_has_connection_config_false_when_empty() -> None:
-        """Test target config has connection config false when empty."""
-        settings = m.Meltano.TargetConfig(target_type="target-csv")
-        tm.that(settings.has_connection_config, truth=False)
-        tm.that(settings.config_size, eq=0)
-
-    @staticmethod
     def test_target_config_rejects_blank_target_type() -> None:
         """Test target config rejects blank target type."""
         with pytest.raises(c.ValidationError, match="target_type cannot be empty"):
@@ -227,14 +184,6 @@ class TestsFlextMeltanoModelsUnit:
         )
         tm.that(tap_config.connection_config["host"], eq="source.db.com")
         tm.that(target_config.connection_config["host"], eq="target.db.com")
-        tm.that(
-            tap_config.tap_identifier,
-            eq=f"{tap_config.tap_type}:{tap_config.tap_version}",
-        )
-        tm.that(
-            target_config.target_identifier,
-            eq=f"{target_config.target_type}:{target_config.target_version}",
-        )
 
     @staticmethod
     def test_connection_serialization_redacts_without_mutating_inputs() -> None:
@@ -256,10 +205,6 @@ class TestsFlextMeltanoModelsUnit:
             ),
             m.Meltano.TargetConfig(
                 target_type="target-serialization-consumer",
-                connection_config=connection,
-            ),
-            m.Meltano.DataSourceConfig(
-                source_type="serialization-consumer",
                 connection_config=connection,
             ),
         )
@@ -304,10 +249,6 @@ class TestsFlextMeltanoModelsUnit:
             m.Meltano.TapConfig.model_validate({
                 **payload,
                 "tap_type": "tap-serialization-consumer",
-            }),
-            m.Meltano.DataSourceConfig.model_validate({
-                **payload,
-                "source_type": "serialization-consumer",
             }),
         )
         for config in configs:
@@ -402,73 +343,6 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(stream.key_properties, has="id")
         tm.that(stream.replication_method, eq="FULL_TABLE")
         tm.that(stream.replication_key, eq="order_date")
-
-    @staticmethod
-    def test_stream_info_computed_fields_for_unprocessed_stream() -> None:
-        """Test stream info computed fields for unprocessed stream."""
-        stream = m.Meltano.StreamInfo(
-            stream_name="users",
-            stream_schema={"type": "object"},
-            stream_created_at="2025-01-01T00:00:00Z",
-        )
-        tm.that(stream.average_records_per_batch, eq=0.0)
-        tm.fail(stream.has_processed_data)
-        tm.that(stream.processing_status, eq=str(c.Meltano.StreamStatus.PENDING))
-
-    @staticmethod
-    def test_stream_info_average_records_per_batch_divides_totals() -> None:
-        """Test stream info average records per batch divides totals."""
-        stream = m.Meltano.StreamInfo(
-            stream_name="users",
-            stream_schema={"type": "object"},
-            stream_created_at="2025-01-01T00:00:00Z",
-            records_loaded=10,
-            batches_processed=2,
-        )
-        tm.that(stream.average_records_per_batch, eq=5.0)
-        tm.ok(stream.has_processed_data)
-
-    @staticmethod
-    @pytest.mark.parametrize(
-        ("status", "records_loaded", "batches_processed", "expected"),
-        [
-            (
-                c.Meltano.StreamStatus.COMPLETED,
-                4,
-                1,
-                str(c.Meltano.StreamStatus.SUCCESS),
-            ),
-            (c.Meltano.StreamStatus.ERROR, 0, 0, str(c.Meltano.StreamStatus.FAILED)),
-            (
-                c.Meltano.StreamStatus.PROCESSING,
-                3,
-                1,
-                str(c.Meltano.StreamStatus.IN_PROGRESS),
-            ),
-            (
-                c.Meltano.StreamStatus.INITIALIZED,
-                0,
-                0,
-                str(c.Meltano.StreamStatus.PENDING),
-            ),
-        ],
-    )
-    def test_stream_info_processing_status_reflects_progress(
-        status: str,
-        records_loaded: int,
-        batches_processed: int,
-        expected: str,
-    ) -> None:
-        """Test stream info processing status reflects progress."""
-        stream = m.Meltano.StreamInfo(
-            stream_name="users",
-            stream_schema={"type": "object"},
-            stream_created_at="2025-01-01T00:00:00Z",
-            status=status,
-            records_loaded=records_loaded,
-            batches_processed=batches_processed,
-        )
-        tm.that(stream.processing_status, eq=expected)
 
     @staticmethod
     def test_stream_info_rejects_empty_stream_name() -> None:

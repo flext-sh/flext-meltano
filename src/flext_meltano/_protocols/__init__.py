@@ -14,28 +14,16 @@ from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano._protocols.base import FlextMeltanoProtocolsBase
-    from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
-    from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
-    from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
 
 
-__all__: tuple[str, ...] = (
-    "FlextMeltanoProtocolsBase",
-    "FlextMeltanoProtocolsPlugin",
-    "FlextMeltanoProtocolsProject",
-    "FlextMeltanoProtocolsServices",
-    "FlextMeltanoProtocolsSinger",
-)
+__all__: tuple[str, ...] = ("FlextMeltanoProtocolsBase", "FlextMeltanoProtocolsSinger")
 
 install_lazy_exports(
     __name__,
     globals(),
     MappingProxyType({
         "FlextMeltanoProtocolsBase": ".base",
-        "FlextMeltanoProtocolsPlugin": ".plugin",
-        "FlextMeltanoProtocolsProject": ".project",
-        "FlextMeltanoProtocolsServices": ".services",
         "FlextMeltanoProtocolsSinger": ".singer",
     }),
     public_exports=__all__,

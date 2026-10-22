@@ -22,7 +22,7 @@ class TestsFlextMeltanoTypingsUnit:
     """Behavioral contract for the flat ``t.Meltano`` namespace and models."""
 
     @staticmethod
-    @pytest.mark.parametrize("dbt_type_name", ["DbtProject", "DbtManifestData"])
+    @pytest.mark.parametrize("dbt_type_name", ["DbtProject"])
     def test_dbt_types_are_flat_members_of_meltano_namespace(
         dbt_type_name: str,
     ) -> None:
@@ -35,10 +35,7 @@ class TestsFlextMeltanoTypingsUnit:
         "composition_type_name",
         [
             "NestedStrMapping",
-            "OptionalScalarMap",
-            "ServicePayload",
             "ValidatorInput",
-            "EnvironmentInput",
         ],
     )
     def test_composition_types_are_exposed_on_meltano_namespace(
@@ -55,12 +52,9 @@ class TestsFlextMeltanoTypingsUnit:
         """Each composed type is a distinct object, not a shared re-alias."""
         composed = {
             t.Meltano.NestedStrMapping,
-            t.Meltano.OptionalScalarMap,
-            t.Meltano.ServicePayload,
             t.Meltano.ValidatorInput,
-            t.Meltano.EnvironmentInput,
         }
-        tm.that(len(composed), eq=5)
+        tm.that(len(composed), eq=2)
 
     @staticmethod
     @pytest.mark.parametrize(
