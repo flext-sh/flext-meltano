@@ -1,9 +1,9 @@
-"""Singer protocol utilities — message emission, stdin processing, discovery.
+"""Singer protocol utilities — stdin processing and catalog discovery.
 
 Centralizes Singer protocol operations that were duplicated across consumer
 projects. All methods return r[T] and use canonical m.Meltano.* models.
 
-Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
+Access pattern: u.Meltano.process_stdin(), u.Meltano.build_catalog_entry().
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -23,101 +23,7 @@ if TYPE_CHECKING:
 
 
 class FlextMeltanoUtilitiesSinger:
-    """Singer protocol utilities for message emission and stdin processing."""
-
-    @staticmethod
-    def emit_schema(
-        stream_name: str,
-        schema: t.JsonMapping,
-        key_properties: t.StrSequence,
-        bookmark_properties: t.StrSequence | None = None,
-    ) -> p.Result[str]:
-        """Emit a Singer SCHEMA message as JSON line to stdout.
-
-        Args:
-            stream_name: Name of the Singer stream.
-            schema: JSON schema for the stream's records.
-            key_properties: Primary key properties for the stream.
-            bookmark_properties: Optional bookmark columns for incremental replication.
-
-        Returns:
-            r[str] with the serialized JSON line on success.
-
-        """
-        try:
-            msg = m.Meltano.SingerSchemaMessage.model_validate({
-                "stream": stream_name,
-                "schema": schema,
-                "key_properties": list(key_properties),
-                "bookmark_properties": list(bookmark_properties or []),
-            })
-            line = msg.model_dump_json(by_alias=True)
-            sys.stdout.write(line + "\n")
-            sys.stdout.flush()
-            return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
-            return e.fail_operation(
-                f"emit SCHEMA for {stream_name}",
-                exc,
-                result_type=r[str],
-            )
-
-    @staticmethod
-    def emit_record(
-        stream_name: str,
-        record: t.JsonMapping,
-        time_extracted: str | None = None,
-        version: int | None = None,
-    ) -> p.Result[str]:
-        """Emit a Singer RECORD message as JSON line to stdout.
-
-        Args:
-            stream_name: Name of the Singer stream.
-            record: The record data payload.
-            time_extracted: Optional ISO 8601 timestamp of extraction.
-            version: Optional stream version for activate_version protocol.
-
-        Returns:
-            r[str] with the serialized JSON line on success.
-
-        """
-        try:
-            msg = m.Meltano.SingerRecordMessage(
-                stream=stream_name,
-                record=record,
-                time_extracted=time_extracted,
-                version=version,
-            )
-            line = msg.model_dump_json(by_alias=True)
-            sys.stdout.write(line + "\n")
-            sys.stdout.flush()
-            return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
-            return e.fail_operation(
-                f"emit RECORD for {stream_name}",
-                exc,
-                result_type=r[str],
-            )
-
-    @staticmethod
-    def emit_state(value: t.MutableJsonMapping) -> p.Result[str]:
-        """Emit a Singer STATE message as JSON line to stdout.
-
-        Args:
-            value: State bookmark payload.
-
-        Returns:
-            r[str] with the serialized JSON line on success.
-
-        """
-        try:
-            msg = m.Meltano.SingerStateMessage.model_validate({"value": value})
-            line = msg.model_dump_json(by_alias=True)
-            sys.stdout.write(line + "\n")
-            sys.stdout.flush()
-            return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
-            return e.fail_operation("emit STATE", exc, result_type=r[str])
+    """Singer protocol utilities for stdin processing and catalog discovery."""
 
     @staticmethod
     def process_stdin(handler: p.Meltano.SingerTargetHandler) -> p.Result[bool]:
@@ -268,17 +174,18 @@ class FlextMeltanoUtilitiesSinger:
             r[m.Meltano.SingerCatalogEntry] on success.
 
         """
+        replication_method = (
+            c.Meltano.SingerReplicationMethod.INCREMENTAL
+            if replication_key
+            else c.Meltano.SingerReplicationMethod.FULL_TABLE
+        )
         try:
             metadata_entry = m.Meltano.SingerCatalogMetadata(
                 breadcrumb=(),
                 metadata={
                     "selected": is_selected,
                     "replication-key": replication_key or "",
-                    "replication-method": (
-                        c.Meltano.SingerReplicationMethod.INCREMENTAL
-                        if replication_key
-                        else c.Meltano.SingerReplicationMethod.FULL_TABLE
-                    ),
+                    "replication-method": replication_method,
                 },
             )
             entry = m.Meltano.SingerCatalogEntry.model_validate({
@@ -288,11 +195,7 @@ class FlextMeltanoUtilitiesSinger:
                 "key_properties": list(key_properties),
                 "metadata": [metadata_entry],
                 "replication_key": replication_key,
-                "replication_method": (
-                    c.Meltano.SingerReplicationMethod.INCREMENTAL
-                    if replication_key
-                    else c.Meltano.SingerReplicationMethod.FULL_TABLE
-                ),
+                "replication_method": replication_method,
             })
             return r[m.Meltano.SingerCatalogEntry].ok(entry)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:

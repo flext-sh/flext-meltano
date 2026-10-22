@@ -63,7 +63,6 @@ class FlextMeltanoConstantsEnums:
         ERROR = c.HealthStatus.ERROR.value
         EXECUTED = "executed"
         HEALTHY = c.HealthStatus.HEALTHY.value
-        INSTALLED = "installed"
         OK = "OK"
         PASSED = "passed"
         PENDING = c.Status.PENDING.value
@@ -108,15 +107,6 @@ class FlextMeltanoConstantsEnums:
         TRANSFORMERS = "transformers"
 
     @unique
-    class DbtCapability(StrEnum):
-        """dbt operations exposed by the Meltano service layer."""
-
-        DOCS = "docs"
-        RUN = "run"
-        SEED = "seed"
-        TEST = "test"
-
-    @unique
     class DbtCommand(StrEnum):
         """dbt CLI commands used across Meltano integrations."""
 
@@ -125,23 +115,6 @@ class FlextMeltanoConstantsEnums:
         DOCS = "docs"
         GENERATE = "generate"
         RUN = "run"
-        TEST = "test"
-
-    @unique
-    class DbtOption(StrEnum):
-        """dbt CLI options used by Meltano runners."""
-
-        EXCLUDE = "--exclude"
-        FULL_REFRESH = "--full-refresh"
-        MODELS = "--models"
-        PROJECTS_DIR = "--projects-dir"
-        SELECT = "--select"
-
-    @unique
-    class DbtResourceType(StrEnum):
-        """dbt manifest resource types used by project helpers."""
-
-        MODEL = "model"
         TEST = "test"
 
     @unique
@@ -162,25 +135,6 @@ class FlextMeltanoConstantsEnums:
         PROJECT = "dbt_project.yml"
 
     @unique
-    class SingerCapability(StrEnum):
-        """Singer operations exposed by the Meltano service layer."""
-
-        DISCOVER = "discover"
-        SYNC = "sync"
-        VALIDATE = "validate"
-
-    @unique
-    class SingerCliOption(StrEnum):
-        """Singer CLI options shared by tap and target translators."""
-
-        CATALOG = "--catalog"
-        CONFIG = "--config"
-        DISCOVER = "--discover"
-        INPUT = "--input"
-        PROPERTIES = "--properties"
-        STATE = "--state"
-
-    @unique
     class SingerMessageType(StrEnum):
         """Singer protocol message kinds."""
 
@@ -189,19 +143,6 @@ class FlextMeltanoConstantsEnums:
         RECORD = "RECORD"
         SCHEMA = "SCHEMA"
         STATE = "STATE"
-
-    @unique
-    class OperationScope(StrEnum):
-        """Top-level operational areas managed by the Meltano API."""
-
-        DBT = "dbt"
-        ENVIRONMENT = "environment"
-        PIPELINE = "pipeline"
-        PLUGIN = "plugin"
-
-    @unique
-    class DispatchOperation(StrEnum):
-        """High-level API operations dispatched by the service layer."""
 
     @unique
     class HandlerType(StrEnum):
@@ -228,45 +169,6 @@ class FlextMeltanoConstantsEnums:
 
         DBT = "dbt"
         PIPELINE = "pipeline_service"
-
-    @unique
-    class PublicFactoryName(StrEnum):
-        """Public factory names exposed by Meltano runtime helpers."""
-
-        DBT = "Dbt"
-        TAP = "Tap"
-        TARGET = "Target"
-
-    @unique
-    class PluginDiscoveryLabel(StrEnum):
-        """Public plugin labels returned by discovery helpers."""
-
-        EXTRACTOR = "extractor"
-        LOADER = "loader"
-        TRANSFORMER = "transformer"
-
-    @unique
-    class ProjectMaturity(StrEnum):
-        """Maturity levels inferred from project environment layout."""
-
-        BASIC = "basic"
-        DEVELOPING = "developing"
-        MATURE = "mature"
-
-    @unique
-    class ProjectStructureComplexity(StrEnum):
-        """Complexity levels inferred from dbt path customization."""
-
-        COMPLEX = "complex"
-        MODERATE = "moderate"
-        SIMPLE = "simple"
-
-    @unique
-    class ProjectSdkState(StrEnum):
-        """Lifecycle states reported by the Meltano SDK manager."""
-
-        INITIALIZED = "initialized"
-        LOADED = "loaded"
 
     @unique
     class ProductionEnvironmentToken(StrEnum):
@@ -349,23 +251,8 @@ class FlextMeltanoConstantsEnums:
         STATUS = "status"
         STREAM_NAME = "stream_name"
         STREAMS = "streams"
-        TAP_ID = "tap_id"
         TAP_STREAM_ID = "tap_stream_id"
-        TAP_TYPE = "tap_type"
-        TARGET_LOADED = "target_loaded"
         VERSION = "version"
-
-    @unique
-    class SchemaKey(StrEnum):
-        """JSON Schema structure field names."""
-
-        INTEGER = "integer"
-        NUMBER = "number"
-        OBJECT = "object"
-        PROPERTIES = "properties"
-        SCHEMA = "schema"
-        STRING = "string"
-        TYPE = "type"
 
 
 __all__: list[str] = ["FlextMeltanoConstantsEnums"]

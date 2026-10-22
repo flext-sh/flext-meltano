@@ -1,4 +1,4 @@
-"""FLEXT Meltano Protocols - Base protocols.
+"""FLEXT Meltano Protocols - Base executor and dbt project protocols.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,55 +6,70 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from flext_cli import p
+
+from flext_meltano import t
+
 if TYPE_CHECKING:
-    from flext_meltano.protocols import FlextMeltanoProtocols
+    from flext_meltano import m
 
 
 class FlextMeltanoProtocolsBase:
-    """Base and Stream protocol definitions."""
+    """Base executor and dbt project protocol definitions."""
 
     @runtime_checkable
-    class PipelineCli(Protocol):
-        def show_pipeline_help(self) -> None: ...
+    class MeltanoExecutor(Protocol):
+        """Protocol for Meltano command execution."""
+
+        def execute_meltano_command(
+            self,
+            command: t.StrSequence,
+            timeout: int = ...,
+            _cwd: Path | None = None,
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+            """Execute a Meltano runtime command."""
+            ...
+
+        def fetch_project_plugins(
+            self,
+            plugin_type: str | None = None,
+            _cwd: Path | None = None,
+        ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+            """Return project-scoped plugin definitions."""
+            ...
+
+        def execute_dbt_command(
+            self,
+            dbt_command: str,
+            args: t.StrSequence | None = None,
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+            """Execute a DBT command."""
+            ...
 
     @runtime_checkable
-    class SingerCli(Protocol):
-        def show_tap_help(self) -> None: ...
+    class DbtConnectionProfile(Protocol):
+        """Canonical dbt connection profile surface.
 
-        def show_target_help(self) -> None: ...
+        Consumer DBT projects expose a typed model (``m.<Ns>.DbtConnectionProfile``)
+        satisfying this protocol rather than passing raw dictionaries.
+        """
 
-    @runtime_checkable
-    class DbtCli(Protocol):
-        def show_dbt_help(self) -> None: ...
-
-    @runtime_checkable
-    class PluginCli(Protocol):
-        def show_plugin_help(self) -> None: ...
-
-    @runtime_checkable
-    class StatusCli(Protocol):
-        def show_status_help(self) -> None: ...
-
-    @runtime_checkable
-    class CommandRouterCli(Protocol):
         @property
-        def pipeline_manager(self) -> FlextMeltanoProtocols.Meltano.CLIManager: ...
+        def type(self) -> str:
+            """DBT adapter type."""
+            ...
 
         @property
-        def singer_manager(self) -> FlextMeltanoProtocols.Meltano.SingerManager: ...
+        def project(self) -> str:
+            """DBT project name."""
+            ...
 
-        @property
-        def dbt_manager(self) -> FlextMeltanoProtocols.Meltano.CLIManager: ...
-
-        @property
-        def plugin_manager(self) -> FlextMeltanoProtocols.Meltano.CLIManager: ...
-
-        @property
-        def status_manager(self) -> FlextMeltanoProtocols.Meltano.StatusManager: ...
-
-        def show_banner(self) -> None: ...
+        def model_dump(self, *, mode: str = ...) -> t.JsonMapping:
+            """Serialize the profile to a JSON-safe mapping."""
+            ...
 
 
 __all__: list[str] = ["FlextMeltanoProtocolsBase"]

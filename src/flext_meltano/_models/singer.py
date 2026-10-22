@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import Annotated
 
 from flext_cli import m
 
@@ -131,40 +131,6 @@ class FlextMeltanoModelsSinger:
             t.PositiveInt,
             m.Field(description="Stream version to activate"),
         ]
-
-    class SingerStateEntry(m.Entity):
-        """Singer state entry for a stream bookmark.
-
-        Tracks per-stream incremental sync bookmarks with validation
-        ensuring bookmark_key and bookmark_value are both set or both None.
-        """
-
-        stream_name: Annotated[str, m.Field(description="Name of the stream")]
-        bookmark_key: Annotated[
-            str | None,
-            m.Field(default=None, description="Bookmark field for incremental"),
-        ] = None
-        bookmark_value: Annotated[
-            str | None,
-            m.Field(default=None, description="Current bookmark value"),
-        ] = None
-
-        @m.model_validator(mode="after")
-        def validate_bookmark(self) -> Self:
-            """Ensure bookmark_key and bookmark_value are both set or both None.
-
-            Returns:
-                The resulting ``Self``.
-
-            Raises:
-                ValueError: If bookmark_key and bookmark_value must both be set or both
-                    be None.
-
-            """
-            if (self.bookmark_key is None) != (self.bookmark_value is None):
-                msg = "bookmark_key and bookmark_value must both be set or both be None"
-                raise ValueError(msg)
-            return self
 
     class StreamSpec(m.Entity):
         """Declarative Singer stream specification."""

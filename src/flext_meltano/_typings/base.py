@@ -6,9 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from pathlib import Path
-
 from flext_cli import t
 
 
@@ -26,13 +23,6 @@ class FlextMeltanoTypingsBase:
 
     type NormalizedValue = t.Scalar
     """Canonical scalar value after normalization (string, number, boolean, or null)."""
-
-    type PathDict = Mapping[str, str | Path]
-
-    type OptionalScalarMap = Mapping[str, t.Scalar | None]
-
-    type ServicePayload = t.JsonMapping
-    """Canonical payload returned by Meltano service operations."""
 
     type MutableContainerValueMapping = t.MutableFlatContainerMapping
     """Mutable container bridge for Singer SDK record/context mappings."""

@@ -9,9 +9,7 @@ from __future__ import annotations
 import errno
 import os
 import signal
-from collections.abc import Callable
 from pathlib import Path
-from types import MappingProxyType
 
 from flext_cli import cli as flext_cli
 
@@ -33,14 +31,8 @@ from flext_meltano.services import FlextMeltanoExecutor
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     """Pipeline manager for FLEXT Meltano CLI."""
 
-    _cli: p.Meltano.PipelineCli | None = m.PrivateAttr(default_factory=lambda: None)
-
-    def __init__(
-        self,
-        cli: p.Meltano.PipelineCli | None = None,
-        settings: FlextMeltanoSettings | None = None,
-    ) -> None:
-        """Initialize the pipeline manager with an optional CLI reference."""
+    def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
+        """Initialize the pipeline manager with an optional settings snapshot."""
         resolved_settings = (
             settings if settings is not None else type(self).fetch_fresh_settings()
         )
@@ -48,7 +40,6 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             runtime_settings=resolved_settings,
             service_name="FlextMeltanoPipelineManager",
         )
-        self._cli = cli
 
     @classmethod
     def fetch_fresh_settings(cls) -> FlextMeltanoSettings:
@@ -307,131 +298,6 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         if delete_result.failure:
             return r[str].from_failure(delete_result)
         return r[str].ok(name_result.value)
-
-    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle pipeline command using composition.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args or u.Meltano.requests_help(args):
-            if self._cli is not None:
-                self._cli.show_pipeline_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
-        subcommand = args[0]
-        subcommand_args = args[1:]
-        return self._dispatch_pipeline(subcommand, subcommand_args)
-
-    def _create_pipeline(self, args: t.StrSequence) -> p.Result[str]:
-        """Create a new pipeline.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args:
-            return r[str].fail(
-                "Pipeline creation requires pipeline name and JSON configuration",
-            )
-        pipeline_name = args[0]
-        config_payload: t.JsonMapping | None = None
-        if len(args) >= c.Meltano.CLI_DEFAULT_MIN_ARGS_WITH_CONFIG:
-            loaded_config_result = u.Cli.json_loads(args[1])
-            if loaded_config_result.failure:
-                return r[str].from_failure(loaded_config_result)
-            try:
-                config_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": loaded_config_result.value,
-                }).values
-            except ValueError as exc:
-                return e.fail_validation(
-                    "pipeline configuration JSON",
-                    error=exc,
-                    result_type=r[str],
-                )
-        return self.create_pipeline(pipeline_name, config_payload)
-
-    def _delete_pipeline(self, args: t.StrSequence) -> p.Result[str]:
-        """Delete a pipeline.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args:
-            return r[str].fail("Pipeline delete requires pipeline name")
-        return self.delete_pipeline(args[0])
-
-    def _dispatch_pipeline(self, subcommand: str, args: t.StrSequence) -> p.Result[str]:
-        """Dispatch one pipeline subcommand to the matching handler.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        handlers: MappingProxyType[str, Callable[[t.StrSequence], p.Result[str]]] = (
-            MappingProxyType({
-                c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
-                c.Meltano.PipelineCommand.RUN: self._run_pipeline,
-                c.Meltano.PipelineCommand.DELETE: self._delete_pipeline,
-                c.Meltano.PipelineCommand.STOP: self._stop_pipeline,
-                c.Meltano.PipelineCommand.STATUS: self._fetch_pipeline_status,
-            })
-        )
-        handler = handlers.get(subcommand)
-        if handler is not None:
-            return handler(args)
-        lister: Callable[[], p.Result[str]] = self._list_pipelines
-        if subcommand == c.Meltano.PipelineCommand.LIST:
-            return lister()
-        return r[str].fail(f"Unknown pipeline command: {subcommand}")
-
-    def _fetch_pipeline_status(self, args: t.StrSequence) -> p.Result[str]:
-        """Fetch one pipeline status.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args:
-            return r[str].fail("Pipeline status requires pipeline name")
-        return self.fetch_pipeline_status(args[0])
-
-    def _list_pipelines(self) -> p.Result[str]:
-        """List pipelines as one CLI-renderable string.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        return self.list_pipelines().map(
-            lambda pipelines: ", ".join(pipelines) or "none",
-        )
-
-    def _run_pipeline(self, args: t.StrSequence) -> p.Result[str]:
-        """Run a persisted pipeline.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args:
-            return r[str].fail("Pipeline execution requires pipeline name")
-        pipeline_name = args[0]
-        command_args = args[1:] if len(args) > 1 else None
-        return self.execute_pipeline(pipeline_name, command_args)
-
-    def _stop_pipeline(self, args: t.StrSequence) -> p.Result[str]:
-        """Stop a running pipeline.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        if not args:
-            return r[str].fail("Pipeline stop requires pipeline name")
-        return self.stop_pipeline(args[0])
 
 
 __all__: list[str] = ["FlextMeltanoPipelineManager"]

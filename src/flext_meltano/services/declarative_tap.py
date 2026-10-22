@@ -31,12 +31,6 @@ class FlextMeltanoDeclarativeTap:
             """Store the built Singer tap class used for flat-CLI dispatch."""
             self._tap_class = tap_class
 
-        @property
-        def settings(self) -> t.JsonMapping:
-            """Declarative taps carry no eager config; the CLI parses it."""
-            empty: t.JsonMapping = {}
-            return empty
-
         def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
             """Run the Singer flat CLI (``--config/--discover/--catalog/--state``).
 
@@ -54,22 +48,6 @@ class FlextMeltanoDeclarativeTap:
             except SystemExit as exc:
                 return exc.code if isinstance(exc.code, int) else 1
             return 0
-
-        def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
-            """Discover streams through a config-free tap instance.
-
-            Returns:
-                The resulting ``t.SequenceOf[p.Meltano.SingerStreamInfo]``.
-
-            """
-            streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap_class(
-                config=None,
-                validate_config=False,
-            ).discover_streams()
-            return streams
-
-        def sync_all(self) -> None:
-            """Direct sync is CLI-driven for declarative taps."""
 
     @classmethod
     def build(

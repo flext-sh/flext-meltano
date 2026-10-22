@@ -1,8 +1,7 @@
 """Base service for FLEXT dbt consumer projects.
 
-Provides dbt project management, model/test execution, manifest parsing,
-and CLI dispatch via MRO. Consumer dbt projects override
-``connection_profile`` only.
+Provides dbt model/test execution and CLI dispatch via MRO. Consumer dbt
+projects override ``connection_profile`` only.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -12,10 +11,9 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 from flext_meltano.services import FlextMeltanoExecutor
 
 
@@ -28,10 +26,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     This base provides via MRO:
     - dbt command execution (``run_models``, ``run_tests``, ``compile_models``)
-    - Manifest parsing and model/test discovery
     - Documentation generation
     - CLI dispatch
-    - Singleton accessor (``get_instance``)
     """
 
     dbt_project_name: Annotated[
@@ -39,7 +35,6 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         m.Field(description="Canonical dbt project name"),
     ] = c.Meltano.ServiceType.DBT
 
-    _dbt_project_root: Path | None = m.PrivateAttr(default_factory=lambda: None)
     _executor: p.Meltano.MeltanoExecutor = m.PrivateAttr(
         default_factory=FlextMeltanoExecutor,
     )
@@ -60,16 +55,6 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
     # CLI dispatch
     # ------------------------------------------------------------------
-
-    @staticmethod
-    def _cli_arguments(args: t.StrSequence | None) -> list[str]:
-        """Resolve the effective CLI argument vector for dispatch.
-
-        Returns:
-            The resulting ``list[str]``.
-
-        """
-        return list(args) if args else sys.argv[1:]
 
     def _dispatch_dbt_subcommand(
         self,
@@ -129,7 +114,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
         """
         try:
-            command_args = self._cli_arguments(args)
+            command_args = list(args) if args else sys.argv[1:]
             if not command_args:
                 self.logger.info("dbt CLI: no arguments, showing help")
                 return 0
@@ -211,115 +196,6 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             c.Meltano.DbtCommand.DOCS,
             extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
         )
-
-    # ------------------------------------------------------------------
-    # Project management
-    # ------------------------------------------------------------------
-
-    def configure_project_root(self, root: Path) -> p.Result[bool]:
-        """Set dbt project root directory.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        if not root.exists():
-            return r[bool].fail(str(root))
-        self._dbt_project_root = root
-        return r[bool].ok(value=True)
-
-    def _resolve_manifest_path(self, manifest_path: Path | None) -> p.Result[Path]:
-        """Resolve the effective dbt manifest location.
-
-        Returns:
-            The resulting ``p.Result[Path]``.
-
-        """
-        if manifest_path is not None:
-            return r[Path].ok(manifest_path)
-        if self._dbt_project_root is None:
-            return r[Path].fail("No project root set")
-        return r[Path].ok(
-            self._dbt_project_root
-            / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
-            / c.Meltano.DBT_MANIFEST_FILE,
-        )
-
-    @staticmethod
-    def _parse_manifest(path: Path) -> p.Result[t.Meltano.DbtManifestData]:
-        """Parse the dbt manifest file into the public manifest contract.
-
-        Returns:
-            The resulting ``p.Result[t.Meltano.DbtManifestData]``.
-
-        """
-        parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
-        if parsed_result.failure:
-            return r[t.Meltano.DbtManifestData].from_failure(parsed_result)
-        parsed = parsed_result.value
-        manifest_data: t.Meltano.DbtManifestData = {
-            "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
-        }
-        return r[t.Meltano.DbtManifestData].ok(manifest_data)
-
-    def load_manifest(
-        self,
-        manifest_path: Path | None = None,
-    ) -> p.Result[t.Meltano.DbtManifestData]:
-        """Load dbt manifest.json.
-
-        Returns:
-            The resulting ``p.Result[t.Meltano.DbtManifestData]``.
-
-        """
-        try:
-            path_result = self._resolve_manifest_path(manifest_path)
-            if path_result.failure:
-                return r[t.Meltano.DbtManifestData].from_failure(path_result)
-            path = path_result.value
-            if not path.exists():
-                return r[t.Meltano.DbtManifestData].fail(str(path))
-            return self._parse_manifest(path)
-        except c.EXC_KEY_OS_TYPE_VALUE as exc:
-            return r[t.Meltano.DbtManifestData].fail(str(exc), exception=exc)
-
-    def fetch_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
-        """Get model list from manifest.
-
-        Returns:
-            The resulting ``p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]``.
-
-        """
-        manifest_result = self.load_manifest()
-        if manifest_result.failure:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(
-                manifest_result,
-            )
-        try:
-            manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
-        except c.EXC_MAPPING_TYPE as exc:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                str(exc),
-                exception=exc,
-            )
-        return self._build_model_nodes(manifest)
-
-    @staticmethod
-    def _build_model_nodes(
-        manifest: m.Meltano.DbtManifest,
-    ) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
-        models: list[t.Meltano.OptionalScalarMap] = []
-        for node in manifest.nodes.values():
-            if node.resource_type != c.Meltano.DbtResourceType.MODEL:
-                continue
-            node_data = node.model_dump()
-            models.append({
-                "name": str(node_data.get("name")),
-                "path": str(node_data.get("path")),
-                "description": str(node_data.get("description") or ""),
-                "fqn": str(node_data.get("fqn_string") or ""),
-            })
-        return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

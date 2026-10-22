@@ -128,6 +128,7 @@ class TestsFlextMeltanoDockerIntegration:
 
         Raises:
             Error: If a ``psycopg2.Error`` is caught.
+
         """
         conn: psycopg2.extensions.connection | None = None
         result = None

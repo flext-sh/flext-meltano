@@ -67,20 +67,6 @@ class FlextMeltanoModelsCore:
             for key, item in value.items()
         }
 
-    @staticmethod
-    def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
-        """Normalize arbitrary values into a validated list of strings.
-
-        Returns:
-            The resulting ``t.StrSequence``.
-
-        """
-        validated: FlextMeltanoModelsCore.StringListValue = (
-            FlextMeltanoModelsCore.StringListValue.model_validate({"items": value})
-        )
-        items: t.StrTuple = validated.items
-        return items
-
     class SensitiveConfigSerializer:
         """Mixin serializing ``connection_config`` with sensitive data protection.
 

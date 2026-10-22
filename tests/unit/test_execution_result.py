@@ -107,47 +107,6 @@ class TestsFlextMeltanoExecutionResult:
     @pytest.mark.parametrize(
         "case",
         [
-            (["meltano", "version"], True, 0, "meltano, version 1.0.0", "", 0.2),
-            (
-                ["meltano", "run", "invalid"],
-                False,
-                1,
-                "",
-                "Plugin 'invalid' not found",
-                0.1,
-            ),
-            (
-                ["meltano", "run", "tap-large-database", "target-warehouse"],
-                True,
-                0,
-                "Large dataset processed successfully",
-                "",
-                3600.5,
-            ),
-        ],
-    )
-    def test_to_dict_carries_full_public_contract(
-        case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
-    ) -> None:
-        """``to_dict`` mirrors every public field plus an ISO timestamp."""
-        command, success, exit_code, output, error, execution_time = case
-        result = TestsFlextMeltanoExecutionResult._build_result(case)
-        result_dict = result.to_dict()
-        tm.that(result_dict["command"], eq=command)
-        tm.that(result_dict["success"], eq=success)
-        tm.that(result_dict["exit_code"], eq=exit_code)
-        tm.that(result_dict["output"], eq=output)
-        tm.that(result_dict["error"], eq=error)
-        tm.that(result_dict["execution_time"], eq=execution_time)
-        tm.that(
-            str(result_dict["timestamp"]),
-            match=TestsFlextMeltanoExecutionResult._ISO_TIMESTAMP.pattern,
-        )
-
-    @staticmethod
-    @pytest.mark.parametrize(
-        "case",
-        [
             (
                 ["meltano", "invoke", "tap-postgres", "discover"],
                 True,
@@ -208,7 +167,7 @@ class TestsFlextMeltanoExecutionResult:
             error=error,
             execution_time=1.2,
         )
-        result_dict = result.to_dict()
+        result_dict = result.model_dump()
         tm.that(result_dict["error"], eq=error)
         tm.that(result_dict["command"], eq=["meltano", "run", "tap-postgres"])
         tm.fail(result_dict["success"])
