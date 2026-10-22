@@ -124,7 +124,11 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.integration
     @pytest.mark.usefixtures("postgres_service")
     def test_postgres_round_trips_inserted_row(self) -> None:
-        """A row written to PostgreSQL is read back unchanged (real round-trip)."""
+        """A row written to PostgreSQL is read back unchanged (real round-trip).
+
+        Raises:
+            Error: If a ``psycopg2.Error`` is caught.
+        """
         conn: psycopg2.extensions.connection | None = None
         result = None
         try:
