@@ -15,7 +15,7 @@ from tests import c, tm
 class TestsFlextMeltanoServices:
     """Tests for ``FlextMeltanoServices``."""
 
-    pytestmark = (pytest.mark.unit,)
+    pytestmark = pytest.mark.unit
 
     @staticmethod
     def test_component_factory_returns_specialized_facade(

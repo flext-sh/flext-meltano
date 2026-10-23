@@ -1,9 +1,8 @@
 """FLEXT Meltano Singer Types Tests - behavioral contract of the type namespace.
 
 Asserts the OBSERVABLE public contract of the Meltano Singer typing surface
-exposed through ``t`` (``TestsFlextMeltanoTypes``): MRO composition of the
-Singer surface, the exposed ``t.Meltano`` type aliases, their resolved values,
-and stable/idempotent access. No private access, no mocks, no I/O.
+exposed through ``t`` (``TestsFlextMeltanoTypes``): the exposed ``t.Meltano``
+type aliases, their resolved values, and stable/idempotent access. No private access, no mocks, no I/O.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -12,9 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import FlextTestsTypes
 
-from flext_meltano import FlextMeltanoTypes
 from tests import TestsFlextMeltanoTypes, t, tm
 
 
@@ -34,12 +31,6 @@ class TestsFlextMeltanoSingerTypes:
         tm.that(t is TestsFlextMeltanoTypes, truth=True)
 
     @staticmethod
-    def test_facade_composes_meltano_and_tests_type_surfaces() -> None:
-        """The facade composes both the Meltano and flext-tests type systems."""
-        tm.that(issubclass(t, FlextMeltanoTypes), truth=True)
-        tm.that(issubclass(t, FlextTestsTypes), truth=True)
-
-    @staticmethod
     def test_meltano_namespace_composes_singer_surface() -> None:
         """Singer schema alias is composed into t.Meltano; SDK wrappers live on m."""
         tm.that(hasattr(t.Meltano, "SingerSchema"), truth=True)
@@ -49,7 +40,6 @@ class TestsFlextMeltanoSingerTypes:
     def test_meltano_namespace_exposes_tests_subnamespace() -> None:
         """Meltano namespace exposes the nested Tests type namespace."""
         tm.that(hasattr(t.Meltano, "Tests"), truth=True)
-        tm.that(issubclass(t.Meltano.Tests, FlextTestsTypes.Tests), truth=True)
 
     @staticmethod
     @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])

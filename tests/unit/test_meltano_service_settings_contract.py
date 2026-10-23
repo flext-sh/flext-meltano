@@ -18,7 +18,7 @@ from tests import tm, u
 class TestsFlextMeltanoServiceSettingsContract:
     """Tests for the settings contract of ``FlextMeltanoServiceBase`` services."""
 
-    pytestmark = (pytest.mark.unit,)
+    pytestmark = pytest.mark.unit
 
     class YamlConfig(FlextMeltanoConfig):
         """Real config subclass consuming the typed SSOT round-trip payload."""
