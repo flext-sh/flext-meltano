@@ -25,7 +25,7 @@ class TestsFlextMeltanoExecutors:
         meltanofile = project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE
         u.Cli.yaml_dump(
             meltanofile,
-            {"version": 1, "project_id": "discovery-project"},
+            {"project_id": "discovery-project"},
         ).unwrap()
         executor = FlextMeltano(
             runtime_settings=FlextMeltanoSettings.model_validate({
