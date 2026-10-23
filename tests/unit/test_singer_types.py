@@ -31,31 +31,31 @@ class TestsFlextMeltanoSingerTypes:
     @staticmethod
     def test_t_is_the_public_tests_meltano_types_facade() -> None:
         """``t`` exported from tests.typings IS the test types facade class."""
-        assert t is TestsFlextMeltanoTypes
+        tm.that(t is TestsFlextMeltanoTypes, truth=True)
 
     @staticmethod
     def test_facade_composes_meltano_and_tests_type_surfaces() -> None:
         """The facade composes both the Meltano and flext-tests type systems."""
-        assert issubclass(t, FlextMeltanoTypes)
-        assert issubclass(t, FlextTestsTypes)
+        tm.that(issubclass(t, FlextMeltanoTypes), truth=True)
+        tm.that(issubclass(t, FlextTestsTypes), truth=True)
 
     @staticmethod
     def test_meltano_namespace_composes_singer_surface() -> None:
         """Singer schema alias is composed into t.Meltano; SDK wrappers live on m."""
-        assert hasattr(t.Meltano, "SingerSchema")
-        assert not hasattr(t.Meltano, "SingerArrayType")
+        tm.that(hasattr(t.Meltano, "SingerSchema"), truth=True)
+        tm.that(not hasattr(t.Meltano, "SingerArrayType"), truth=True)
 
     @staticmethod
     def test_meltano_namespace_exposes_tests_subnamespace() -> None:
         """Meltano namespace exposes the nested Tests type namespace."""
-        assert hasattr(t.Meltano, "Tests")
-        assert issubclass(t.Meltano.Tests, FlextTestsTypes.Tests)
+        tm.that(hasattr(t.Meltano, "Tests"), truth=True)
+        tm.that(issubclass(t.Meltano.Tests, FlextTestsTypes.Tests), truth=True)
 
     @staticmethod
     @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
     def test_meltano_exposes_public_type_alias(alias_name: str) -> None:
         """Each documented Singer/Meltano type alias is publicly reachable."""
-        assert hasattr(t.Meltano, alias_name)
+        tm.that(hasattr(t.Meltano, alias_name), truth=True)
 
     @staticmethod
     @pytest.mark.parametrize(("alias_name", "value_fragment"), _MELTANO_TYPE_ALIASES)
@@ -72,4 +72,7 @@ class TestsFlextMeltanoSingerTypes:
     @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
     def test_type_alias_access_is_idempotent(alias_name: str) -> None:
         """Repeated access yields the same stable alias object (no rebuild)."""
-        assert getattr(t.Meltano, alias_name) is getattr(t.Meltano, alias_name)
+        tm.that(
+            getattr(t.Meltano, alias_name) is getattr(t.Meltano, alias_name),
+            truth=True,
+        )

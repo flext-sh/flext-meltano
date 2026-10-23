@@ -402,13 +402,11 @@ def test_csv_processing(sample_users_csv):
 # Using configuration fixtures
 def test_meltano_integration(meltano_test_project, flext_meltano_config):
     """Test Meltano integration with fixtures."""
-    settings = flext_meltano_config
-    settings.project_root = str(meltano_test_project)
+    _ = meltano_test_project, flext_meltano_config
 
-    bridge = FlextMeltanoBridge(settings)
-    result = bridge.get_version()
+    result = meltano.fetch_version()
 
-    tm.ok(result.success)
+    tm.ok(result)
 ```
 
 ### **Advanced Fixture Composition**

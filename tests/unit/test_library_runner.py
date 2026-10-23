@@ -55,7 +55,7 @@ class TestsFlextMeltanoLibraryRunner:
         attribute: str,
     ) -> None:
         """The typed CommandExecutionResult carries every documented field."""
-        assert hasattr(dbt_result.unwrap(), attribute)
+        tm.that(hasattr(dbt_result.unwrap(), attribute), truth=True)
 
     @staticmethod
     def test_dbt_result_command_targets_requested_models(

@@ -309,33 +309,24 @@ def test_operation_failure():
     assert isinstance(error, FlextMeltanoError)
 ```
 
-### **Mock Integration Patterns**
+### **Real Runtime Integration Patterns**
+
+Tests exercise the public facade against the real Meltano runtime; mocks and
+patches are not used:
 
 ```text
 from __future__ import annotations
 
-# ✅ CORRECT - Proper mocking for isolation
-from unittest.mock import patch
-
-import pytest
+from flext_meltano import meltano
+from tests import tm
 
 
-@pytest.fixture
-def mock_meltano_adapter():
-    """Provide mocked Meltano adapter for testing."""
-    with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
-        mock.return_value.run_tap.return_value = r.ok({"status": "success"})
-        yield mock
+def test_runtime_command_normalizes_meltano_prefix() -> None:
+    """The in-process executor runs a real Meltano command."""
+    result = meltano.execute_meltano_command(["meltano", "version"])
 
-
-def test_service_with_meltano_integration(mock_meltano_adapter):
-    """Test service integration with mocked Meltano operations."""
-    service = FlextMeltanoService()
-
-    result = service.execute_pipeline("tap-csv", "target-postgres")
-
-    tm.ok(result.success)
-    mock_meltano_adapter.return_value.run_tap.assert_called_once()
+    tm.ok(result)
+    tm.that(result.value.command[0], eq="--version")
 ```
 
 ### **Fixture Best Practices**

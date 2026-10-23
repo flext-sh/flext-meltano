@@ -2,7 +2,7 @@
 
 Behavioral contract tests for the flattened Meltano type namespace
 (``t.Meltano``) and its companion domain models (``m.Meltano``). Tests
-assert the OBSERVABLE public contract: which symbols the flat namespace
+tm.that(the OBSERVABLE public contract: which symbols the flat namespace, truth=True)
 exposes, which legacy nested namespaces and duplicate aliases it refuses,
 where runtime Singer SDK wrappers live, and the public model behavior of
 the exported Singer catalog model.
@@ -27,7 +27,7 @@ class TestsFlextMeltanoTypingsUnit:
         dbt_type_name: str,
     ) -> None:
         """DBT types are exposed flat (``Dbt`` prefix) directly on ``t.Meltano``."""
-        assert hasattr(t.Meltano, dbt_type_name)
+        tm.that(hasattr(t.Meltano, dbt_type_name), truth=True)
         tm.that(getattr(t.Meltano, dbt_type_name), none=False)
 
     @staticmethod
@@ -45,7 +45,7 @@ class TestsFlextMeltanoTypingsUnit:
 
         Exposed on ``t.Meltano``.
         """
-        assert hasattr(t.Meltano, composition_type_name)
+        tm.that(hasattr(t.Meltano, composition_type_name), truth=True)
 
     @staticmethod
     def test_composition_types_are_distinct_symbols() -> None:
@@ -63,7 +63,7 @@ class TestsFlextMeltanoTypingsUnit:
     )
     def test_legacy_nested_namespaces_are_absent(legacy_namespace: str) -> None:
         """Flat namespace refuses the old nested sub-namespaces."""
-        assert not hasattr(t.Meltano, legacy_namespace)
+        tm.that(not hasattr(t.Meltano, legacy_namespace), truth=True)
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -91,7 +91,7 @@ class TestsFlextMeltanoTypingsUnit:
 
         Not exposed on ``t.Meltano``.
         """
-        assert not hasattr(t.Meltano, removed_alias)
+        tm.that(not hasattr(t.Meltano, removed_alias), truth=True)
 
     @staticmethod
     def test_jsonmapping_remains_a_top_level_type_alias() -> None:
@@ -99,8 +99,8 @@ class TestsFlextMeltanoTypingsUnit:
 
         Not exposed on ``t.Meltano``.
         """
-        assert hasattr(t, "JsonMapping")
-        assert not hasattr(t.Meltano, "JsonMapping")
+        tm.that(hasattr(t, "JsonMapping"), truth=True)
+        tm.that(not hasattr(t.Meltano, "JsonMapping"), truth=True)
 
     @staticmethod
     @pytest.mark.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
@@ -112,7 +112,7 @@ class TestsFlextMeltanoTypingsUnit:
         Never on ``t.Meltano``.
         """
         tm.that(getattr(m.Meltano, wrapper_name), none=False)
-        assert not hasattr(t.Meltano, wrapper_name)
+        tm.that(not hasattr(t.Meltano, wrapper_name), truth=True)
 
     @staticmethod
     def test_singer_catalog_entry_is_exposed_as_domain_model() -> None:

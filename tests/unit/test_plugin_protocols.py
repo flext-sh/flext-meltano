@@ -189,4 +189,4 @@ class TestsFlextMeltanoPluginProtocols:
             "PluginCatalog",
             "PluginDefinition",
         ):
-            assert not hasattr(t.Meltano, legacy)
+            tm.that(not hasattr(t.Meltano, legacy), truth=True)

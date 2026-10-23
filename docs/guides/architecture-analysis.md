@@ -28,6 +28,10 @@
 **Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last
 Updated**: 2026-04-14
 
+> **Historical evidence (version 0.9.9).** The classes analysed here
+> (`FlextMeltanoAdapter`, the bridge, the pipeline service) were removed on
+> 2026-10-22. The current public surface is in [API Reference](../api-reference.md).
+
 Comprehensive architecture analysis for FLEXT-Meltano, the enterprise Meltano
 integration framework providing Singer protocol implementation and data pipeline
 orchestration.

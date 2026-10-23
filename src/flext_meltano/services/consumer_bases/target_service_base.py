@@ -1,6 +1,7 @@
 """Base service for FLEXT target consumer projects.
 
-Provides sink management, record processing, and batch lifecycle via MRO. Consumer targets override ``create_sink()`` only.
+Provides sink management, record processing, and batch lifecycle via MRO.
+Consumer targets override ``create_sink()`` only.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

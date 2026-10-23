@@ -77,25 +77,20 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 ```python
 from flext_cli import u
 
-from flext_meltano import FlextMeltanoService
+from flext_meltano import meltano
 
-# Initialize ELT service
-service = FlextMeltanoService()
-
-# Service is ready for ELT operations
-u.Cli.print("flext-meltano service initialized")
+# The shared facade exposes the Meltano runtime operations
+version = meltano.fetch_version().unwrap()
+u.Cli.print(f"Meltano {version}")
 ```
 
 ### **Singer Protocol Operations**
 
-```python
-from flext_meltano import FlextMeltanoTapAbstractions
+```python notest
+from flext_meltano import FlextMeltanoTapServiceBase
 
-# Initialize tap abstractions
-tap_abstractions = FlextMeltanoTapAbstractions()
-
-# Example catalog discovery (requires a configured tap) runs through
-# the discover_catalog operation of the tap abstractions instance.
+# Tap connectors subclass FlextMeltanoTapServiceBase, implement
+# create_tap_instance(), and run the flat Singer CLI through cli_main().
 ```
 
 ### **r Pattern**

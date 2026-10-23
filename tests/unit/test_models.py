@@ -17,7 +17,7 @@ from jsonschema import Draft202012Validator, ValidationError, validate
 from tests import c, m, t, tm, u
 
 
-class TestsFlextMeltanoModelsUnit:
+class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
     """Public-contract tests for Meltano tap/target/stream models."""
 
     @staticmethod
@@ -44,9 +44,15 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(execution_context.elt_context, eq={"extractor_name": "tap-example"})
         tm.that(execution_context.execution_result, eq={"success": True})
         tm.that(result_context.execution_result, eq={"success": True})
-        assert isinstance(execution_context.elt_context, MappingProxyType)
-        assert isinstance(execution_context.execution_result, MappingProxyType)
-        assert isinstance(result_context.execution_result, MappingProxyType)
+        tm.that(isinstance(execution_context.elt_context, MappingProxyType), truth=True)
+        tm.that(
+            isinstance(execution_context.execution_result, MappingProxyType),
+            truth=True,
+        )
+        tm.that(
+            isinstance(result_context.execution_result, MappingProxyType),
+            truth=True,
+        )
 
     # ---- TapConfig ---------------------------------------------------------
 
@@ -225,7 +231,7 @@ class TestsFlextMeltanoModelsUnit:
                 tm.that(exported_database["password"], ne=marker)
                 tm.that(exported_database["name"], eq=database["name"])
                 exported_options = exported["options"]
-                assert isinstance(exported_options, list)
+                tm.that(isinstance(exported_options, list), truth=True)
                 exported_option = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     exported_options[0],
                 )
@@ -239,7 +245,7 @@ class TestsFlextMeltanoModelsUnit:
 
     @staticmethod
     @pytest.mark.parametrize("supplied", [False, True])
-    def test_readonly_stream_config_serialization_roundtrip(supplied: bool) -> None:
+    def test_readonly_stream_config_serialization_roundtrip(*, supplied: bool) -> None:
         """Exporting default or supplied stream mappings keeps their readonly state."""
         stream_input: t.JsonDict = {"users": "public"}
         payload: t.JsonDict = {"connection_config": {"host": "source.example"}}
@@ -260,7 +266,7 @@ class TestsFlextMeltanoModelsUnit:
                 config.model_dump_json(round_trip=True),
             )
             for stream_config in (config.stream_config, restored.stream_config):
-                assert not isinstance(stream_config, MutableMapping)
+                tm.that(not isinstance(stream_config, MutableMapping), truth=True)
                 with pytest.raises(AttributeError, match="update"):
                     methodcaller("update", {"users": "changed"})(stream_config)
                 tm.that(stream_config, eq=config.stream_config)

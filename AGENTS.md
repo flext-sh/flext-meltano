@@ -10,7 +10,7 @@
 
 <!-- AIHUB-AGENTS-SCOPE-LOCAL-BEGIN -->
 
-**Package:** `flext_meltano` · ~10.7k src LOC · deps: `flext-cli`, `flext-core`
+**Package:** `flext_meltano` · ~5.2k src LOC · deps: `flext-cli`, `flext-core`
 
 ## Overview
 
@@ -26,7 +26,7 @@ src/flext_meltano/
 ├── services/
 │   ├── consumer_bases/   # Tap / Target / Dbt bases (connectors subclass)
 │   ├── declarative_tap.py  # sole singer_sdk integration point
-│   ├── executor_base.py dbt_runner.py dbt_project.py bridge.py adapters.py
+│   ├── executor_base.py executor.py library_runner.py singer_sdk.py singer_target.py
 ├── constants.py typings.py protocols.py models.py utilities.py
 └── _constants/ _typings/ _protocols/ _models/ _utilities/
 ```

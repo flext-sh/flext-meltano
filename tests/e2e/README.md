@@ -189,23 +189,20 @@ export FLEXT_ENABLE_METRICS=true
 ```text
 # Complete end-to-end workflow test
 import pytest
-from flext_meltano import FlextMeltanoBridge
+from flext_meltano import meltano
 
 
 @pytest.mark.e2e
 @pytest.mark.slow
 def test_complete_data_pipeline_e2e():
-    """Test complete data pipeline from Go service to data output."""
+    """Test complete data pipeline through the in-process Meltano runtime."""
 
-    # Step 1: Initialize Go service simulation
-    bridge = FlextMeltanoBridge()
+    # Step 1: Execute the ELT run through the public facade
+    result = meltano.execute_meltano_command(["elt", "tap-postgres", "target-csv"])
 
-    # Step 2: Execute complete pipeline
-    result = bridge.run_pipeline("tap-postgres", "target-csv")
-
-    # Step 3: Validate pipeline execution
-    tm.ok(result.success)
-    tm.that(result.data["status"], eq="success")
+    # Step 2: Validate pipeline execution
+    tm.ok(result)
+    tm.ok(result.value.success)
 
     # Step 4: Validate output data
     output_files = glob.glob("output/*.csv")

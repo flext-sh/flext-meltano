@@ -32,6 +32,10 @@
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last
 Updated**: 2026-04-14
 
+> **Historical plan (version 0.9.9).** `FlextMeltanoAdapter`, the project
+> service validators and the pipeline execution API it describes were removed on
+> 2026-10-22. The current public surface is in [API Reference](../api-reference.md).
+
 Implementation plan for transforming FLEXT-Meltano into a **generic, reusable library**
 following the same patterns as FLEXT-LDIF, with complete abstraction from CLI
 dependencies and external Meltano tooling.

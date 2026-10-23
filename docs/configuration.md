@@ -302,27 +302,20 @@ execution_result = service.execute()
 
 ### Configuration Validation
 
+Tap and target configuration is validated by the Pydantic models themselves;
+invalid input raises a validation error at construction:
+
 ```python
-from flext_cli import u
+from flext_meltano import m
 
-from flext_meltano import FlextMeltanoValidators
-
-# Pipeline configuration from the preceding build step
-tap_config = {"name": "tap-csv", "settings": {}}
-target_config = {"name": "target-jsonl", "settings": {}}
-dbt_config = {"name": "dbt-transform", "project_dir": "transform/"}
-
-validators = FlextMeltanoValidators()
-
-# Validate complete pipeline
-validation_result = validators.validate_pipeline_config({
-    "tap": tap_config,
-    "target": target_config,
-    "transform": dbt_config,
+tap_config = m.Meltano.TapConfig.model_validate({
+    "tap_type": "tap-csv",
+    "connection_config": {"files": ["data.csv"]},
 })
-
-if validation_result.failure:
-    u.Cli.print(f"Pipeline validation failed: {validation_result.error}")
+target_config = m.Meltano.TargetConfig.model_validate({
+    "target_type": "target-jsonl",
+    "connection_config": {"destination_path": "output"},
+})
 ```
 
 ---
@@ -442,22 +435,20 @@ if backup_result.success:
 
 ### Schema Validation
 
+Stream schemas are validated by `m.Meltano.StreamDefinition`, which requires a
+`properties` mapping and a known stream status:
+
 ```python
-from flext_meltano import FlextMeltanoValidators
+from flext_meltano import m
 
-validators = FlextMeltanoValidators()
-
-# Validate Singer schema
-schema_validation = validators.validate_singer_schema({
-    "type": "object",
-    "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+stream = m.Meltano.StreamDefinition.model_validate({
+    "stream_name": "users",
+    "source_type": "tap-postgres",
+    "stream_schema": {
+        "type": "object",
+        "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+    },
 })
-
-# Validate dbt models
-model_validation = validators.validate_dbt_models([
-    {"name": "stg_users", "path": "models/staging/stg_users.sql"},
-    {"name": "dim_users", "path": "models/marts/dim_users.sql"},
-])
 ```
 
 ### Runtime Validation
@@ -465,15 +456,11 @@ model_validation = validators.validate_dbt_models([
 ```python
 from flext_cli import u
 
-from flext_meltano import FlextMeltanoExecutor
+from flext_meltano import meltano
 
-executor = FlextMeltanoExecutor()
-
-# Validate execution environment
-env_validation = executor.validate_execution_environment()
-
-if env_validation.failure:
-    u.Cli.print(f"Environment validation failed: {env_validation.error}")
+health = meltano.health()
+if health.failure:
+    u.Cli.print(f"Meltano runtime check failed: {health.error}")
 ```
 
 ---
