@@ -17,8 +17,8 @@ from jsonschema import Draft202012Validator, ValidationError, validate
 from tests import c, m, t, tm, u
 
 
-class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
-    """Public-contract tests for Meltano tap/target/stream models."""
+class TestsPipelineContext:
+    """Public contract for immutable pipeline execution and result contexts."""
 
     @staticmethod
     def test_pipeline_context_mappings_are_normalized_and_immutable(
@@ -54,7 +54,9 @@ class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
             truth=True,
         )
 
-    # ---- TapConfig ---------------------------------------------------------
+
+class TestsTapConfig:
+    """Public contract for tap configuration defaults and validation."""
 
     @staticmethod
     def test_tap_config_exposes_defaults_for_optional_fields() -> None:
@@ -119,7 +121,9 @@ class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
                 "connection_config": "invalid",
             })
 
-    # ---- TargetConfig ------------------------------------------------------
+
+class TestsTargetConfig:
+    """Public contract for target configuration defaults and validation."""
 
     @staticmethod
     def test_target_config_exposes_defaults_for_optional_fields() -> None:
@@ -175,7 +179,9 @@ class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
                 "batch_size": "invalid",
             })
 
-    # ---- Composition -------------------------------------------------------
+
+class TestsModelComposition:
+    """Public contract for model composition and serialization."""
 
     @staticmethod
     def test_tap_and_target_configs_are_independent() -> None:
@@ -317,7 +323,9 @@ class TestsFlextMeltanoModelsUnit:  # ruff: ignore[too-many-public-methods]
         tm.that(stream.stream_schema, eq=schema_input)
         tm.that(schema_input, lacks="type")
 
-    # ---- StreamInfo --------------------------------------------------------
+
+class TestsStreamInfo:
+    """Public contract for stream state and validation."""
 
     @staticmethod
     def test_stream_info_exposes_defaults_for_optional_fields() -> None:
