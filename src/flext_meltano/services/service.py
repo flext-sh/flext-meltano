@@ -56,8 +56,8 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         """
         try:
             instance: Self = cls.model_validate({
-                "service_name": f"{component_name}_service",
-                "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
+                c.ContextKey.SERVICE_NAME: f"{component_name}_service",
+                c.ContextKey.SERVICE_VERSION: c.Meltano.DEFAULT_SERVICE_VERSION,
                 field_name: component_name,
             })
             settings_payload = cls._settings_payload(config)

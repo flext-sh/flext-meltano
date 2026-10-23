@@ -115,7 +115,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         config_result = self._load_pipeline_config(pipeline_name)
         if config_result.failure:
             return r[t.StrSequence].from_failure(config_result)
-        command_value = config_result.value.get("command")
+        command_value = config_result.value.get(c.HandlerMode.COMMAND)
         if not isinstance(command_value, c.SEQUENCE_PAIR_TYPES):
             return r[t.StrSequence].fail("Pipeline execution not configured")
         command = m.Meltano.StringListValue.model_validate({

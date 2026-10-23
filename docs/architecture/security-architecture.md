@@ -236,7 +236,7 @@ class UserRole:
 ADMIN_ROLE = UserRole(
     name="admin",
     permissions={"*"},  # All permissions
-    scope="global",
+    scope=c.ContextScope.GLOBAL,
 )
 
 DATA_ENGINEER_ROLE = UserRole(
@@ -314,7 +314,7 @@ class SessionManager:
         """Create new user session."""
         session_id = self._generate_secure_session_id()
         session_data = {
-            "user_id": user_id,
+            c.ContextKey.USER_ID: user_id,
             "created_at": datetime.utcnow().isoformat(),
             "last_activity": datetime.utcnow().isoformat(),
             "metadata": metadata,
@@ -800,13 +800,13 @@ class SecurityAuditor:
 
         # Add user context if available
         if hasattr(self, "_current_user"):
-            audit_entry["user_id"] = self._current_user.id
+            audit_entry[c.ContextKey.USER_ID] = self._current_user.id
             audit_entry["user_role"] = self._current_user.role
 
         # Add request context
         if hasattr(self, "_current_request"):
             audit_entry.update({
-                "request_id": self._current_request.id,
+                c.ContextKey.REQUEST_ID: self._current_request.id,
                 "client_ip": self._current_request.client_ip,
                 "user_agent": self._current_request.user_agent,
                 "endpoint": self._current_request.endpoint,

@@ -73,7 +73,7 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     @pytest.mark.parametrize(
-        "command",
+        c.HandlerMode.COMMAND,
         [c.Meltano.CliCommand.TAP, c.Meltano.CliCommand.TARGET],
     )
     def test_unsupported_extractor_operation_reports_failure(

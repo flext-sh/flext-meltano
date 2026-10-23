@@ -18,7 +18,7 @@ from tests import c, u
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from tests import t
+from tests import t
 
 MELTANO_COMPONENT_CASES: t.VariadicTuple[t.Meltano.ComponentCase] = (
     ("tap", "tap-csv", "source_name"),
@@ -46,7 +46,7 @@ def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.Componen
 
 
 @pytest.fixture(
-    params=["version", "service_name", "status", "handlers"],
+    params=["version", c.ContextKey.SERVICE_NAME, "status", "handlers"],
     ids=["version", "service-name", "status", "handlers"],
 )
 def meltano_execute_field(request: pytest.FixtureRequest) -> str:

@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-from tests import m, t, tm
+from tests import c, m, t, tm
 
 
 class TestsFlextMeltanoExecutionResult:
@@ -169,7 +169,9 @@ class TestsFlextMeltanoExecutionResult:
         )
         result_dict = result.model_dump()
         tm.that(result_dict["error"], eq=error)
-        tm.that(result_dict["command"], eq=["meltano", "run", "tap-postgres"])
+        tm.that(
+            result_dict[c.HandlerMode.COMMAND], eq=["meltano", "run", "tap-postgres"]
+        )
         tm.fail(result_dict["success"])
 
     @staticmethod

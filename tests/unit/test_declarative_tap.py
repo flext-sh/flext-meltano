@@ -11,8 +11,8 @@ import io
 import signal
 from pathlib import Path
 
-from flext_meltano import m, p, r, services, t
-from tests import tm, u
+from flext_meltano import m, p, services, t
+from tests import r, tm, u
 
 
 class TestsFlextMeltanoDeclarativeTap:

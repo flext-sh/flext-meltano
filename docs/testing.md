@@ -318,7 +318,8 @@ patches are not used:
 from __future__ import annotations
 
 from flext_meltano import meltano
-from tests import tm
+from tests import c, r
+from tests import c, tm
 
 
 def test_runtime_command_normalizes_meltano_prefix() -> None:

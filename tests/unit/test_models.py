@@ -28,7 +28,7 @@ class TestsFlextMeltanoModelsUnit:
             [
                 {"extractor_name": "tap-example"},
                 {"success": True},
-                MappingProxyType({"command": ["meltano", "--version"]}),
+                MappingProxyType({c.HandlerMode.COMMAND: ["meltano", "--version"]}),
             ],
         )
         def test_pipeline_context_mappings_are_normalized_and_immutable(
@@ -68,7 +68,7 @@ class TestsFlextMeltanoModelsUnit:
                 connection_config={
                     "host": "db.example.com",
                     "port": 3306,
-                    "user": "etl_user",
+                    c.ContextScope.USER: "etl_user",
                     "password": "secret",
                 },
                 stream_config={"users": "public", "orders": "commerce"},
@@ -139,7 +139,7 @@ class TestsFlextMeltanoModelsUnit:
                     "host": "localhost",
                     "port": 5432,
                     "database": "analytics",
-                    "user": "etl_user",
+                    c.ContextScope.USER: "etl_user",
                     "password": "p" + "8" * 8,
                 },
                 batch_size=1000,

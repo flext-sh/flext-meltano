@@ -80,7 +80,9 @@ class TestsFlextMeltanoExecutors:
         tm.ok(execute_result)
         tm.that(health_result.value["health"], eq="OK")
         tm.that(health_result.value["status"], eq="healthy")
-        tm.that(execute_result.value["service_name"], eq=meltano.service_name)
+        tm.that(
+            execute_result.value[c.ContextKey.SERVICE_NAME], eq=meltano.service_name
+        )
         tm.that(execute_result.value["status"], eq="active")
 
     @staticmethod

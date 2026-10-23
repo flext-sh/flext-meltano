@@ -83,7 +83,7 @@ class FlextMeltano(
             handler.value for handler in c.Meltano.HANDLER_ALL
         ]
         payload: t.JsonDict = {
-            "service_name": self.service_name,
+            c.ContextKey.SERVICE_NAME: self.service_name,
             "version": self.service_version,
             "status": "active",
             "timestamp": u.generate_iso_timestamp(),

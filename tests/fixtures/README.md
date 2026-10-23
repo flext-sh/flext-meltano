@@ -118,6 +118,7 @@ fixtures/
 ```text
 # Standard pytest fixture usage
 import pytest
+from tests import c, r
 from tests import (
     sample_csv_data,
     meltano_test_project,
@@ -302,7 +303,7 @@ def mock_database_connection():
 
 ```text
 # Optimized fixture with caching
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=c.ContextScope.SESSION)
 def expensive_fixture():
     """Session-scoped fixture for expensive setup."""
     # Setup once per test session

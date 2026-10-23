@@ -295,7 +295,7 @@ make test                              # Coverage thresholds in pyproject.toml
 
 ```text
 # E2E test data lifecycle
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=c.ContextScope.SESSION)
 def e2e_test_environment():
     """Setup complete E2E test environment."""
 

@@ -119,7 +119,7 @@ class TestsFlextMeltanoServices:
         tm.ok(result)
         payload = result.value
         tm.that(payload["status"], eq="active")
-        tm.that(payload["service_name"], eq=meltano.service_name)
+        tm.that(payload[c.ContextKey.SERVICE_NAME], eq=meltano.service_name)
         tm.that(payload["version"], eq=meltano.service_version)
         tm.ok("timestamp" in payload)
         tm.ok("handlers" in payload)
@@ -133,6 +133,9 @@ class TestsFlextMeltanoServices:
         tm.that(second, ok=True)
         tm.ok(first)
         tm.ok(second)
-        tm.that(first.value["service_name"], eq=second.value["service_name"])
+        tm.that(
+            first.value[c.ContextKey.SERVICE_NAME],
+            eq=second.value[c.ContextKey.SERVICE_NAME],
+        )
         tm.that(first.value["version"], eq=second.value["version"])
         tm.that(first.value["handlers"], eq=second.value["handlers"])

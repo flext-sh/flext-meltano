@@ -13,7 +13,7 @@ from __future__ import annotations
 import pytest
 
 from flext_meltano import m, meltano, p, t
-from tests import tm
+from tests import c, tm
 
 
 @pytest.mark.docker
@@ -22,7 +22,7 @@ class TestsFlextMeltanoLibraryRunner:
 
     # Attributes the typed CommandExecutionResult exposes per the public contract.
     _COMMAND_RESULT_ATTRIBUTES: t.VariadicTuple[str] = (
-        "command",
+        c.HandlerMode.COMMAND,
         "success",
         "output",
         "error",

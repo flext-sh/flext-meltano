@@ -2,7 +2,8 @@
 
 Asserts the OBSERVABLE public contract of the Meltano Singer typing surface
 exposed through ``t`` (``TestsFlextMeltanoTypes``): the exposed ``t.Meltano``
-type aliases, their resolved values, and stable/idempotent access. No private access, no mocks, no I/O.
+type aliases, their resolved values, and stable/idempotent access.
+No private access, no mocks, no I/O.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

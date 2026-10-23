@@ -84,7 +84,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
             dict(data)
         )
         settings = normalized.pop("settings", None)
-        for field_name in ("service_name", "service_version"):
+        for field_name in (c.ContextKey.SERVICE_NAME, c.ContextKey.SERVICE_VERSION):
             if normalized.get(field_name) is None:
                 normalized.pop(field_name, None)
         if settings is None or "runtime_settings" in normalized:

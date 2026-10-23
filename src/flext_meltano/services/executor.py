@@ -26,7 +26,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 "status": c.Meltano.OperationStatus.HEALTHY
                 if cmd_result.success
                 else c.Meltano.OperationStatus.ERROR,
-                "command": "health",
+                c.HandlerMode.COMMAND: "health",
                 "command_type": "health",
                 "health": "OK" if cmd_result.success else "DEGRADED",
                 "exit_code": cmd_result.exit_code,
