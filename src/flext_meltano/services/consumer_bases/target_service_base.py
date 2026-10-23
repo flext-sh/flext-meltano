@@ -45,6 +45,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         self,
         _stream_name: str,
         _schema: t.JsonMapping,
+        /,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 

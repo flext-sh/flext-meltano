@@ -50,6 +50,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     def create_tap_instance(
         self,
         _settings: p.Settings | None = None,
+        /,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
