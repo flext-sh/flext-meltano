@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from collections.abc import MutableMapping
 from operator import methodcaller
-from pathlib import Path
 from types import MappingProxyType
 
 import pytest
@@ -21,44 +20,27 @@ class TestsFlextMeltanoModelsUnit:
     """Public-contract tests for Meltano tap/target/stream models."""
 
     class TestsPipelineContext:
-        """Public contract for immutable pipeline execution and result contexts."""
+        """Public contract for normalized, read-only pipeline ingress."""
 
         @staticmethod
+        @pytest.mark.parametrize(
+            "values",
+            [
+                {"extractor_name": "tap-example"},
+                {"success": True},
+                MappingProxyType({"command": ["meltano", "--version"]}),
+            ],
+        )
         def test_pipeline_context_mappings_are_normalized_and_immutable(
-            tmp_path: Path,
+            values: t.JsonMapping,
         ) -> None:
-            """Test pipeline context mappings are normalized and immutable."""
-            project_root = tmp_path / "project"
-            execution_context = m.Meltano.PipelineExecutionContext(
-                project_root=f" {project_root} ",
-                elt_context={"extractor_name": "tap-example"},
-                extractor_name=" tap-example ",
-                loader_name=" target-example ",
-                execution_result={"success": True},
-            )
-            result_context = m.Meltano.PipelineResultContext(
-                project_root=f" {project_root} ",
-                execution_result={"success": True},
-            )
-
-            tm.that(execution_context.project_root, eq=str(project_root))
-            tm.that(execution_context.extractor_name, eq="tap-example")
-            tm.that(execution_context.loader_name, eq="target-example")
-            tm.that(execution_context.elt_context, eq={"extractor_name": "tap-example"})
-            tm.that(execution_context.execution_result, eq={"success": True})
-            tm.that(result_context.execution_result, eq={"success": True})
-            tm.that(
-                isinstance(execution_context.elt_context, MappingProxyType),
-                truth=True,
-            )
-            tm.that(
-                isinstance(execution_context.execution_result, MappingProxyType),
-                truth=True,
-            )
-            tm.that(
-                isinstance(result_context.execution_result, MappingProxyType),
-                truth=True,
-            )
+            """Pipeline ingress validates JSON values and rejects mapping mutation."""
+            payload = m.Meltano.ConfigMappingPayload.model_validate({"values": values})
+            tm.that(payload.values, eq=values)
+            tm.that(isinstance(payload.values, MappingProxyType), truth=True)
+            with pytest.raises(AttributeError, match="update"):
+                methodcaller("update", {"unexpected": True})(payload.values)
+            tm.that(payload.values, eq=values)
 
     class TestsTapConfig:
         """Public contract for tap configuration defaults and validation."""
@@ -239,7 +221,9 @@ class TestsFlextMeltanoModelsUnit:
                     )
                     tm.that(exported_database["password"], ne=marker)
                     tm.that(exported_database["name"], eq=database["name"])
-                    exported_options = exported["options"]
+                    exported_options = u.json_list_adapter().validate_python(
+                        exported["options"],
+                    )
                     tm.that(isinstance(exported_options, list), truth=True)
                     exported_option = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                         exported_options[0],
@@ -325,7 +309,12 @@ class TestsFlextMeltanoModelsUnit:
                 )
                 Draft202012Validator.check_schema(schema)
                 validate({"id": 1}, schema, cls=Draft202012Validator)
-                for invalid in ({"id": "not-an-integer"}, {}, [{"id": 1}]):
+                invalid_records: tuple[t.JsonValue, ...] = (
+                    {"id": "not-an-integer"},
+                    {},
+                    [{"id": 1}],
+                )
+                for invalid in invalid_records:
                     with pytest.raises(ValidationError):
                         validate(invalid, schema, cls=Draft202012Validator)
             tm.that(stream.stream_schema, eq=schema_input)

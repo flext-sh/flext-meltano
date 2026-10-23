@@ -11,6 +11,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import signal
+import threading
 from typing import TYPE_CHECKING, override
 
 from singer_sdk import Stream, Tap
@@ -39,6 +41,14 @@ class FlextMeltanoDeclarativeTap:
 
             """
             command = self._tap_class.get_singer_command()
+            handlers = (
+                {
+                    signum: signal.getsignal(signum)
+                    for signum in (signal.SIGINT, signal.SIGTERM)
+                }
+                if threading.current_thread() is threading.main_thread()
+                else {}
+            )
             try:
                 _ = command.main(
                     args=list(args),
@@ -47,6 +57,10 @@ class FlextMeltanoDeclarativeTap:
                 )
             except SystemExit as exc:
                 return exc.code if isinstance(exc.code, int) else 1
+            finally:
+                # Singer installs process handlers even for an embedded CLI call.
+                for signum, handler in handlers.items():
+                    signal.signal(signum, handler)
             return 0
 
     @classmethod

@@ -62,7 +62,17 @@ class TestsFlextMeltanoServiceSettingsContract:
             update={"lifecycle_probe": "yaml-roundtrip"},
         )
         expected = config.model_copy(update={"Meltano": namespace})
-        tm.ok(u.Cli.yaml_dump(tmp_path / "roundtrip.yaml", expected.model_dump()))
+        tm.ok(
+            u.Cli.yaml_dump(
+                tmp_path / "roundtrip.yaml",
+                {
+                    "Meltano": namespace.model_dump(
+                        mode="json",
+                        include={"lifecycle_probe"},
+                    ),
+                },
+            ),
+        )
         prefix = owner.__module__.split(".", 1)[0].upper()
         with u.Tests.env_vars_context({f"{prefix}_CONFIG_DIR": str(tmp_path)}):
             owner.reset_for_testing()

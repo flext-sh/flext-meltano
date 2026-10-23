@@ -52,7 +52,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
             else settings
         )
-        return u.Meltano.resolve_project_root(active_settings) or Path.cwd()
+        return (
+            u.Meltano.resolve_project_root(active_settings.Meltano.project_root)
+            or Path.cwd()
+        )
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
@@ -82,7 +85,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
             else settings
         )
-        configured_root: Path | None = u.Meltano.resolve_project_root(active_settings)
+        configured_root = u.Meltano.resolve_project_root(
+            active_settings.Meltano.project_root,
+        )
         if configured_root is not None:
             return configured_root
         if _cwd is not None:
