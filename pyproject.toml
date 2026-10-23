@@ -130,12 +130,14 @@ package_name = "flext_meltano"
 scan_dirs = ["src"]
 
 [tool.hatch.build.targets.wheel]
+exclude = ["/src/flext_meltano/config"]
 only-include = ["src/flext_meltano"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src/flext_meltano" = "flext_meltano"
 
 [tool.hatch.build.targets.wheel.force-include]
+"src/flext_meltano/config" = "flext_meltano/config"
 "pyproject.toml" = "flext_meltano/pyproject.toml"
 
 [tool.hatch.build.targets.sdist]
