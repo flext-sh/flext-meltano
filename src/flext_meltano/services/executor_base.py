@@ -326,7 +326,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return self.execute_meltano_command(
                 u.Meltano.build_dbt_runtime_command(dbt_command, args),
             )
-        except c.Meltano.OPERATION_ERRORS as e:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
 
 

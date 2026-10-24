@@ -74,7 +74,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 )
                 instance = copied
             return r.ok(instance)
-        except c.Meltano.OPERATION_ERRORS as ex:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as ex:
             # Why: fail() binds its payload type from the result class's own
             # parameter, which no caller-side spelling carries through both
             # checkers; the declared owner contract is cast once here.

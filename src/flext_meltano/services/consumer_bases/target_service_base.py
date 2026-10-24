@@ -138,7 +138,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             self._sinks[stream_name] = sink
             self.logger.debug("Sink created", stream=stream_name)
             return r[p.Meltano.SingerDrainSink].ok(sink)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc), exception=exc)
 
     def flush(self, stream_name: str | None = None) -> p.Result[bool]:
@@ -159,7 +159,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
                 sink.process_batch(context)
                 sink.mark_drained()
             return r[bool].ok(value=True)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[bool].fail(str(exc), exception=exc)
 
     # ------------------------------------------------------------------
@@ -186,7 +186,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[bool].fail(str(exc), exception=exc)
 
     @override

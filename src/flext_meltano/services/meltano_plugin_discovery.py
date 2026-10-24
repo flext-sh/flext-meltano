@@ -79,7 +79,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         """
         try:
             return self._discover_plugins(project)
-        except c.Meltano.OPERATION_ERRORS as e:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
             return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
@@ -174,7 +174,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
         try:
             return _run_fetch_plugin_info()
-        except c.Meltano.OPERATION_ERRORS as e:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
             return r[t.StrMapping].fail(error_msg)

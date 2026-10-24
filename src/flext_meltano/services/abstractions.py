@@ -105,7 +105,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                 plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
                 _cwd=cwd,
             )
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             error_msg = f"Failed to get plugins of type {plugin_type}: {exc}"
             return r[t.Meltano.NestedStrMapping].fail(error_msg)
         if plugins_result.failure:
@@ -136,7 +136,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                     f"Project path is not a valid directory: {project_root}",
                 )
             return r[Path].ok(project_root)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             error_msg = f"Failed to load pipeline project: {exc}"
             return r[Path].fail(error_msg)
 
@@ -190,7 +190,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
         try:
             return _run_discover_streams()
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             self.logger.exception(
                 c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED,
                 error=str(exc),
