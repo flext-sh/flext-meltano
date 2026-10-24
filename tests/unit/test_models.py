@@ -12,10 +12,9 @@ from pathlib import Path
 from types import MappingProxyType
 
 import pytest
-from jsonschema import Draft202012Validator
-from jsonschema.protocols import Validator
+from jsonschema import Draft202012Validator, ValidationError, validate
 
-from tests import c, m, t, tm
+from tests import c, m, t, tm, u
 
 
 class TestsFlextMeltanoModelsUnit:
@@ -177,9 +176,7 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(settings.target_type, eq="target-postgres")
         tm.that(settings.connection_config["database"], eq="analytics")
         tm.that(settings.batch_size, eq=1000)
-        batch_wait_limit = settings.batch_wait_limit
-        assert batch_wait_limit is not None
-        tm.that(abs(batch_wait_limit - 30.0), lt=1e-9)
+        tm.that(settings.batch_wait_limit, eq=30.0)
 
     @staticmethod
     def test_target_config_computed_fields_derive_from_state() -> None:
@@ -268,25 +265,23 @@ class TestsFlextMeltanoModelsUnit:
         )
         for config in configs:
             payloads = (
-                t.Cli.JSON_MAPPING_ADAPTER.validate_python(
-                    config.model_dump(mode="json"),
-                ),
-                t.Cli.JSON_MAPPING_ADAPTER.validate_json(config.model_dump_json()),
+                config.model_dump(mode="json"),
+                u.Cli.JSON_MAPPING_ADAPTER.validate_json(config.model_dump_json()),
             )
             for payload in payloads:
-                exported = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                exported = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     payload["connection_config"],
                 )
                 tm.that(exported["display_name"], eq=connection["display_name"])
                 tm.that(list(exported.values()), lacks=marker)
-                exported_database = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                exported_database = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     exported["database"],
                 )
                 tm.that(exported_database["password"], ne=marker)
                 tm.that(exported_database["name"], eq=database["name"])
                 exported_options = exported["options"]
                 assert isinstance(exported_options, list)
-                exported_option = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                exported_option = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                     exported_options[0],
                 )
                 tm.that(exported_option["token"], ne=marker)
@@ -316,11 +311,10 @@ class TestsFlextMeltanoModelsUnit:
             }),
         )
         for config in configs:
-            original = dict(config.stream_config)
-            exported = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+            tm.that(
                 config.model_dump(mode="json")["stream_config"],
+                eq=config.stream_config,
             )
-            tm.that(exported, eq=original)
             restored = type(config).model_validate_json(
                 config.model_dump_json(round_trip=True),
             )
@@ -328,7 +322,7 @@ class TestsFlextMeltanoModelsUnit:
                 assert not isinstance(stream_config, MutableMapping)
                 with pytest.raises(AttributeError, match="update"):
                     methodcaller("update", {"users": "changed"})(stream_config)
-                tm.that(stream_config, eq=original)
+                tm.that(stream_config, eq=config.stream_config)
         tm.that(stream_input, eq={"users": "public"})
 
     @staticmethod
@@ -361,21 +355,18 @@ class TestsFlextMeltanoModelsUnit:
             stream_schema=schema_input,
         )
         payloads = (
-            t.Cli.JSON_MAPPING_ADAPTER.validate_python(stream.model_dump(mode="json")),
-            t.Cli.JSON_MAPPING_ADAPTER.validate_json(stream.model_dump_json()),
+            stream.model_dump(mode="json"),
+            u.Cli.JSON_MAPPING_ADAPTER.validate_json(stream.model_dump_json()),
         )
-        validators: t.MutableSequenceOf[Validator] = []
         for payload in payloads:
-            schema = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+            schema = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
                 payload["stream_schema"],
             )
             Draft202012Validator.check_schema(schema)
-            validators.append(Draft202012Validator(schema))
-        for validator in validators:
-            validator.validate({"id": 1})
-            assert not validator.is_valid({"id": "not-an-integer"})
-            assert not validator.is_valid({})
-            assert not validator.is_valid([{"id": 1}])
+            validate({"id": 1}, schema, cls=Draft202012Validator)
+            for invalid in ({"id": "not-an-integer"}, {}, [{"id": 1}]):
+                with pytest.raises(ValidationError):
+                    validate(invalid, schema, cls=Draft202012Validator)
         tm.that(stream.stream_schema, eq=schema_input)
         tm.that(schema_input, lacks="type")
 

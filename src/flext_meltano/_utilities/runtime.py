@@ -370,7 +370,7 @@ class FlextMeltanoUtilitiesRuntime:
         source_payload = (
             payload if extra_fields is None else {**payload, **extra_fields}
         )
-        return t.Cli.JSON_MAPPING_ADAPTER.validate_python(source_payload)
+        return u.Cli.JSON_MAPPING_ADAPTER.validate_python(source_payload)
 
     @staticmethod
     def build_mutable_command_execution_payload(
