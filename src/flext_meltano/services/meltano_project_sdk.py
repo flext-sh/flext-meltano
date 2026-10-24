@@ -181,7 +181,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 "value": variant_raw,
             })
             json_variant = (
-                t.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)
+                u.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)
                 if variant_payload.value is not None
                 else None
             )
