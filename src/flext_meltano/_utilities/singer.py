@@ -190,7 +190,7 @@ class FlextMeltanoUtilitiesSinger:
             )
             entry = m.Meltano.SingerCatalogEntry.model_validate({
                 "tap_stream_id": stream_name,
-                "stream": stream_name,
+                c.ProcessingMode.STREAM: stream_name,
                 "schema": schema,
                 "key_properties": list(key_properties),
                 "metadata": [metadata_entry],

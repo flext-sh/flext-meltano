@@ -150,7 +150,7 @@ def meltano_project(
         "directory": meltano_project_dir,
         "config_path": meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
-        "version": "1",
+        "version": c.ParserBooleanToken.ONE,
         "settings": meltano_yml_config,
     }
 

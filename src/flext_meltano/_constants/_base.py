@@ -167,7 +167,7 @@ class FlextMeltanoConstantsEnums:
 
         CREATE = "create"
         DELETE = "delete"
-        LIST = "list"
+        LIST = c.Action.LIST
         RUN = "run"
         STATUS = "status"
         STOP = "stop"
@@ -180,7 +180,7 @@ class FlextMeltanoConstantsEnums:
         HELP = "help"
         INFO = "info"
         INSTALL = "install"
-        LIST = "list"
+        LIST = c.Action.LIST
         PIPELINE = "pipeline"
         RUN = "run"
         SELECT = "select"

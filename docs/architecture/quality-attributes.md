@@ -3069,7 +3069,7 @@ class APIResource:
             links[c.ContextScope.USER] = f"/api/v1/users/{self.user_id}"
 
         # Add action links
-        links["update"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
+        links[c.MergeStrategy.UPDATE] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
         links["delete"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
 
         return links

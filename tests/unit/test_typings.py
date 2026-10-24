@@ -119,7 +119,7 @@ class TestsFlextMeltanoTypingsUnit:
         """The Singer catalog entry is exposed as a real model on ``m.Meltano``."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "users",
-            "stream": "users",
+            c.ProcessingMode.STREAM: "users",
             "schema": {"type": "object"},
         })
 
@@ -131,7 +131,7 @@ class TestsFlextMeltanoTypingsUnit:
         """A valid Singer catalog entry constructs and exposes its fields publicly."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "users",
-            "stream": "users",
+            c.ProcessingMode.STREAM: "users",
             "schema": {"type": "object"},
         })
 
@@ -143,7 +143,7 @@ class TestsFlextMeltanoTypingsUnit:
         """``model_dump`` output re-validates to an equal public state (idempotence)."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "orders",
-            "stream": "orders",
+            c.ProcessingMode.STREAM: "orders",
             "schema": {"type": "object"},
         })
 

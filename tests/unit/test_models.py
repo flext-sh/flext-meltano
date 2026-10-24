@@ -38,8 +38,10 @@ class TestsFlextMeltanoModelsUnit:
             payload = m.Meltano.ConfigMappingPayload.model_validate({"values": values})
             tm.that(payload.values, eq=values)
             tm.that(isinstance(payload.values, MappingProxyType), truth=True)
-            with pytest.raises(AttributeError, match="update"):
-                methodcaller("update", {"unexpected": True})(payload.values)
+            with pytest.raises(AttributeError, match=c.MergeStrategy.UPDATE):
+                methodcaller(c.MergeStrategy.UPDATE, {"unexpected": True})(
+                    payload.values
+                )
             tm.that(payload.values, eq=values)
 
     class TestsTapConfig:
@@ -263,8 +265,10 @@ class TestsFlextMeltanoModelsUnit:
                 )
                 for stream_config in (config.stream_config, restored.stream_config):
                     tm.that(not isinstance(stream_config, MutableMapping), truth=True)
-                    with pytest.raises(AttributeError, match="update"):
-                        methodcaller("update", {"users": "changed"})(stream_config)
+                    with pytest.raises(AttributeError, match=c.MergeStrategy.UPDATE):
+                        methodcaller(c.MergeStrategy.UPDATE, {"users": "changed"})(
+                            stream_config
+                        )
                     tm.that(stream_config, eq=config.stream_config)
             tm.that(stream_input, eq={"users": "public"})
 

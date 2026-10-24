@@ -340,7 +340,7 @@ import pytest
 @pytest.fixture
 def typed_fixture() -> m.Dict:
     """Properly typed fixture with clear return type."""
-    return {"key": "value", "count": 42, "items": ["a", "b", "c"]}
+    return {"key": "value", c.Aggregation.COUNT: 42, "items": ["a", "b", "c"]}
 
 
 @pytest.fixture
