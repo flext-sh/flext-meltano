@@ -25,7 +25,7 @@ src/flext_meltano/
 ├── api.py cli.py base.py pipeline_mgr.py
 ├── services/
 │   ├── consumer_bases/   # Tap / Target / Dbt bases (connectors subclass)
-│   ├── declarative_tap.py  # sole singer_sdk integration point
+│   ├── declarative_tap.py  # builds the singer_sdk tap (its direct import is bead flext-3jsmb)
 │   ├── executor_base.py executor.py library_runner.py singer_sdk.py singer_target.py
 ├── constants.py typings.py protocols.py models.py utilities.py
 └── _constants/ _typings/ _protocols/ _models/ _utilities/
@@ -48,7 +48,7 @@ src/flext_meltano/
 - Never `import singer_sdk` in a connector — only via `services/declarative_tap.py`.
 - Do not fork executor/consumer lifecycle; extend the bases. CLI-domain `u` helpers come
   from `flext_cli`.
-- Config/settings canonical pattern: ADR-012.
+- Config/settings canonical pattern: ADR-005 (SSOT) and ADR-024 (DI config contract).
 - Codemod governance (ast-grep + make mod): ADR-014.
 
 ## Commands
