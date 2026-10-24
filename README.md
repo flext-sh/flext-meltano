@@ -55,16 +55,19 @@ required validation.
 - Parent FLEXT chain: read this project's `pyproject.toml` `dependencies` array filtered
   by `flext-*`. The FLEXT cascade is encoded in the inheritance lists of the facade
   classes listed under Module Map above.
-- Public extensions exposed by this project: `FlextMeltano`, `FlextMeltanoCli`,
-  `FlextMeltanoConfig`, `FlextMeltanoConstants`, `FlextMeltanoDbtServiceBase`,
-  `FlextMeltanoLibraryRunner` (+10 more).
+- Public extensions exposed by this project: `FlextMeltano`, `FlextMeltanoAbstractions`,
+  `FlextMeltanoCli`, `FlextMeltanoConfig`, `FlextMeltanoConstants`,
+  `FlextMeltanoDbtServiceBase` (+13 more).
 - Library abstraction boundaries: see the project `AGENTS.md` and the referenced parent
   architecture rules.
 
 ## Quality Gates
 
-Canonical `make` verbs (`gen`, `check`, `test`, `fmt`, `docs`) execute their declared
-operations directly.
+Consult `make help` for the current command surface. Each verb performs only its
+declared operation; `make check` validates without applying repairs. Environment setup
+delegates tool provisioning to Mise and project/workspace installation to native uv
+declarations and locks. Python runs the installed project; no custom Python bootstrap or
+lock parser precedes installation.
 
 See [`/flext/AGENTS.md`](https://github.com/flext-sh/flext/blob/0.12.0-dev/AGENTS.md)
 for the build, test, and Python quality gates.

@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Types - Domain-specific Meltano type definitions.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -8,9 +9,11 @@ from __future__ import annotations
 
 from flext_cli import FlextCliTypes
 
-from flext_meltano._typings.base import FlextMeltanoTypingsBase
-from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
-from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+from flext_meltano._typings import (
+    FlextMeltanoTypingsBase,
+    FlextMeltanoTypingsDomains,
+    FlextMeltanoTypingsSinger,
+)
 
 
 class FlextMeltanoTypes(FlextCliTypes):
@@ -23,8 +26,8 @@ class FlextMeltanoTypes(FlextCliTypes):
 
     class Meltano(
         FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsSinger,
         FlextMeltanoTypingsDomains,
+        FlextMeltanoTypingsSinger,
     ):
         """Meltano plugin complex types namespace."""
 
