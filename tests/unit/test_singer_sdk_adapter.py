@@ -17,15 +17,15 @@ from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
 from tests import tm
 
-_FACTORY_CASES: tuple[tuple[str, str, str], ...] = (
-    ("tap", "tap-csv", "source_name"),
-    ("target", "target-jsonl", "sink_name"),
-    ("dbt", "analytics", "transformation_name"),
-)
-
 
 class TestsFlextMeltanoSingerSdkAdapter:
     """Validate the public tap/target/dbt factory contract."""
+
+    _FACTORY_CASES: tuple[tuple[str, str, str], ...] = (
+        ("tap", "tap-csv", "source_name"),
+        ("target", "target-jsonl", "sink_name"),
+        ("dbt", "analytics", "transformation_name"),
+    )
 
     @staticmethod
     def test_tap_factory_binds_source_role_only() -> None:
@@ -93,7 +93,10 @@ class TestsFlextMeltanoSingerSdkAdapter:
         dumped = facade.model_dump()
         role_fields = {"source_name", "sink_name", "transformation_name"}
         tm.that(dumped[role_field], eq=name)
-        assert all(dumped[other] is None for other in role_fields - {role_field})
+        tm.that(
+            all(dumped[other] is None for other in role_fields - {role_field}),
+            truth=True,
+        )
 
     @staticmethod
     def test_factory_returns_new_facade_distinct_from_singleton() -> None:
@@ -101,7 +104,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         facade = meltano.tap("tap-csv").unwrap()
 
         tm.that(facade, is_=FlextMeltano)
-        assert facade is not meltano
+        tm.that(facade is not meltano, truth=True)
 
     @staticmethod
     def test_factories_produce_independent_facades() -> None:
@@ -110,7 +113,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
 
         target_facade = meltano.target("target-jsonl").unwrap()
 
-        assert target_facade is not tap_facade
+        tm.that(target_facade is not tap_facade, truth=True)
         tm.that(tap_facade.source_name, eq="tap-csv")
         tm.that(tap_facade.sink_name, none=True)
 
@@ -138,5 +141,5 @@ class TestsFlextMeltanoSingerSdkAdapter:
         first = getattr(meltano, factory)(name).unwrap()
         second = getattr(meltano, factory)(name).unwrap()
 
-        assert first is not second
+        tm.that(first is not second, truth=True)
         tm.that(first.model_dump(), eq=second.model_dump())

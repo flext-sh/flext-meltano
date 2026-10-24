@@ -493,7 +493,7 @@ def test_operation_returns_flext_result():
     result = service.discover_plugins()
 
     assert isinstance(result, r)
-    assert result.success or result.failure
+    tm.ok(result.success) or result.failure
 
 
 def test_operation_success_path():
@@ -502,7 +502,7 @@ def test_operation_success_path():
 
     result = service.discover_plugins()
 
-    assert result.success
+    tm.ok(result.success)
     plugins = result.unwrap()
     assert isinstance(plugins, list)
 
@@ -514,7 +514,7 @@ def test_operation_failure_path():
     # Setup failure scenario
     result = service.run_invalid_operation()
 
-    assert result.failure
+    tm.fail(result)
     error = result.error_value
     assert isinstance(error, FlextMeltanoError)
 ```

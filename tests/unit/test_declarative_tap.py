@@ -8,11 +8,11 @@ from __future__ import annotations
 
 import contextlib
 import io
+import signal
 from pathlib import Path
 
-from flext_meltano import m, p, r, t
-from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
-from tests import tm, u
+from flext_meltano import m, p, services, t
+from tests import r, tm, u
 
 
 class TestsFlextMeltanoDeclarativeTap:
@@ -65,7 +65,10 @@ class TestsFlextMeltanoDeclarativeTap:
             The resulting ``tuple[p.Meltano.SingerTapInstance, Path, io.StringIO]``.
 
         """
-        instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
+        instance = services.FlextMeltanoDeclarativeTap.build(
+            self._spec(),
+            self._Fetcher(),
+        )
         config_path = tmp_path / "config.json"
         config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
         tm.ok(config_result)
@@ -75,11 +78,20 @@ class TestsFlextMeltanoDeclarativeTap:
     def test_discover_emits_catalog_with_declared_stream(self, tmp_path: Path) -> None:
         """A flat ``--config --discover`` run emits the declared stream catalog."""
         instance, config_path, buffer = self._setup(tmp_path)
+        handlers = tuple(
+            signal.getsignal(signum) for signum in (signal.SIGINT, signal.SIGTERM)
+        )
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
                 ["--config", str(config_path), "--discover"],
                 "tap-sample",
             )
+        tm.that(
+            tuple(
+                signal.getsignal(signum) for signum in (signal.SIGINT, signal.SIGTERM)
+            ),
+            eq=handlers,
+        )
 
         catalog_result = u.Cli.json_loads(buffer.getvalue())
         tm.ok(catalog_result)
@@ -94,8 +106,17 @@ class TestsFlextMeltanoDeclarativeTap:
     def test_sync_emits_fetched_record(self, tmp_path: Path) -> None:
         """A flat ``--config`` run emits the fetcher's validated Singer record."""
         instance, config_path, buffer = self._setup(tmp_path)
+        handlers = tuple(
+            signal.getsignal(signum) for signum in (signal.SIGINT, signal.SIGTERM)
+        )
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(["--config", str(config_path)], "tap-sample")
+        tm.that(
+            tuple(
+                signal.getsignal(signum) for signum in (signal.SIGINT, signal.SIGTERM)
+            ),
+            eq=handlers,
+        )
 
         messages: list[t.JsonMapping] = [
             u.json_dict_adapter().validate_json(line)

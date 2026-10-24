@@ -73,7 +73,7 @@ from __future__ import annotations
 def test_pipeline_validation():
     validator = PipelineValidator()
     result = validator.validate_config(invalid_config)
-    assert result.failure
+    tm.fail(result)
 ```
 
 **Maintainability**: Changes to external systems don't affect business logic

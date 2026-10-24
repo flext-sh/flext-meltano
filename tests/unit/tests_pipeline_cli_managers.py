@@ -125,7 +125,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         previous_root = self._activate_pipelines_root(tmp_path)
         meltano_cli = FlextMeltanoCli()
         pipeline_name = "daily-pipeline"
-        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        config_json_result = u.Cli.json_dumps({c.HandlerMode.COMMAND: ["help"]})
         config_path = (
             tmp_path
             / "pipelines"
@@ -185,8 +185,8 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.that(list_output, has=pipeline_name)
         tm.that(status_output, has="stopped")
         tm.that(run_output.lower(), has="usage:")
-        tm.that(stored_payload.values, eq={"command": ["help"]})
-        tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
+        tm.that(stored_payload.values, eq={c.HandlerMode.COMMAND: ["help"]})
+        tm.fail((tmp_path / "pipelines" / pipeline_name).exists())
 
     def test_pipeline_create_requires_runtime_configuration(
         self,
@@ -220,7 +220,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         previous_root = self._activate_pipelines_root(tmp_path)
         meltano_cli = FlextMeltanoCli()
         pipeline_name = "status-pipeline"
-        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        config_json_result = u.Cli.json_dumps({c.HandlerMode.COMMAND: ["help"]})
         pid_path = (
             tmp_path
             / "pipelines"
@@ -266,4 +266,4 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.ok(stop_result)
         tm.that(running_output, has="running")
         tm.that(stop_output, has="stopped")
-        tm.that(pid_path.exists(), eq=False)
+        tm.fail(pid_path.exists())

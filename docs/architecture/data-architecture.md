@@ -316,11 +316,11 @@ class PipelineConfig:
     {
       "properties": {
         "type": { "const": "RECORD" },
-        "stream": { "type": "string" },
+        c.ProcessingMode.STREAM: { "type": "string" },
         "record": { "type": "object" },
         "time_extracted": { "type": "string", "format": "date-time" }
       },
-      "required": ["type", "stream", "record"]
+      "required": ["type", c.ProcessingMode.STREAM, "record"]
     },
     {
       "properties": {
@@ -332,11 +332,11 @@ class PipelineConfig:
     {
       "properties": {
         "type": { "const": "SCHEMA" },
-        "stream": { "type": "string" },
+        c.ProcessingMode.STREAM: { "type": "string" },
         "schema": { "$ref": "http://json-schema.org/draft-07/schema#" },
         "key_properties": { "type": "array", "items": { "type": "string" } }
       },
-      "required": ["type", "stream", "schema"]
+      "required": ["type", c.ProcessingMode.STREAM, "schema"]
     }
   ]
 }

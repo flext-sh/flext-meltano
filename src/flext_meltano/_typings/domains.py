@@ -12,8 +12,6 @@ from collections.abc import Mapping
 
 from flext_cli import t
 
-from flext_meltano import c
-
 
 class FlextMeltanoTypingsDomains:
     """Domain-specific type definitions for Meltano subsystems.
@@ -23,11 +21,7 @@ class FlextMeltanoTypingsDomains:
     """
 
     type NestedStrMapping = Mapping[str, t.StrMapping]
-    type DbtManifestData = t.JsonMapping
     type DbtProject = t.JsonMapping
 
-    PluginType = c.Meltano.PluginType
 
-    type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
-    """Environment selector input: a named environment or a full environment
-    configuration mapping."""
+__all__: list[str] = ["FlextMeltanoTypingsDomains"]

@@ -125,7 +125,7 @@ padrão.
       111              return r[t.StrSequence].fail(
 >>>   112                  config_result.error or "Pipeline execution not configured"
       113              )
-      114          command_value = config_result.value.get("command")
+      114          command_value = config_result.value.get(c.HandlerMode.COMMAND)
       115          if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
       116              return r[t.StrSequence].fail("Pipeline execution not configured")
 ```

@@ -1,4 +1,4 @@
-"""FLEXT Meltano models - Singer catalog and pipeline config models.
+"""FLEXT Meltano models - Singer catalog models.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,17 +6,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated, Literal
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSingerCatalog:
-    """Singer catalog, pipeline config, and sync result models."""
+    """Singer catalog models."""
 
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
@@ -44,7 +43,7 @@ class FlextMeltanoModelsSingerCatalog:
             """
             return MappingProxyType(dict(value))
 
-        @u.field_serializer("metadata", when_used="json")
+        @m.field_serializer("metadata", when_used="json")
         @classmethod
         def serialize_metadata(cls, value: t.FlatContainerMapping) -> t.JsonDict:
             """Emit frozen metadata as a plain JSON mapping.
@@ -123,74 +122,6 @@ class FlextMeltanoModelsSingerCatalog:
             t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry],
             m.Field(description="Singer catalog stream entries"),
         ] = ()
-
-    class SingerPipelineConfig(m.Entity):
-        """Configuration for a Singer ELT pipeline."""
-
-        tap_config_path: Annotated[
-            Path | None,
-            m.Field(default=None, description="Path to tap configuration"),
-        ] = None
-        target_config_path: Annotated[
-            Path | None,
-            m.Field(default=None, description="Path to target configuration"),
-        ] = None
-        catalog_path: Annotated[
-            Path | None,
-            m.Field(default=None, description="Path to catalog file"),
-        ] = None
-        state_path: Annotated[
-            Path | None,
-            m.Field(default=None, description="Path to state file"),
-        ] = None
-        selected_streams: Annotated[
-            t.StrSequence | None,
-            m.Field(default=None, description="Specific streams to sync"),
-        ] = None
-
-    class SingerSyncResult(m.Entity):
-        """Result of a Singer sync operation."""
-
-        records_processed: Annotated[
-            t.NonNegativeInt,
-            m.Field(description="Number of records processed"),
-        ]
-        records_written: Annotated[
-            t.NonNegativeInt,
-            m.Field(description="Number of records written"),
-        ]
-        errors: Annotated[t.NonNegativeInt, m.Field(description="Number of errors")]
-        state: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Final state payload",
-        )
-
-        @m.field_validator("state", mode="after")
-        @classmethod
-        def freeze_state(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose the final Singer state as read-only.
-
-            Returns:
-                The resulting ``t.FlatContainerMapping``.
-
-            """
-            return MappingProxyType(dict(value))
-
-        @u.field_serializer("state", when_used="json")
-        @classmethod
-        def serialize_state(cls, value: t.FlatContainerMapping) -> t.JsonDict:
-            """Emit frozen state as a plain JSON mapping.
-
-            Returns:
-                The resulting ``t.JsonDict``.
-
-            """
-            return dict(value)
-
-        duration_seconds: Annotated[
-            t.NonNegativeFloat,
-            m.Field(description="Execution duration"),
-        ]
 
 
 __all__: list[str] = ["FlextMeltanoModelsSingerCatalog"]

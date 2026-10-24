@@ -1,7 +1,7 @@
 """Base service for FLEXT target consumer projects.
 
-Provides sink management, record processing, batch lifecycle, and connection
-management via MRO. Consumer targets override ``create_sink()`` only.
+Provides sink management, record processing, and batch lifecycle via MRO.
+Consumer targets override ``create_sink()`` only.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -27,26 +27,25 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
     This base provides via MRO:
     - CLI dispatch (``cli_main``)
-    - Sink management (``get_or_create_sink``, ``flush``)
-    - Record and batch processing
-    - Connection lifecycle (``connect`` / ``disconnect``)
-    - Singleton accessor (``get_instance``)
+    - Sink management (``fetch_or_create_sink``, ``flush``)
+    - Record processing
     """
 
     target_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical target name (e.g. target-oracle)"),
+        m.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
-    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
 
     @abstractmethod
     def create_sink(
         self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        _stream_name: str,
+        _schema: t.JsonMapping,
+        /,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -189,50 +188,6 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[bool].fail(str(exc), exception=exc)
-
-    def process_batch(
-        self,
-        stream_name: str,
-        records: t.SequenceOf[t.JsonMapping],
-        schema: t.JsonMapping,
-    ) -> p.Result[int]:
-        """Process a batch of records.
-
-        Returns:
-            The resulting ``p.Result[int]``.
-
-        """
-        processed = 0
-        for record in records:
-            result = self.process_record(stream_name, record, schema)
-            if result.failure:
-                return r[int].from_failure(result)
-            processed += 1
-        return r[int].ok(processed)
-
-    # ------------------------------------------------------------------
-    # Connection lifecycle
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def connect() -> p.Result[bool]:
-        """Connect to the target data store. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return r[bool].ok(value=True)
-
-    def disconnect(self) -> p.Result[bool]:
-        """Disconnect from the target data store. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        self._sinks.clear()
-        return r[bool].ok(value=True)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

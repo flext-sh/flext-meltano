@@ -6,7 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import m, p, u
+from flext_meltano import m, p
+from tests import tm
 
 
 class TestsFlextMeltanoDbtConnectionProfile:
@@ -15,8 +16,8 @@ class TestsFlextMeltanoDbtConnectionProfile:
     class ProfileModelFixture(m.Value):
         """Fixture model for the ``FlextMeltanoProfile`` behavior contract."""
 
-        type: str = u.Field(description="Dbt adapter type")
-        project: str = u.Field(description="Dbt project name")
+        type: str = m.Field(description="Dbt adapter type")
+        project: str = m.Field(description="Dbt project name")
 
     @staticmethod
     def _accept_profile(
@@ -40,4 +41,4 @@ class TestsFlextMeltanoDbtConnectionProfile:
 
         accepted = TestsFlextMeltanoDbtConnectionProfile._accept_profile(profile)
 
-        assert accepted.model_dump() == {"type": "test", "project": "dbt-test"}
+        tm.that(accepted.model_dump(), eq={"type": "test", "project": "dbt-test"})

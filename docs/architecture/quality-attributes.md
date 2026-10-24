@@ -1234,7 +1234,7 @@ class RailwayExecutor:
             self.logger.error(
                 f"Operation execution failed: {e}",
                 extra={
-                    "operation_id": operation.id,
+                    c.ContextKey.OPERATION_ID: operation.id,
                     "operation_type": operation.type,
                     "error_type": type(e).__name__,
                     "stack_trace": traceback.format_exc(),
@@ -2946,7 +2946,7 @@ class APIResponse:
         response = {
             "success": self.success,
             "timestamp": self.timestamp,
-            "request_id": self.request_id,
+            c.ContextKey.REQUEST_ID: self.request_id,
         }
 
         if self.success:
@@ -3065,11 +3065,11 @@ class APIResource:
         if hasattr(self, "pipeline_id"):
             links["pipeline"] = f"/api/v1/pipelines/{self.pipeline_id}"
 
-        if hasattr(self, "user_id"):
-            links["user"] = f"/api/v1/users/{self.user_id}"
+        if hasattr(self, c.ContextKey.USER_ID):
+            links[c.ContextScope.USER] = f"/api/v1/users/{self.user_id}"
 
         # Add action links
-        links["update"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
+        links[c.MergeStrategy.UPDATE] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
         links["delete"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
 
         return links
@@ -3156,14 +3156,14 @@ class APIHelpSystem:
             examples.append({
                 "title": "Create a PostgreSQL to Snowflake pipeline",
                 "description": "Basic pipeline creation example",
-                "request": {
+                c.ContextScope.REQUEST: {
                     "name": "postgres-to-snowflake",
                     "tap": {
                         "name": "tap-postgres",
                         "settings": {
                             "host": "postgres.example.com",
                             "database": "analytics",
-                            "user": "pipeline_user",
+                            c.ContextScope.USER: "pipeline_user",
                             "password": "secure_password",
                         },
                     },
@@ -3439,7 +3439,7 @@ def test_entity_processing():
 
     result = service.process_entity(entity)
 
-    assert result.success
+    tm.ok(result.success)
     assert result.value.tags == ["important", "test"]
 ```
 
@@ -3495,7 +3495,7 @@ class TestContext:
             lambda: cleanup_test_pipeline(self.pipeline),
         ]
 
-        return {"db": self.db, "user": self.user, "pipeline": self.pipeline}
+        return {"db": self.db, c.ContextScope.USER: self.user, "pipeline": self.pipeline}
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Cleanup in reverse order
@@ -3513,7 +3513,7 @@ def test_complex_pipeline_operation():
 
         result = service.execute_pipeline(context["pipeline"])
 
-        assert result.success
+        tm.ok(result.success)
         # Context automatically cleaned up
 ```
 
@@ -3548,8 +3548,8 @@ class PropertyBasedTests:
         # Then either succeeds or fails with validation error
         if result.success:
             pipeline = result.unwrap()
-            assert pipeline.name == name
-            assert pipeline.settings == settings
+            tm.that(pipeline.name, eq=name)
+            tm.that(pipeline.settings, eq=settings)
         else:
             # Must be a validation error
             assert isinstance(result.error, ValidationError)
@@ -3575,7 +3575,7 @@ class PropertyBasedTests:
         result2 = processor.process_batch(records)
 
         # Then results should be identical
-        assert result1 == result2
+        tm.that(result1, eq=result2)
 
     @given(st.datetimes(), st.datetimes())
     def test_time_range_validation(self, start_time: datetime, end_time: datetime):
@@ -3623,7 +3623,7 @@ class ContractTests:
         with consumer:
             # Make actual API call
             response = requests.get("http://localhost:8000/api/v1/pipelines/123")
-            assert response.status_code == 200
+            tm.that(response.status_code, eq=200)
 
     def test_data_transformation_contract(self):
         """Test data transformation contract."""
@@ -3641,12 +3641,12 @@ class ContractTests:
             output_schema={
                 "type": "object",
                 "properties": {
-                    "user_id": {"type": "integer"},
+                    c.ContextKey.USER_ID: {"type": "integer"},
                     "full_name": {"type": "string"},
                     "contact_email": {"type": "string", "format": "email"},
                     "processed_at": {"type": "string", "format": "date-time"},
                 },
-                "required": ["user_id", "full_name"],
+                "required": [c.ContextKey.USER_ID, "full_name"],
             },
             transformation_rules=[
                 "id -> user_id",
@@ -3663,9 +3663,9 @@ class ContractTests:
         result = transformer.transform(test_input)
 
         # Verify output matches contract
-        assert result["user_id"] == 123
-        assert result["full_name"] == "John Doe"
-        assert result["contact_email"] == "john@example.com"
+        tm.that(result[c.ContextKey.USER_ID], eq=123)
+        tm.that(result["full_name"], eq="John Doe")
+        tm.that(result["contact_email"], eq="john@example.com")
         assert "processed_at" in result
 
         # Verify schema compliance

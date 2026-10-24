@@ -8,46 +8,25 @@
   - [Target Implementation Pattern](#target-implementation-pattern)
 - [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
   - [dbt Project Foundation](#dbt-project-foundation)
-- [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)
-  - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
-- [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
-  - [Go ↔ Python Integration](#go-python-integration)
 - [📊 Integration Matrix](#integration-matrix)
-  - [FLEXT Project Integration Status](#flext-project-integration-status)
   - [Integration Requirements](#integration-requirements)
 - [🌍 Environment Integration](#environment-integration)
-  - [FLEXT Workspace Setup](#flext-workspace-setup)
   - [Consumer Project Dependencies](#consumer-project-dependencies)
-- [⚠️ Integration Limitations](#integration-limitations)
-  - [Current Constraints](#current-constraints)
-  - [Workaround Strategies](#workaround-strategies)
-  - [Resolution Timeline](#resolution-timeline)
 - [🔧 Integration Best Practices](#integration-best-practices)
-  - [Design Patterns](#design-patterns)
-  - [Quality Standards](#quality-standards)
 
 <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
-> **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration
-> patterns. Full ecosystem compatibility requires abstraction layer.
-
 ---
 
 ## 🎯 ELT Foundation Role
 
-flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem,
-providing:
-
-- **Singer Protocol Abstractions** - Foundation for flext-tap-_and flext-target-_
-  projects
-- **Meltano Integration** - Enterprise project management and orchestration
-- **dbt Operations** - Transformation pipeline coordination
-- **ELT Orchestration** - Complete extract-load-transform workflows
-
-**Integration Authority**: All FLEXT projects requiring ELT operations must use
-flext-meltano patterns.
+flext-meltano is the ELT foundation of the FLEXT ecosystem (ADR-006). The
+`flext-tap-*`, `flext-target-*` and `flext-dbt-*` connectors are thin drivers over
+its consumer bases; reusable CLI dispatch, Singer message handling and dbt
+execution live here once. Connectors import every flext-meltano name from the
+package root and never import `singer_sdk` directly.
 
 ---
 
@@ -55,83 +34,56 @@ flext-meltano patterns.
 
 ### Tap Implementation Pattern
 
-\__Standard pattern for flext-tap-_ projects\_\*:
+Declarative taps describe their streams as data and fetch records with their own
+domain library; flext-meltano builds the Singer tap and its flat CLI
+(`--config/--discover/--catalog/--state`):
 
 ```text
 from __future__ import annotations
 
-from flext_meltano import (
-    FlextMeltanoTapAbstractions,
-    FlextMeltanoTapServiceBase,
-    m,
-    p,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoTapServiceBase, m, p, r
 
 
-class FlextOracleTapService(FlextMeltanoTapServiceBase):
-    """Oracle tap using flext-meltano Singer abstractions."""
+class FlextExampleTapService(FlextMeltanoTapServiceBase):
+    """Declarative tap: streams as data, records from the domain fetcher."""
 
-    tap_name: t.Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)")
-    ] = "tap-oracle"
+    tap_name: str = "tap-example"
 
-    def discover_oracle_streams(
-        self, settings: dict
-    ) -> p.Result[t.SequenceOf[m.Meltano.StreamDefinition]]:
-        """Discover Oracle database streams using flext-meltano."""
-        abstractions = FlextMeltanoTapAbstractions()
-        return abstractions.create_tap_from_config("tap-oracle", settings)
+    def create_tap_instance(self, _settings=None) -> p.Meltano.SingerTapInstance:
+        return self.build_declarative_tap(TAP_SPEC, ExampleFetcher())
 
-    def extract_oracle_data(self, stream: str, settings: dict) -> p.Result[list]:
-        """Extract data using flext-meltano abstractions."""
-        abstractions = FlextMeltanoTapAbstractions()
-        return abstractions.process_source({"stream": stream, **settings})
+
+class ExampleFetcher:
+    def fetch(self, request: m.Meltano.FetchRequest) -> p.Result[m.Meltano.FetchResult]:
+        return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=()))
 ```
+
+Taps that already own a `singer_sdk` tap class (subclassing
+`m.Meltano.SingerTapBase`) return `FlextMeltanoSingerTapAdapter(tap)` from
+`create_tap_instance`. The console entry point calls `cli_main(args)`.
 
 ### Target Implementation Pattern
 
-\__Standard pattern for flext-target-_ projects\_\*:
-
 ```text
 from __future__ import annotations
 
-from typing import Annotated
-
-from flext_meltano import (
-    FlextMeltanoTargetAbstractions,
-    FlextMeltanoTargetServiceBase,
-    m,
-    p,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoTargetServiceBase, p, t
 
 
-class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
-    """Oracle target using flext-meltano Singer abstractions."""
+class FlextExampleTargetService(FlextMeltanoTargetServiceBase):
+    """Target: drains Singer messages from stdin into per-stream sinks."""
 
-    target_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
-    ] = "target-oracle"
+    target_name: str = "target-example"
 
     def create_sink(
         self, stream_name: str, schema: t.JsonMapping
     ) -> p.Meltano.SingerDrainSink:
-        """Create an Oracle sink for a Singer stream."""
-        raise NotImplementedError
-
-    def load_to_oracle(
-        self, records: list, settings: dict
-    ) -> p.Result[m.Meltano.DataSinkInstance]:
-        """Load records to Oracle using flext-meltano abstractions."""
-        abstractions = FlextMeltanoTargetAbstractions()
-        return abstractions.create_flext_target({
-            "sink_type": "target-oracle",
-            "connection_config": settings,
-        })
+        return ExampleSink(stream_name, schema)
 ```
+
+`cli_main()` routes SCHEMA/RECORD/STATE messages through
+`u.Meltano.process_stdin`, creates sinks on demand and flushes them at STATE
+boundaries and at end of input.
 
 ---
 
@@ -139,168 +91,47 @@ class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
 
 ### dbt Project Foundation
 
-\__Standard pattern for flext-dbt-_ projects\_\*:
-
 ```text
 from __future__ import annotations
 
-from flext_meltano import FlextMeltanoDbtServiceBase, p, t
+from flext_meltano import FlextMeltanoDbtServiceBase, p
 
 
-class FlextOracleDbtService(FlextMeltanoDbtServiceBase):
-    """Oracle dbt transformations using flext-meltano."""
+class FlextExampleDbtService(FlextMeltanoDbtServiceBase):
+    """dbt project: run/test/compile/docs through the Meltano executor."""
 
     @property
     def connection_profile(self) -> p.Meltano.DbtConnectionProfile:
-        """Oracle dbt connection profile."""
-        raise NotImplementedError
-
-    def run_oracle_models(self, models: t.StrSequence) -> p.Result[t.JsonMapping]:
-        """Execute Oracle-specific dbt models."""
-        return self.run_models(models)
+        return EXAMPLE_PROFILE
 ```
 
-**Current Limitation**: dbt integration is a stub implementation requiring dbt
-programmatic API integration.
-
----
-
-## 🚀 Complete ELT Pipeline Integration
-
-### Enterprise Pipeline Pattern
-
-**Full ELT workflow using flext-meltano foundation**:
-
-```text
-from __future__ import annotations
-
-from flext_meltano import (
-    FlextMeltanoAdapter,
-    FlextMeltanoDbtServiceBase,
-    FlextMeltanoService,
-    m,
-    p,
-    r,
-    t,
-)
-
-
-class EnterpriseELTService(FlextMeltanoService):
-    """Complete ELT pipeline for enterprise applications."""
-
-    def __init__(self):
-        super().__init__()
-        self._meltano_service = FlextMeltanoService()
-        self._adapter = FlextMeltanoAdapter()
-
-    def execute_elt_pipeline(
-        self, tap_name: str, target_name: str, dbt_models: t.StrSequence | None = None
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Execute complete ELT pipeline."""
-        pipeline_result = self._adapter.execute()
-        if pipeline_result.failure:
-            return pipeline_result
-
-        if dbt_models:
-            transform_result = self._run_dbt_models(dbt_models)
-            if transform_result.failure:
-                return transform_result
-
-        return r[m.Meltano.CommandExecutionResult].ok({
-            "pipeline": pipeline_result.unwrap(),
-            "models_executed": dbt_models or [],
-        })
-
-    def _run_dbt_models(
-        self, models: t.StrSequence
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Run dbt models."""
-        dbt_service = FlextMeltanoDbtServiceBase()
-        return dbt_service.run_models(models)
-```
-
----
-
-## 🔗 Bridge Communication Patterns
-
-### Go ↔ Python Integration
-
-The historical `scripts/flext_meltano_bridge.py` entry point is not present in the
-current tracked source. Do not invoke the retired script; verify integrations against
-the current public API reference. **JSON API Response Pattern**:
-
-```python
-from __future__ import annotations
-
-from flext_meltano import FlextMeltanoBridge
-
-bridge = FlextMeltanoBridge()
-response = bridge.execute_bridge_command(
-    "run_pipeline",
-    args={"tap": "tap-csv", "target": "target-jsonl"},
-)
-
-# Response format follows r structure
-print(response.unwrap())
-```
+`cli_main(["run", "model_a"])` dispatches to `run_models`; `test`, `compile` and
+`docs` dispatch to `run_tests`, `compile_models` and `generate_docs`. Each returns
+the typed `m.Meltano.CommandExecutionResult`.
 
 ---
 
 ## 📊 Integration Matrix
 
-### FLEXT Project Integration Status
-
-| Project Category        | Integration Pattern            | Status     | Notes                        |
-| ----------------------- | ------------------------------ | ---------- | ---------------------------- |
-| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
-| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
-| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
-| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
-| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
-| **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Stub implementation          |
-| **DataCosmos**          | Complete ELT Foundation        | 🟡 Partial | Blocked by compliance issues |
+| Consumer base                     | Connectors                                                   |
+| --------------------------------- | ------------------------------------------------------------ |
+| `FlextMeltanoTapServiceBase`      | flext-tap-ldap, flext-tap-ldif, flext-tap-oracle, flext-tap-oracle-oic, flext-tap-oracle-wms |
+| `FlextMeltanoTargetServiceBase`   | flext-target-ldif, flext-target-oracle, flext-target-oracle-oic, flext-target-oracle-wms |
+| `FlextMeltanoDbtServiceBase`      | flext-dbt-ldap, flext-dbt-ldif, flext-dbt-oracle, flext-dbt-oracle-wms |
+| `FlextMeltanoLibraryRunner`       | flext-dbt-oracle-wms (`run_dbt_transformation`)              |
+| `FlextMeltanoAbstractions`        | flext-tap-oracle-oic                                         |
+| `FlextMeltanoTargetAbstractions`  | flext-target-oracle-oic                                      |
 
 ### Integration Requirements
 
-\__For flext-tap-_ projects\_\*:
-
-1. Use FlextMeltanoTapAbstractions for all Singer operations
-2. Follow r patterns for error handling
-3. Implement stream discovery and data extraction
-4. Maintain Singer protocol compliance
-
-\__For flext-target-_ projects\_\*:
-
-1. Use FlextMeltanoTargetAbstractions for all load operations
-2. Implement record loading with validation
-3. Handle Singer message processing
-4. Follow FLEXT service patterns
-
-\__For flext-dbt-_ projects\_\*:
-
-1. Use FlextMeltanoDbtService for transformations
-2. Plan for dbt programmatic API integration
-3. Implement model execution workflows
-4. Maintain transformation validation
+1. Import flext-meltano names from the package root only.
+2. Implement only the abstract hook of the base (`create_tap_instance`,
+   `create_sink`, `connection_profile`); the base owns CLI dispatch.
+3. Return `r[T]` results; never import `singer_sdk` in a connector.
 
 ---
 
 ## 🌍 Environment Integration
-
-### FLEXT Workspace Setup
-
-**Required environment configuration for consumers**:
-
-```bash
-# FLEXT workspace virtual environment
-cd ../..
-source .venv/bin/activate
-
-# flext-meltano specific variables
-export PYTHONPATH=..flext-meltano/src:$PYTHONPATH
-export MELTANO_PROJECT_ROOT=..flext-meltano
-export MELTANO_ENVIRONMENT=dev
-```
 
 ### Consumer Project Dependencies
 
@@ -316,104 +147,14 @@ make gen
 
 ---
 
-## ⚠️ Integration Limitations
-
-### Current Constraints
-
-**Architecture Compliance Issues**:
-
-- **Direct meltano.core imports** (adapters.py lines 17-25) limit some integration
-  patterns
-- **dbt stub implementation** affects flext-dbt-\* project functionality
-- **Modern ELT patterns** missing for 2025 industry standards
-
-**Integration Impact**:
-
-- **Singer Operations**: ✅ Fully functional through abstractions
-- **Meltano Integration**: 🟡 Working but non-compliant
-- **dbt Operations**: 🔴 Limited to stub data
-- **Enterprise Use**: 🔴 Not recommended for production
-
-### Workaround Strategies
-
-**Current Development Approach**:
-
-1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and
-   FlextMeltanoTargetAbstractions are fully functional
-2. **Follow r Patterns**: Maintain consistency for future compatibility
-3. **Plan for Updates**: Design integration patterns to accommodate resolution
-4. **Document Limitations**: Clear communication about current constraints
-
-### Resolution Timeline
-
-**Integration Improvement Phases**:
-
-- **Phase 1** (4-6 weeks): Abstraction layer for meltano.core compliance
-- **Phase 2** (3-4 weeks): dbt programmatic API integration
-- **Phase 3** (2-3 weeks): Modern ELT patterns adoption
-- **Phase 4** (1-2 weeks): Complete ecosystem integration validation
-
----
-
 ## 🔧 Integration Best Practices
 
-### Design Patterns
-
-**1. Dependency Injection**:
-
-```python
-from __future__ import annotations
-
-from flext_core import FlextContainer
-from flext_meltano import FlextMeltanoTapAbstractions, FlextMeltanoTargetAbstractions
-
-# Register services for ecosystem consumption
-container = FlextContainer.shared()
-container.bind("tap_abstractions", FlextMeltanoTapAbstractions)
-container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
-```
-
-**2. Configuration Management**:
-
-```python
-from __future__ import annotations
-
-from flext_meltano import FlextMeltanoSettings
-
-settings = FlextMeltanoSettings()
-print(settings.model_dump())
-```
-
-**3. Error Handling**:
-
-```text
-from __future__ import annotations
-
-from flext_meltano import FlextMeltanoTapAbstractions, m, p, r
-
-
-def handle_discovery(name: str) -> p.Result[m.Meltano.DataSourceInstance]:
-    """Consistent r patterns across all integrations."""
-    abstractions = FlextMeltanoTapAbstractions()
-    result = abstractions.create_tap_from_config(name, {})
-    if result.failure:
-        return r[m.Meltano.DataSourceInstance].fail(
-            f"Integration failed: {result.error}"
-        )
-    return result
-```
-
-### Quality Standards
-
-**Integration Requirements**:
-
-- Use only root-level imports from flext-meltano
-- Follow r patterns for all operations
-- Implement proper error handling and logging
-- Maintain Singer protocol compliance
-- Use FLEXT service architecture patterns
+- Use only root-level imports from flext-meltano; the
+  `rewire-consumer-deep-import-to-root` codemod rule repairs deep imports.
+- Follow `r` patterns for all operations.
+- Keep connector-specific behavior in the connector (ADR-006); shared Singer and
+  dbt mechanics belong in flext-meltano once.
 
 ---
 
-**Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT
-integration with clear guidance on current capabilities and planned improvements.
+**Integration Guide v0.12.0-dev**

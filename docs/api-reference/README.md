@@ -27,9 +27,8 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: `FlextMeltano`, `FlextMeltanoCli`, `FlextMeltanoConfig`,
-  `FlextMeltanoConstants`, `FlextMeltanoDbtServiceBase`, `FlextMeltanoLibraryRunner`
-  (+10 more)
+- Primary facades: `FlextMeltano`, `FlextMeltanoAbstractions`, `FlextMeltanoCli`,
+  `FlextMeltanoConfig`, `FlextMeltanoConstants`, `FlextMeltanoDbtServiceBase` (+13 more)
 - Generated module pages: `10`
 
 Back to [project docs](../index.md).

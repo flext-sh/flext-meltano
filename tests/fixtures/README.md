@@ -118,6 +118,7 @@ fixtures/
 ```text
 # Standard pytest fixture usage
 import pytest
+from tests import c, r
 from tests import (
     sample_csv_data,
     meltano_test_project,
@@ -302,7 +303,7 @@ def mock_database_connection():
 
 ```text
 # Optimized fixture with caching
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=c.ContextScope.SESSION)
 def expensive_fixture():
     """Session-scoped fixture for expensive setup."""
     # Setup once per test session
@@ -339,7 +340,7 @@ import pytest
 @pytest.fixture
 def typed_fixture() -> m.Dict:
     """Properly typed fixture with clear return type."""
-    return {"key": "value", "count": 42, "items": ["a", "b", "c"]}
+    return {"key": "value", c.Aggregation.COUNT: 42, "items": ["a", "b", "c"]}
 
 
 @pytest.fixture
@@ -395,20 +396,18 @@ def test_csv_processing(sample_users_csv):
     processor = CSVProcessor(sample_users_csv["file_path"])
     results = processor.process()
 
-    assert len(results) == sample_users_csv["records"]
+    tm.that(len(results), eq=sample_users_csv["records"])
     assert all("email" in record for record in results)
 
 
 # Using configuration fixtures
 def test_meltano_integration(meltano_test_project, flext_meltano_config):
     """Test Meltano integration with fixtures."""
-    settings = flext_meltano_config
-    settings.project_root = str(meltano_test_project)
+    _ = meltano_test_project, flext_meltano_config
 
-    bridge = FlextMeltanoBridge(settings)
-    result = bridge.get_version()
+    result = meltano.fetch_version()
 
-    assert result.success
+    tm.ok(result)
 ```
 
 ### **Advanced Fixture Composition**

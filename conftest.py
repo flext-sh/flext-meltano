@@ -1,17 +1,29 @@
-"""Pytest bootstrap for flext-meltano local package resolution.
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Pytest bootstrap for flext_meltano local package resolution.
+
+Rendered from flext-infra ``templates/project/base/conftest.py.j2``: change the
+template or the shared ``install_local_packages`` owner, then run ``make gen``.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
-# Copyright (c) 2025 FLEXT Team. All rights reserved.
 from __future__ import annotations
 
 from pathlib import Path
 
-from flext_tests.pytest_bootstrap import install_local_packages
-
-"""Pytest bootstrap for flext-meltano local package resolution."""
+from flext_tests import install_local_packages
 
 
-install_local_packages(Path(__file__).resolve().parent)
+class FlextMeltanoPytestBootstrap:
+    """Bind this checkout's local tiers through the shared bootstrap owner."""
+
+    @staticmethod
+    def main() -> None:
+        """Install this checkout's local tier packages before collection."""
+        install_local_packages(Path(__file__).resolve().parent)
+
+
+FlextMeltanoPytestBootstrap.main()
+
+__all__: list[str] = ["FlextMeltanoPytestBootstrap"]

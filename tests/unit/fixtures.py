@@ -18,7 +18,7 @@ from tests import c, u
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from tests import t
+from tests import t
 
 MELTANO_COMPONENT_CASES: t.VariadicTuple[t.Meltano.ComponentCase] = (
     ("tap", "tap-csv", "source_name"),
@@ -46,7 +46,7 @@ def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.Componen
 
 
 @pytest.fixture(
-    params=["version", "service_name", "status", "handlers"],
+    params=["version", c.ContextKey.SERVICE_NAME, "status", "handlers"],
     ids=["version", "service-name", "status", "handlers"],
 )
 def meltano_execute_field(request: pytest.FixtureRequest) -> str:
@@ -150,7 +150,7 @@ def meltano_project(
         "directory": meltano_project_dir,
         "config_path": meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
-        "version": "1",
+        "version": c.ParserBooleanToken.ONE,
         "settings": meltano_yml_config,
     }
 

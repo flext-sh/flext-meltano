@@ -12,7 +12,7 @@ from flext_cli import m
 class FlextMeltanoModelsConfig:
     """Config namespace models for model-less ``config/*.yaml`` exposure."""
 
-    class MeltanoNamespace(m.BaseModel):
+    class MeltanoNamespace(m.FrozenModel):
         """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
 
         model_config = m.ConfigDict(extra="allow", frozen=True)
