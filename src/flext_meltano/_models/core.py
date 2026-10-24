@@ -29,7 +29,7 @@ class FlextMeltanoModelsCore:
         """
         match value:
             case Mapping():
-                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                return u.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
             case _:
                 empty: t.FlatContainerMapping = {}
                 return empty
