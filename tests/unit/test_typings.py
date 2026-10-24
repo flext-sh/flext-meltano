@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests import m, t, tm
+from tests import c, m, t, tm
 
 
 class TestsFlextMeltanoTypingsUnit:
