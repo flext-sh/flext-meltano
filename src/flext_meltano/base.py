@@ -29,7 +29,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
     # Pydantic field; inject the Meltano default by overriding the field default
     # (replaces the orphaned _settings_type PrivateAttr + redundant __init__ that only
     # forwarded the now-native runtime_settings kwarg).
-    settings_type: p.SettingsType | None = m.Field(
+    settings_type: t.Port[p.SettingsType] | None = m.Field(
         default=FlextMeltanoSettings,
         exclude=True,
         description="Default FlextMeltanoSettings class for Meltano services.",
