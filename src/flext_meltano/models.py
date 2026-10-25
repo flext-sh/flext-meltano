@@ -53,5 +53,4 @@ class FlextMeltanoModels(FlextCliModels):
 
 
 m = FlextMeltanoModels
-
-__all__ = ["FlextMeltanoModels", "m"]
+__all__: list[str] = ["FlextMeltanoModels", "m"]

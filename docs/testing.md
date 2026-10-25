@@ -21,7 +21,7 @@
   - [Phase 3: Quality Assurance (Week 4)](#phase-3-quality-assurance-week-4)
 - [🧪 TEST PATTERNS & BEST PRACTICES](#test-patterns-best-practices)
   - [Railway-Oriented Testing Patterns](#railway-oriented-testing-patterns)
-  - [Mock Integration Patterns](#mock-integration-patterns)
+  - [Real Runtime Integration Patterns](#real-runtime-integration-patterns)
   - [Fixture Best Practices](#fixture-best-practices)
 - [📊 TEST METRICS & MONITORING](#test-metrics-monitoring)
   - [Coverage Dashboard Configuration](#coverage-dashboard-configuration)

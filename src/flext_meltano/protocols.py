@@ -26,4 +26,4 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
 
 p = FlextMeltanoProtocols
-__all__ = ["FlextMeltanoProtocols", "p"]
+__all__: list[str] = ["FlextMeltanoProtocols", "p"]

@@ -70,6 +70,24 @@ class FlextMeltanoProtocolsSinger:
         ) -> None: ...
 
     @runtime_checkable
+    class SinkFactory(Protocol):
+        """Sink factory a target service declares instead of overriding a method.
+
+        Target facades bind it to their stateless ``u.<Namespace>.create_sink``,
+        so ``api.py`` stays a pure MRO facade.
+        """
+
+        def __call__(
+            self,
+            *,
+            stream_name: str,
+            schema: t.JsonMapping,
+            target_config: t.JsonMapping,
+        ) -> FlextMeltanoProtocolsSinger.SingerDrainSink:
+            """Build the drain sink for one stream from its target config."""
+            ...
+
+    @runtime_checkable
     class SingerTargetHandler(Protocol):
         """Protocol for Singer target message handlers.
 

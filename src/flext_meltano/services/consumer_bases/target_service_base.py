@@ -1,7 +1,7 @@
 """Base service for FLEXT target consumer projects.
 
 Provides sink management, record processing, and batch lifecycle via MRO.
-Consumer targets override ``create_sink()`` only.
+Consumer targets declare ``sink_factory`` only.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,21 +9,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Annotated, override
+from typing import Annotated, ClassVar, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping
 
-
-class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
+class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     """Base for all FLEXT target service projects.
 
-    Subclasses MUST define:
+    Subclasses declare:
     - ``target_name``: canonical target identifier (e.g. ``"target-oracle"``)
-    - ``create_sink(stream_name, schema)``: factory returning a Sink instance
+    - ``sink_factory``: the member's stateless ``u.<Namespace>.create_sink``
 
     This base provides via MRO:
     - CLI dispatch (``cli_main``)
@@ -36,21 +32,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         m.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
-    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
+    sink_factory: ClassVar[p.Meltano.SinkFactory]
+
+    _sinks: t.MutableMappingKV[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
-
-    @abstractmethod
-    def create_sink(
-        self,
-        _stream_name: str,
-        _schema: t.JsonMapping,
-        /,
-    ) -> p.Meltano.SingerDrainSink:
-        """Create a Sink instance for a stream.
-
-        Consumer implements this with domain-specific sink logic.
-        """
 
     # ------------------------------------------------------------------
     # CLI dispatch
@@ -134,7 +120,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         try:
             if stream_name in self._sinks:
                 return r[p.Meltano.SingerDrainSink].ok(self._sinks[stream_name])
-            sink = self.create_sink(stream_name, schema)
+            sink = type(self).sink_factory(
+                stream_name=stream_name,
+                schema=schema,
+                target_config=self.settings_overrides or {},
+            )
             self._sinks[stream_name] = sink
             self.logger.debug("Sink created", stream=stream_name)
             return r[p.Meltano.SingerDrainSink].ok(sink)

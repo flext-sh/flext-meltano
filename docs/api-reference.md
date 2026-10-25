@@ -3,12 +3,15 @@
 <!-- TOC START -->
 
 - [Public Surface](#public-surface)
-- [The `meltano` Facade](#the-meltano-facade)
+- [The meltano Facade](#the-meltano-facade)
 - [Consumer Bases](#consumer-bases)
 - [Singer Utilities](#singer-utilities)
 - [Pipeline Manager and CLI](#pipeline-manager-and-cli)
 - [Models, Protocols, Types, Constants](#models-protocols-types-constants)
 - [Integration Examples](#integration-examples)
+  - [Runtime command](#runtime-command)
+  - [dbt transformation](#dbt-transformation)
+  - [Declarative tap](#declarative-tap)
 - [Related Documentation](#related-documentation)
 
 <!-- TOC END -->
@@ -24,7 +27,7 @@ error text.
 
 Import every public name from the package root:
 
-```python notest
+```{.python .notest}
 from flext_meltano import (
     FlextMeltano,  # MRO facade class
     FlextMeltanoAbstractions,  # Meltano runtime abstraction (tap entry points)
@@ -75,7 +78,9 @@ drivers over these bases (ADR-006):
 - `FlextMeltanoTapServiceBase` — implement `create_tap_instance()`; the base
   provides `cli_main()` and `build_declarative_tap(spec, fetcher)`, which turns
   an `m.Meltano.TapSpec` plus a `p.Meltano.RecordFetcher` into a real Singer tap.
-- `FlextMeltanoTargetServiceBase` — implement `create_sink()`; the base drains
+- `FlextMeltanoTargetServiceBase` — declare `sink_factory:
+  ClassVar[p.Meltano.SinkFactory]` bound to the member's stateless
+  `u.<Namespace>.create_sink` (no method in `api.py`); the base drains
   Singer messages from stdin (`cli_main()`), manages sinks
   (`fetch_or_create_sink`, `flush`) and processes records.
 - `FlextMeltanoDbtServiceBase` — implement `connection_profile`; the base
@@ -114,7 +119,7 @@ The `flext-meltano` console script (`flext_meltano.cli:main`) exposes `version`,
 
 ### Runtime command
 
-```python notest
+```{.python .notest}
 from flext_meltano import meltano
 
 result = meltano.execute_meltano_command(["meltano", "--version"])
@@ -124,7 +129,7 @@ if result.success and result.value.success:
 
 ### dbt transformation
 
-```python notest
+```{.python .notest}
 from flext_meltano import meltano
 
 result = meltano.run_dbt_transformation(models=["staging_orders"])
@@ -132,7 +137,7 @@ result = meltano.run_dbt_transformation(models=["staging_orders"])
 
 ### Declarative tap
 
-```python notest
+```{.python .notest}
 from flext_meltano import FlextMeltanoTapServiceBase, m, p
 
 

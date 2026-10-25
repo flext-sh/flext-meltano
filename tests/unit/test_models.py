@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import secrets
 from collections.abc import MutableMapping
 from operator import methodcaller
 from types import MappingProxyType
@@ -71,7 +72,7 @@ class TestsFlextMeltanoModelsUnit:
                     "host": "db.example.com",
                     "port": 3306,
                     c.ContextScope.USER: "etl_user",
-                    "password": "secret",
+                    "password": secrets.token_urlsafe(16),
                 },
                 stream_config={"users": "public", "orders": "commerce"},
                 tap_version="1.0.0",

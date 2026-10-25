@@ -17,6 +17,8 @@ if TYPE_CHECKING:
     from examples.models import ExamplesFlextMeltanoModels, m
     from examples.protocols import ExamplesFlextMeltanoProtocols, p
     from examples.simple_working import ExamplesFlextMeltanoSimple
+    from examples.target_service import ExamplesFlextMeltanoTargetService
+    from examples.target_sink import ExamplesFlextMeltanoTargetSink
     from examples.typings import ExamplesFlextMeltanoTypes, t
     from examples.utilities import ExamplesFlextMeltanoUtilities, u
     from flext_meltano import d, e, h, r, s, x
@@ -27,6 +29,8 @@ __all__: tuple[str, ...] = (
     "ExamplesFlextMeltanoModels",
     "ExamplesFlextMeltanoProtocols",
     "ExamplesFlextMeltanoSimple",
+    "ExamplesFlextMeltanoTargetService",
+    "ExamplesFlextMeltanoTargetSink",
     "ExamplesFlextMeltanoTypes",
     "ExamplesFlextMeltanoUtilities",
     "c",
@@ -50,6 +54,8 @@ install_lazy_exports(
         "ExamplesFlextMeltanoModels": ".models",
         "ExamplesFlextMeltanoProtocols": ".protocols",
         "ExamplesFlextMeltanoSimple": ".simple_working",
+        "ExamplesFlextMeltanoTargetService": ".target_service",
+        "ExamplesFlextMeltanoTargetSink": ".target_sink",
         "ExamplesFlextMeltanoTypes": ".typings",
         "ExamplesFlextMeltanoUtilities": ".utilities",
         "c": ".constants",

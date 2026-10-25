@@ -64,25 +64,24 @@ Taps that already own a `singer_sdk` tap class (subclassing
 
 ### Target Implementation Pattern
 
-```text
-from __future__ import annotations
+The runnable example lives in `examples/target_service.py`: the service declares
+`sink_factory: ClassVar[p.Meltano.SinkFactory]` and defines no method, and
+`examples/target_sink.py` provides a drain sink whose constructor
+`(*, stream_name, schema, target_config)` is the factory. A connector binds its
+stateless `u.<Namespace>.create_sink` the same way.
 
-from flext_meltano import FlextMeltanoTargetServiceBase, p, t
+```python
+from examples import ExamplesFlextMeltanoTargetService
 
-
-class FlextExampleTargetService(FlextMeltanoTargetServiceBase):
-    """Target: drains Singer messages from stdin into per-stream sinks."""
-
-    target_name: str = "target-example"
-
-    def create_sink(
-        self, stream_name: str, schema: t.JsonMapping
-    ) -> p.Meltano.SingerDrainSink:
-        return ExampleSink(stream_name, schema)
+service = ExamplesFlextMeltanoTargetService()
+created = service.fetch_or_create_sink("orders", {"properties": {}})
+if created.failure:
+    raise RuntimeError(created.error)
 ```
 
 `cli_main()` routes SCHEMA/RECORD/STATE messages through
-`u.Meltano.process_stdin`, creates sinks on demand and flushes them at STATE
+`u.Meltano.process_stdin`, creates sinks on demand through `sink_factory` (with
+`target_config` taken from the service settings overrides) and flushes them at STATE
 boundaries and at end of input.
 
 ---
@@ -125,8 +124,9 @@ the typed `m.Meltano.CommandExecutionResult`.
 ### Integration Requirements
 
 1. Import flext-meltano names from the package root only.
-2. Implement only the abstract hook of the base (`create_tap_instance`,
-   `create_sink`, `connection_profile`); the base owns CLI dispatch.
+2. Provide only the base's capability (`create_tap_instance`, the declared
+   `sink_factory`, `connection_profile`); the base owns CLI dispatch. Targets declare
+   `sink_factory` in `api.py` and define no method there (ADR-006, amended 2026-10-25).
 3. Return `r[T]` results; never import `singer_sdk` in a connector.
 
 ---

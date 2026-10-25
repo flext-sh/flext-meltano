@@ -15,7 +15,6 @@ from flext_core.lazy import install_lazy_exports
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
 
-    from flext_meltano import services as services
     from flext_meltano.__version__ import (
         FlextMeltanoVersion,
         __author__,
@@ -88,7 +87,6 @@ __all__: tuple[str, ...] = (
     "p",
     "r",
     "s",
-    "services",
     "settings",
     "t",
     "u",
@@ -136,7 +134,6 @@ install_lazy_exports(
         "p": ".protocols",
         "r": "flext_cli",
         "s": ".base",
-        "services": ".services",
         "settings": "._settings",
         "t": ".typings",
         "u": ".utilities",

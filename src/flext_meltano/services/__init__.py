@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano.services import consumer_bases as consumer_bases
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.consumer_bases import (
         FlextMeltanoConsumerBases,
@@ -49,7 +48,6 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoTapServiceBase",
     "FlextMeltanoTargetAbstractions",
     "FlextMeltanoTargetServiceBase",
-    "consumer_bases",
 )
 
 install_lazy_exports(
@@ -70,7 +68,6 @@ install_lazy_exports(
         "FlextMeltanoTapServiceBase": ".consumer_bases.tap_service_base",
         "FlextMeltanoTargetAbstractions": ".singer_target",
         "FlextMeltanoTargetServiceBase": ".consumer_bases.target_service_base",
-        "consumer_bases": ".consumer_bases",
     }),
     public_exports=__all__,
 )
