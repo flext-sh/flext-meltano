@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_cli import d, e, h, r, x
+    from flext_cli import cli, d, e, h, r, x
 
     from flext_meltano.__version__ import (
         FlextMeltanoVersion,
@@ -77,6 +77,7 @@ __all__: tuple[str, ...] = (
     "__version__",
     "__version_info__",
     "c",
+    "cli",
     "config",
     "d",
     "e",
@@ -124,6 +125,7 @@ install_lazy_exports(
         "__url__": ".__version__",
         "__version_info__": ".__version__",
         "c": ".constants",
+        "cli": "flext_cli",
         "config": "._config",
         "d": "flext_cli",
         "e": "flext_cli",

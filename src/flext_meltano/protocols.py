@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p
 
 from flext_meltano._protocols import (
     FlextMeltanoProtocolsBase,
@@ -15,7 +15,7 @@ from flext_meltano._protocols import (
 )
 
 
-class FlextMeltanoProtocols(FlextCliProtocols):
+class FlextMeltanoProtocols(p):
     """Unified Meltano protocols extending FlextCliProtocols."""
 
     class Meltano(

@@ -14,10 +14,14 @@ from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-    from flext_meltano.services.consumer_bases import (
-        FlextMeltanoConsumerBases,
+    from flext_meltano.services.consumer_bases.dbt_service_base import (
         FlextMeltanoDbtServiceBase,
+    )
+    from flext_meltano.services.consumer_bases.facade import FlextMeltanoConsumerBases
+    from flext_meltano.services.consumer_bases.tap_service_base import (
         FlextMeltanoTapServiceBase,
+    )
+    from flext_meltano.services.consumer_bases.target_service_base import (
         FlextMeltanoTargetServiceBase,
     )
     from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
