@@ -15,11 +15,13 @@ from flext_core.lazy import install_lazy_exports
 if TYPE_CHECKING:
     from flext_tests import (
         api,
+        cli,
         config,
         d,
         e,
         h,
         install_local_packages,
+        main,
         r,
         settings,
         td,
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
         x,
     )
 
-    from flext_meltano import cli, main, meltano
+    from flext_meltano import meltano
     from tests.base import TestsFlextMeltanoServiceBase, s
     from tests.constants import TestsFlextMeltanoConstants, c
     from tests.models import TestsFlextMeltanoModels, m
@@ -84,14 +86,14 @@ install_lazy_exports(
         "TestsFlextMeltanoUtilities": ".utilities",
         "api": "flext_tests",
         "c": ".constants",
-        "cli": "flext_meltano",
+        "cli": "flext_tests",
         "config": "flext_tests",
         "d": "flext_tests",
         "e": "flext_tests",
         "h": "flext_tests",
         "install_local_packages": "flext_tests",
         "m": ".models",
-        "main": "flext_meltano",
+        "main": "flext_tests",
         "meltano": "flext_meltano",
         "p": ".protocols",
         "r": "flext_tests",
