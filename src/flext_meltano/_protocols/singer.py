@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import p
@@ -27,7 +28,7 @@ class FlextMeltanoProtocolsSinger:
         consumer projects depend only on FLEXT's own runtime surface.
         """
 
-        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
+        def run_cli(self, args: Sequence[str], prog_name: str) -> int:
             """Execute the tap CLI and return a normalized exit code."""
             ...
 

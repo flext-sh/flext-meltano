@@ -215,6 +215,15 @@ external --> intermediate: Data extraction
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class PipelineState:
     """Pipeline execution state with bookmarks."""
@@ -236,6 +245,15 @@ class PipelineState:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class RecordBuffer:
     """In-memory buffer for batch processing."""
@@ -254,6 +272,15 @@ class RecordBuffer:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class ErrorStore:
@@ -280,6 +307,15 @@ class ErrorStore:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 @dataclass
@@ -348,6 +384,15 @@ class PipelineConfig:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class SchemaValidator:
@@ -473,6 +518,15 @@ stop
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class DataQualityMetrics:
     """Track data quality throughout pipeline."""
@@ -565,6 +619,15 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 @dataclass
 class RetentionPolicy:
@@ -605,6 +668,15 @@ class RetentionPolicy:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
@@ -627,6 +699,15 @@ class PipelineScaler:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
@@ -648,6 +729,15 @@ class DataPartitioner:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class PipelineCache:
@@ -681,6 +771,15 @@ class PipelineCache:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 @dataclass

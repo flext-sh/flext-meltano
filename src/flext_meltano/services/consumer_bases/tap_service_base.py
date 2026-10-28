@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
@@ -61,7 +62,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # CLI dispatch
     # ------------------------------------------------------------------
 
-    def cli_main(self, args: t.StrSequence | None = None) -> int:
+    def cli_main(self, args: Sequence[str] | None = None) -> int:
         """Run the main CLI entry point through the internal Singer bridge.
 
         Returns:

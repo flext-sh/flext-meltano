@@ -12,6 +12,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from flext_cli import u
@@ -152,7 +153,7 @@ class FlextMeltanoUtilitiesSinger:
     def build_catalog_entry(
         stream_name: str,
         schema: t.JsonMapping,
-        key_properties: t.StrSequence,
+        key_properties: Sequence[str],
         replication_key: str | None = None,
         *,
         is_selected: bool = True,

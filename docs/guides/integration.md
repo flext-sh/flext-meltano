@@ -41,6 +41,15 @@ domain library; flext-meltano builds the Singer tap and its flat CLI
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from flext_meltano import FlextMeltanoTapServiceBase, m, p, r
 
 
@@ -92,6 +101,15 @@ boundaries and at end of input.
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 from flext_meltano import FlextMeltanoDbtServiceBase, p
 

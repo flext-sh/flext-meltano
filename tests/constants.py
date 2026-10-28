@@ -13,17 +13,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from enum import StrEnum, unique
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 from flext_tests import FlextTestsConstants
 
 from flext_meltano import FlextMeltanoConstants
-
-if TYPE_CHECKING:
-    from tests import t
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants):
@@ -61,13 +59,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants):
                 MELTANO = "meltano"
 
             HOST: ClassVar[str] = FlextMeltanoConstants.LOCALHOST
-            SERVICE_PORTS: ClassVar[t.MappingKV[_DockerService, int]] = (
-                MappingProxyType({
-                    _DockerService.POSTGRES: 5433,
-                    _DockerService.REDIS: 6380,
-                    _DockerService.MELTANO: 3000,
-                })
-            )
+            SERVICE_PORTS: ClassVar[Mapping[_DockerService, int]] = MappingProxyType({
+                _DockerService.POSTGRES: 5433,
+                _DockerService.REDIS: 6380,
+                _DockerService.MELTANO: 3000,
+            })
             POSTGRES_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.POSTGRES]
             REDIS_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.REDIS]
             MELTANO_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.MELTANO]
@@ -94,7 +90,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants):
                 SUCCESS_COMMAND = "tap-ok"
                 FAILURE_COMMAND = "tap-fail"
 
-            SINGER_SDK_ADAPTER_SETTINGS: ClassVar[t.MappingKV[str, str]] = (
+            SINGER_SDK_ADAPTER_SETTINGS: ClassVar[Mapping[str, str]] = (
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE

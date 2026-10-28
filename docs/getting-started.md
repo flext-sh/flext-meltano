@@ -98,6 +98,15 @@ from flext_meltano import FlextMeltanoTapServiceBase
 ```python
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from flext_cli import u
 from flext_core import e
 

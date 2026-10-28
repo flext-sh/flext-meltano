@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
@@ -67,7 +68,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
 
         """
-        models: t.StrSequence | None = rest or None
+        models: Sequence[str] | None = rest or None
         match subcommand:
             case c.Meltano.DbtCommand.RUN:
                 return self.run_models(models)
@@ -103,7 +104,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             raise SystemExit(1)
         return 0
 
-    def cli_main(self, args: t.StrSequence | None = None) -> int:
+    def cli_main(self, args: Sequence[str] | None = None) -> int:
         """Run the main CLI entry point for dbt project.
 
         Returns:
@@ -132,8 +133,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def _run_dbt_cmd(
         self,
         subcommand: str,
-        models: t.StrSequence | None = None,
-        extra_args: t.StrSequence | None = None,
+        models: Sequence[str] | None = None,
+        extra_args: Sequence[str] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a dbt command via the canonical typed executor (SSOT).
 
@@ -151,7 +152,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     def run_models(
         self,
-        models: t.StrSequence | None = None,
+        models: Sequence[str] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt models.
 
@@ -163,7 +164,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     def run_tests(
         self,
-        models: t.StrSequence | None = None,
+        models: Sequence[str] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt tests.
 
@@ -175,7 +176,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     def compile_models(
         self,
-        models: t.StrSequence | None = None,
+        models: Sequence[str] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Compile dbt models.
 

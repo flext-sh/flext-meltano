@@ -9,6 +9,7 @@ from __future__ import annotations
 import errno
 import os
 import signal
+from collections.abc import Sequence
 from pathlib import Path
 
 from flext_cli import cli as flext_cli
@@ -110,18 +111,18 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     def _pipeline_command(
         self,
         pipeline_name: str,
-        args: t.StrSequence | None = None,
-    ) -> p.Result[t.StrSequence]:
+        args: Sequence[str] | None = None,
+    ) -> p.Result[Sequence[str]]:
         config_result = self._load_pipeline_config(pipeline_name)
         if config_result.failure:
-            return r[t.StrSequence].from_failure(config_result)
+            return r[Sequence[str]].from_failure(config_result)
         command_value = config_result.value.get(c.HandlerMode.COMMAND)
         if not isinstance(command_value, c.SEQUENCE_PAIR_TYPES):
-            return r[t.StrSequence].fail("Pipeline execution not configured")
+            return r[Sequence[str]].fail("Pipeline execution not configured")
         command = m.Meltano.StringListValue.model_validate({
             "items": command_value,
         }).items
-        return r[t.StrSequence].ok([
+        return r[Sequence[str]].ok([
             *command,
             *(list(args) if args is not None else []),
         ])
@@ -208,7 +209,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     def execute_pipeline(
         self,
         pipeline_name: str,
-        args: t.StrSequence | None = None,
+        args: Sequence[str] | None = None,
     ) -> p.Result[str]:
         """Execute a named pipeline using the persisted command definition.
 
@@ -235,11 +236,11 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             )
         return r[str].ok(execution_result.value.output)
 
-    def list_pipelines(self) -> p.Result[t.StrSequence]:
+    def list_pipelines(self) -> p.Result[Sequence[str]]:
         """List all persisted pipeline names.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         return flext_cli.list_directory_names(self._pipelines_root())

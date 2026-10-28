@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import MutableMapping, Sequence
 from typing import Annotated, ClassVar, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
@@ -34,7 +35,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
 
     sink_factory: ClassVar[p.Meltano.SinkFactory]
 
-    _sinks: t.MutableMappingKV[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
 
@@ -42,7 +43,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # CLI dispatch
     # ------------------------------------------------------------------
 
-    def cli_main(self, args: t.StrSequence | None = None) -> int:
+    def cli_main(self, args: Sequence[str] | None = None) -> int:
         """Drain the Singer message stream from stdin into the sink registry.
 
         A Singer target owns no argument surface: messages arrive on stdin, so

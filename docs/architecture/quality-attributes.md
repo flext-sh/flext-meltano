@@ -216,6 +216,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class MultiLevelCache:
     """Multi-level caching for optimal performance."""
@@ -282,6 +291,15 @@ class MultiLevelCache:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class ConnectionPoolManager:
@@ -358,6 +376,15 @@ class ConnectionPoolManager:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class AsyncPipelineExecutor:
@@ -445,6 +472,15 @@ class AsyncPipelineExecutor:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class PerformanceMonitor:
@@ -664,6 +700,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class HorizontalScaler:
     """Horizontal scaling management for API and worker services."""
@@ -830,6 +875,15 @@ class HorizontalScaler:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class DataScaler:
     """Data layer scaling with sharding and replication."""
@@ -952,6 +1006,15 @@ class DataScaler:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class FunctionalDecomposer:
@@ -1145,6 +1208,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
@@ -1249,6 +1321,15 @@ class RailwayExecutor:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class CircuitBreaker:
     """Circuit breaker implementation for external service protection."""
@@ -1320,6 +1401,15 @@ class CircuitBreaker:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class RetryExecutor:
@@ -1399,6 +1489,15 @@ class RetryExecutor:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class ReliabilityMonitor:
@@ -1711,6 +1810,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class AvailabilityManager:
     """Manage high availability and failover across multiple availability zones."""
@@ -1949,6 +2057,15 @@ class AvailabilityManager:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class DisasterRecoveryManager:
@@ -2386,6 +2503,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 import pathlib
 
 
@@ -2558,6 +2684,15 @@ class QualityGate:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 import pathlib
 
@@ -2927,6 +3062,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class APIResponse:
     """Consistent API response format."""
@@ -3011,6 +3155,15 @@ class APIResponse:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class APIResource:
     """API resource with progressive disclosure."""
@@ -3079,6 +3232,15 @@ class APIResource:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class APIHelpSystem:
@@ -3357,6 +3519,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class TestableService:
     """Service designed for testability with dependency injection."""
@@ -3403,6 +3574,15 @@ class TestableService:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class TestDataBuilder:
     """Fluent builder for test data creation."""
@@ -3447,6 +3627,15 @@ def test_entity_processing():
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 @pytest.fixture
@@ -3522,6 +3711,15 @@ def test_complex_pipeline_operation():
 ````tex
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -3593,6 +3791,15 @@ class PropertyBasedTests:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 from pact import Consumer, Provider
 
@@ -3750,6 +3957,15 @@ jobs:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 import pathlib
 
 
@@ -3817,6 +4033,15 @@ class TestDataManager:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class TestResultAnalyzer:

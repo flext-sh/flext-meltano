@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import MutableSequence
+
 from examples import t
 
 
@@ -26,7 +28,7 @@ class ExamplesFlextMeltanoTargetSink:
         self.stream_name = stream_name
         self.schema = schema
         self.target_config = target_config
-        self.records: t.MutableSequenceOf[t.Meltano.MutableContainerValueMapping] = []
+        self.records: MutableSequence[t.Meltano.MutableContainerValueMapping] = []
         self.drained = False
 
     @staticmethod

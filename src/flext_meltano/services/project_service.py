@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Mapping
 from pathlib import Path
 
 from flext_meltano import FlextMeltanoServiceBase, c, e, p, r, t, u
@@ -20,19 +21,19 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _validate_project_parameters(
         project_id: str | None,
         prefix: str,
-    ) -> p.Result[t.StrMapping]:
+    ) -> p.Result[Mapping[str, str]]:
         """Validate temporary project creation parameters.
 
         Returns:
-            The resulting ``p.Result[t.StrMapping]``.
+            The resulting ``p.Result[Mapping[str, str]]``.
 
         """
         if not prefix or not prefix.strip():
             return e.fail_validation(
                 "Project prefix cannot be empty",
-                result_type=r[t.StrMapping],
+                result_type=r[Mapping[str, str]],
             )
-        return r[t.StrMapping].ok({
+        return r[Mapping[str, str]].ok({
             "project_id": project_id or "flext-meltano-project",
             "prefix": prefix.strip(),
         })

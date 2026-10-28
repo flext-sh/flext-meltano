@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
@@ -26,7 +27,7 @@ class FlextMeltanoProtocolsBase:
 
         def execute_meltano_command(
             self,
-            command: t.StrSequence,
+            command: Sequence[str],
             timeout: int = ...,
             _cwd: Path | None = None,
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
@@ -37,14 +38,14 @@ class FlextMeltanoProtocolsBase:
             self,
             plugin_type: str | None = None,
             _cwd: Path | None = None,
-        ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+        ) -> p.Result[Sequence[Mapping[str, str]]]:
             """Return project-scoped plugin definitions."""
             ...
 
         def execute_dbt_command(
             self,
             dbt_command: str,
-            args: t.StrSequence | None = None,
+            args: Sequence[str] | None = None,
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...

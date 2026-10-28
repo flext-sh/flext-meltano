@@ -237,6 +237,15 @@ sync_result = tap.sync(selected_streams)
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # Generic plugin discovery
 def discover_plugins(
@@ -258,6 +267,15 @@ def discover_plugins(
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 def install_plugin(
@@ -282,6 +300,15 @@ def install_plugin(
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 def execute_tap(
@@ -309,9 +336,18 @@ def execute_tap(
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def execute_target(
-    target_name: str, records: t.SequenceOf[m.Dict], settings: m.Dict
+    target_name: str, records: Sequence[m.Dict], settings: m.Dict
 ) -> p.Result[TargetExecutionResult]:
     """Execute Singer target with records.
 
@@ -333,6 +369,15 @@ def execute_target(
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
     """Create pipeline configuration.
@@ -350,6 +395,15 @@ def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 def execute_pipeline(

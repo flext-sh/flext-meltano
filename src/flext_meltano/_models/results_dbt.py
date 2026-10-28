@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import m, u
@@ -23,7 +24,7 @@ class FlextMeltanoModelsResultsDbt:
         """
 
         command: Annotated[
-            t.StrSequence,
+            Sequence[str],
             m.Field(description="Command that was executed"),
         ]
         success: Annotated[bool, m.Field(description="Whether the command succeeded")]

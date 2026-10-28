@@ -7,10 +7,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 
 import pytest
 
-from tests import c, m, t, tm
+from tests import c, m, tm
 
 
 class TestsFlextMeltanoExecutionResult:
@@ -18,7 +19,7 @@ class TestsFlextMeltanoExecutionResult:
 
     _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 
-    _ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
+    _ExecutionResultCase = tuple[Sequence[str], bool, int, str, str, float]
 
     class ExecutionResultJsonFixture(m.BaseModel):
         """Fixture model mirroring the ``CommandExecutionResult`` JSON shape."""

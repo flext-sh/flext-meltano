@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -25,7 +26,7 @@ MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
     ("dbt", "analytics", "transformation_name"),
 )
 
-MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
+MELTANO_COMPONENT_IDS: Sequence[str] = ("tap", "target", "dbt")
 
 
 @pytest.fixture(

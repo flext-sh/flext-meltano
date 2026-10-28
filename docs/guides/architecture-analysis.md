@@ -93,6 +93,15 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 # Plugin operations
 discover_plugins() -> p.Result[Sequence[PluginInfo]]
 install_plugin(name: str, version: str | None) -> p.Result[PluginInstallResult]
@@ -137,6 +146,15 @@ validate_configuration() -> p.Result[bool]
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
@@ -155,13 +173,22 @@ class FlextSingerTap(s):
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
     def __init__(self, target_name: str, settings: m.Dict) -> None: ...
     async def load_records(
-        self, records: t.SequenceOf[m.Dict]
+        self, records: Sequence[m.Dict]
     ) -> p.Result[LoadResult]: ...
     async def flush(self) -> p.Result[FlushResult]: ...
 ```
@@ -342,6 +369,15 @@ sync_result = tap.sync(catalog.streams[:5]).unwrap()
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # Worker pool management
 class FlextMeltanoWorkerPool:
@@ -349,7 +385,7 @@ class FlextMeltanoWorkerPool:
         self.max_workers = max_workers
         self.worker_pool = []
 
-    async def execute_pipeline_parallel(self, pipelines: t.SequenceOf[PipelineConfig]):
+    async def execute_pipeline_parallel(self, pipelines: Sequence[PipelineConfig]):
         # Distribute pipelines across workers
         # Monitor worker health and redistribute load
         # Handle worker failures and recovery

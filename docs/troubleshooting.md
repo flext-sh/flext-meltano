@@ -86,6 +86,15 @@ make check
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # Ensure proper type hints
 # Use concrete union types: t.JsonMapping | None
 
@@ -219,6 +228,15 @@ make check
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # ❌ Incorrect
 def risky_operation():
@@ -244,6 +262,15 @@ def safe_operation() -> p.Result[m.Dict]:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # ❌ Incorrect

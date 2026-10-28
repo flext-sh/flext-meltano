@@ -26,7 +26,7 @@ class FlextMeltanoModelsInstances:
             m.Field(description="Stream name identifier"),
         ]
         stream_schema: Annotated[
-            Mapping[str, t.Scalar | t.ScalarMapping],
+            Mapping[str, t.Scalar | Mapping[str, t.Scalar]],
             m.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[

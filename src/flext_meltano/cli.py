@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from typing import ClassVar
 
 from flext_cli import cli
@@ -30,7 +31,7 @@ class FlextMeltanoCli:
         )
         self._register_commands()
 
-    def run(self, args: t.StrSequence | None = None) -> p.Result[bool]:
+    def run(self, args: Sequence[str] | None = None) -> p.Result[bool]:
         """Run the CLI with the given arguments.
 
         Returns:

@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -48,7 +48,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         """
         return FlextMeltanoSettings.fetch_global()
 
-    def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
+    def _run_meltano(self, args: Sequence[str]) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success.
 
         Returns:
@@ -110,7 +110,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
             return r[t.Meltano.NestedStrMapping].fail(error_msg)
         if plugins_result.failure:
             return r[t.Meltano.NestedStrMapping].from_failure(plugins_result)
-        plugins: t.MutableMappingKV[str, t.StrMapping] = {}
+        plugins: MutableMapping[str, Mapping[str, str]] = {}
         for plugin in plugins_result.value:
             plugin_name = plugin.get("name", "")
             if not plugin_name:

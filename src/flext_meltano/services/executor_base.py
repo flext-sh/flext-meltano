@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import time
+from collections.abc import Mapping, Sequence
 from contextlib import redirect_stderr, redirect_stdout
 from importlib import metadata
 from io import StringIO
@@ -121,11 +122,11 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         plugin_type: str | None = None,
         _cwd: Path | None = None,
-    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+    ) -> p.Result[Sequence[Mapping[str, str]]]:
         """Return the project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
-            return r[t.SequenceOf[t.StrMapping]].from_failure(project_result)
+            return r[Sequence[Mapping[str, str]]].from_failure(project_result)
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
         current_plugins_raw = project_result.value.plugins.plugins_by_type(
             ensure_parent=False,
@@ -134,13 +135,13 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             current_plugins_raw,
             selected_type=selected_type,
         )
-        return r[t.SequenceOf[t.StrMapping]].ok(discovered)
+        return r[Sequence[Mapping[str, str]]].ok(discovered)
 
-    def discover_installed_plugins(self) -> p.Result[t.StrSequence]:
+    def discover_installed_plugins(self) -> p.Result[Sequence[str]]:
         """Discover installed Meltano plugins from the active project runtime.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         return self.fetch_project_plugins().map(
@@ -149,11 +150,11 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ],
         )
 
-    def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
+    def _runtime_environment_args(self, _cwd: Path | None = None) -> Sequence[str]:
         """Select a runtime environment explicitly to avoid leaking test env vars.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         active_settings = (
@@ -196,7 +197,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def execute_meltano_command(
         self,
-        command: t.StrSequence,
+        command: Sequence[str],
         timeout: int = c.Meltano.DEFAULT_TIMEOUT_SECONDS,
         _cwd: Path | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
@@ -314,7 +315,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def execute_dbt_command(
         self,
         dbt_command: str,
-        args: t.StrSequence | None = None,
+        args: Sequence[str] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a DBT command.
 

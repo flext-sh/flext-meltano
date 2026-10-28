@@ -485,6 +485,15 @@ make test
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def test_operation_returns_flext_result():
     """Test that operations return r instances."""

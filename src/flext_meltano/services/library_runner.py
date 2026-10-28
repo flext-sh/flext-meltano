@@ -6,9 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, settings, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, settings
 from flext_meltano.services import FlextMeltanoExecutor
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
 
     def run_dbt_transformation(
         self,
-        models: t.StrSequence | None = None,
+        models: Sequence[str] | None = None,
         project_dir: Path | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.

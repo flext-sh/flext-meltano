@@ -6,12 +6,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from types import MappingProxyType
 from typing import ClassVar, Self
 
 from flext_core import FlextSettings
 
-from flext_meltano import t
 from flext_meltano._constants import FlextMeltanoConstantsEnums
 
 
@@ -78,7 +78,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
         return object.__hash__(self)
 
     # Environments
-    ENVIRONMENT_RUNTIME_ALIASES: ClassVar[t.StrMapping] = MappingProxyType({
+    ENVIRONMENT_RUNTIME_ALIASES: ClassVar[Mapping[str, str]] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
         ),
@@ -101,7 +101,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
 
     # Capabilities
     PLUGIN_GROUP_ALIASES: ClassVar[
-        t.MappingKV[str, FlextMeltanoConstantsEnums.PluginType]
+        Mapping[str, FlextMeltanoConstantsEnums.PluginType]
     ] = MappingProxyType({
         "extractor": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
         FlextMeltanoConstantsEnums.PluginType.EXTRACTORS: (

@@ -6,9 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
-
-from flext_meltano import t
 
 if TYPE_CHECKING:
     from singer_sdk.tap_base import Tap
@@ -21,7 +20,7 @@ class FlextMeltanoSingerTapAdapter:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap
 
-    def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
+    def run_cli(self, args: Sequence[str], prog_name: str) -> int:
         """Execute the Singer CLI and normalize ``SystemExit`` into an int.
 
         Returns:

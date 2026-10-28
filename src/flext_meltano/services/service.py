@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Self, cast
 
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
@@ -15,7 +16,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     """Generic data pipeline service with the component factory."""
 
     @staticmethod
-    def _settings_payload(config: t.MappingKV[str, t.Scalar]) -> t.JsonDict | None:
+    def _settings_payload(config: Mapping[str, t.Scalar]) -> t.JsonDict | None:
         """Normalize loose scalar ``config`` into one JSON settings payload.
 
         Returns ``None`` for empty config so the specialized factory skips the
@@ -35,7 +36,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         component_name: str,
         field_name: str,
         component_label: str,
-        config: t.MappingKV[str, t.Scalar],
+        config: Mapping[str, t.Scalar],
     ) -> p.Result[Self]:
         """Create one specialized Meltano component service.
 

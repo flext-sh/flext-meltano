@@ -6,11 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import m
-
-from flext_meltano import t
 
 
 class FlextMeltanoModelsCliInputs:
@@ -41,7 +40,7 @@ class FlextMeltanoModelsCliInputs:
         # mro-wkii.17 (codex): keep the runtime annotation resolvable so the
         # model-driven CLI preserves the optional immutable sequence default.
         args: Annotated[
-            t.StrSequence,
+            Sequence[str],
             m.Field(
                 default_factory=tuple[str, ...],
                 description="Extra arguments forwarded to the pipeline command",
@@ -95,7 +94,7 @@ class FlextMeltanoModelsCliInputs:
             m.Field(description="DBT subcommand (run, test, compile, docs)"),
         ]
         args: Annotated[
-            t.StrSequence,
+            Sequence[str],
             m.Field(
                 default=(),
                 description="Extra arguments forwarded to DBT",
@@ -110,7 +109,7 @@ class FlextMeltanoModelsCliInputs:
             m.Field(default=None, description="Tap operation name"),
         ] = None
         args: Annotated[
-            t.StrSequence,
+            Sequence[str],
             m.Field(
                 default=(),
                 description="Extra arguments forwarded to the tap operation",
@@ -125,7 +124,7 @@ class FlextMeltanoModelsCliInputs:
             m.Field(default=None, description="Target operation name"),
         ] = None
         args: Annotated[
-            t.StrSequence,
+            Sequence[str],
             m.Field(
                 default=(),
                 description="Extra arguments forwarded to the target operation",

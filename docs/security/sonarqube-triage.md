@@ -119,15 +119,15 @@ padrão.
 > configured" 3 times.
 
 ```text
-      108      ) -> p.Result[t.StrSequence]:
+      108      ) -> p.Result[Sequence[str]]:
       109          config_result = self._load_pipeline_config(pipeline_name)
       110          if config_result.failure:
-      111              return r[t.StrSequence].fail(
+      111              return r[Sequence[str]].fail(
 >>>   112                  config_result.error or "Pipeline execution not configured"
       113              )
       114          command_value = config_result.value.get(c.HandlerMode.COMMAND)
       115          if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
-      116              return r[t.StrSequence].fail("Pipeline execution not configured")
+      116              return r[Sequence[str]].fail("Pipeline execution not configured")
 ```
 
 **Decisão**: pendente
@@ -165,7 +165,7 @@ padrão.
        71      # CLI dispatch
        72      # ------------------------------------------------------------------
        73
->>>    74      def cli_main(self, args: t.StrSequence | None = None) -> int:
+>>>    74      def cli_main(self, args: Sequence[str] | None = None) -> int:
        75          """Run the main CLI entry point for dbt project."""
        76
        77          def _run_cli_main() -> int:
@@ -184,7 +184,7 @@ padrão.
        45              c.Meltano.DbtResourceType.MODEL
        46          )
        47          if model_nodes_result.failure:
-       48              return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+       48              return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
 >>>    49                  model_nodes_result.error or "Unknown error"
        50              )
        51          try:
@@ -209,7 +209,7 @@ padrão.
        48                  return exc.code if isinstance(exc.code, int) else 1
        49              return 0
        50
-       51          def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+       51          def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
 ```
 
 **Decisão**: pendente
@@ -227,7 +227,7 @@ padrão.
       202
 >>>   203      def execute_meltano_command(
       204          self,
-      205          command: t.StrSequence,
+      205          command: Sequence[str],
       206          timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
       207          _cwd: Path | None = None,
 ```
@@ -249,7 +249,7 @@ padrão.
       322          self, tap_name: str, target_name: str, config: t.JsonMapping | No ...
       323      ) -> p.Result[m.Meltano.CommandExecutionResult]:
       324          """Execute a complete ELT pipeline."""
-      325          prepared_command: t.StrSequence | None = None
+      325          prepared_command: Sequence[str] | None = None
 ```
 
 **Decisão**: pendente
@@ -284,11 +284,11 @@ padrão.
 ```text
        69              error_msg = f"Failed to discover plugins: {e}"
        70              self.logger.exception(error_msg, error=str(e))
-       71              return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
+       71              return r[Sequence[Mapping[str, str]]].fail(error_msg)
        72
 >>>    73      def _discover_plugins(
        74          self, project: t.JsonPayload | t.Meltano.DbtProject | None
-       75      ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+       75      ) -> p.Result[Sequence[Mapping[str, str]]]:
        76          """Discover plugins without owning the exception boundary."""
        77          self.logger.info("Discovering Meltano plugins")
 ```
@@ -309,7 +309,7 @@ padrão.
 >>>    70          except SystemExit as exc:
        71              return exc.code if isinstance(exc.code, int) else 1
        72
-       73      def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+       73      def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
        74          """Delegate stream discovery to the raw Singer tap."""
 ```
 
@@ -868,7 +868,7 @@ padrão.
        31
 >>>    32      PluginType = c.Meltano.PluginType
        33
-       34      type VariantValue = str | t.StrSequence | t.ScalarMapping | None
+       34      type VariantValue = str | Sequence[str] | Mapping[str, t.Scalar] | None
        35      """Normalized plugin variant: string, string list, scalar mapping, or null."""
        36
 ```

@@ -284,6 +284,15 @@ src/flext_meltano/
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # ✅ CORRECT - Test r patterns
 def test_operation_success():
@@ -317,6 +326,15 @@ patches are not used:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from flext_meltano import meltano
 from tests import c, r
 from tests import c, tm
@@ -334,6 +352,15 @@ def test_runtime_command_normalizes_meltano_prefix() -> None:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # ✅ CORRECT - Reusable test fixtures

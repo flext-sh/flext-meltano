@@ -13,14 +13,12 @@ from __future__ import annotations
 
 import signal
 import threading
-from typing import TYPE_CHECKING, override
+from collections.abc import Iterable, Sequence
+from typing import override
 
 from singer_sdk import Stream, Tap
 
 from flext_meltano import m, p, t
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 
 class FlextMeltanoDeclarativeTap:
@@ -33,7 +31,7 @@ class FlextMeltanoDeclarativeTap:
             """Store the built Singer tap class used for flat-CLI dispatch."""
             self._tap_class = tap_class
 
-        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
+        def run_cli(self, args: Sequence[str], prog_name: str) -> int:
             """Run the Singer flat CLI (``--config/--discover/--catalog/--state``).
 
             Returns:
@@ -86,19 +84,19 @@ class FlextMeltanoDeclarativeTap:
                     schema=dict(stream_spec.json_schema),
                     name=stream_spec.name,
                 )
-                self._declared_primary_keys: t.StrSequence = stream_spec.primary_keys
+                self._declared_primary_keys: Sequence[str] = stream_spec.primary_keys
                 self._declared_replication_key: str | None = stream_spec.replication_key
                 self._stream_config: t.JsonMapping = config
 
             @property
             @override
-            def primary_keys(self) -> t.StrSequence:
+            def primary_keys(self) -> Sequence[str]:
                 """Keys declared by the canonical stream specification."""
                 return self._declared_primary_keys
 
             @primary_keys.setter
             @override
-            def primary_keys(self, new_value: t.StrSequence) -> None:
+            def primary_keys(self, new_value: Sequence[str]) -> None:
                 """Accept Singer catalog key selection through its public contract."""
                 self._declared_primary_keys = new_value
 

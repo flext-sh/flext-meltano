@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -25,11 +25,11 @@ class FlextMeltanoUtilitiesRuntime:
     """Runtime-focused helpers for in-process Meltano execution."""
 
     @staticmethod
-    def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
+    def _normalized_parts(values: Sequence[str]) -> Sequence[str]:
         """Normalize a sequence of CLI-like values to stripped non-empty strings.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
 
@@ -43,11 +43,11 @@ class FlextMeltanoUtilitiesRuntime:
         return list(u.filter(stripped_values, _is_non_empty_part))
 
     @staticmethod
-    def normalize_runtime_command(command: t.StrSequence) -> t.StrSequence:
+    def normalize_runtime_command(command: Sequence[str]) -> Sequence[str]:
         """Normalize legacy Meltano command arguments for in-process execution.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         normalized = FlextMeltanoUtilitiesRuntime._normalized_parts(command)
@@ -78,7 +78,7 @@ class FlextMeltanoUtilitiesRuntime:
         return resolved.value if resolved is not None else normalized
 
     @staticmethod
-    def requests_help(args: t.StrSequence) -> bool:
+    def requests_help(args: Sequence[str]) -> bool:
         """Return whether the provided args request CLI help."""
         normalized_args = FlextMeltanoUtilitiesRuntime._normalized_parts(args)
         return not normalized_args or normalized_args[0] in {
@@ -130,12 +130,12 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_dbt_runtime_command(
         dbt_command: str,
-        args: t.StrSequence | None = None,
-    ) -> t.StrSequence:
+        args: Sequence[str] | None = None,
+    ) -> Sequence[str]:
         """Build the canonical Meltano DBT invoke runtime command.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         command = [
@@ -150,11 +150,11 @@ class FlextMeltanoUtilitiesRuntime:
     def build_discovered_project_plugin(
         raw_type: str,
         raw_plugin: ProjectPlugin,
-    ) -> t.StrMapping | None:
+    ) -> Mapping[str, str] | None:
         """Normalize a Meltano project plugin object into discovery payload shape.
 
         Returns:
-            The resulting ``t.StrMapping | None``.
+            The resulting ``Mapping[str, str] | None``.
 
         """
         raw_mapping: t.JsonMapping = {
@@ -186,17 +186,17 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def discover_project_plugins(
-        current_plugins: t.MappingKV[MeltanoPluginType, t.SequenceOf[ProjectPlugin]],
+        current_plugins: Mapping[MeltanoPluginType, Sequence[ProjectPlugin]],
         *,
         selected_type: str | None = None,
-    ) -> list[t.StrMapping]:
+    ) -> list[Mapping[str, str]]:
         """Normalize Meltano current_plugins catalog into canonical discovery mappings.
 
         Returns:
-            The resulting ``list[t.StrMapping]``.
+            The resulting ``list[Mapping[str, str]]``.
 
         """
-        discovered: list[t.StrMapping] = []
+        discovered: list[Mapping[str, str]] = []
         for raw_type, raw_plugins in current_plugins.items():
             normalized_type = raw_type.value
             for raw_plugin in raw_plugins:
@@ -218,7 +218,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_name: str,
         plugin_type: str,
         source: m.Meltano.PluginDiscoverySource,
-    ) -> t.StrMapping:
+    ) -> Mapping[str, str]:
         """Build canonical plugin discovery payload from raw Meltano metadata.
 
         ``source`` carries the plugin's own normalized discovery metadata
@@ -226,7 +226,7 @@ class FlextMeltanoUtilitiesRuntime:
         domain object instead of four independent keyword arguments.
 
         Returns:
-            The resulting ``t.StrMapping``.
+            The resulting ``Mapping[str, str]``.
 
         """
         variants_str = (

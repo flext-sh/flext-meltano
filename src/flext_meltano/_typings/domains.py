@@ -20,7 +20,7 @@ class FlextMeltanoTypingsDomains:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    type NestedStrMapping = Mapping[str, t.StrMapping]
+    type NestedStrMapping = Mapping[str, Mapping[str, str]]
     type DbtProject = t.JsonMapping
 
 
