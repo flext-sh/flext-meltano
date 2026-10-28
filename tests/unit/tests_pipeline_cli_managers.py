@@ -46,8 +46,8 @@ class TestsFlextMeltanoPipelineCliManagers:
         capsys.readouterr()
         return result
 
-    @staticmethod
     @pytest.fixture
+    @staticmethod
     def meltano_cli() -> FlextMeltanoCli:
         """Provide the public CLI facade used by every command scenario.
 
