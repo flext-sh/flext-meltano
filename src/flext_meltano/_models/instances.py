@@ -103,7 +103,7 @@ class FlextMeltanoModelsInstances:
         # class before the namespace body finishes executing; the assigned
         # empty tuple keeps the same default with full checker visibility.
         streams: Annotated[
-            t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo],
+            tuple[FlextMeltanoModelsInstances.StreamInfo, ...],
             m.Field(description="Available streams"),
         ] = ()
         status: Annotated[

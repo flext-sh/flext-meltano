@@ -1519,7 +1519,7 @@ class ReliabilityMonitor:
     def _calculate_reliability_score(
         self,
         error_rates: Dict[str, float],
-        circuit_breaker_states: Dict[str, str],
+        circuit_breaker_states: Dict[str, ...]
         uptime_percentages: Dict[str, float],
     ) -> float:
         """Calculate overall reliability score (0-100)."""
@@ -1559,7 +1559,7 @@ class ReliabilityMonitor:
     def _generate_reliability_recommendations(
         self,
         error_rates: Dict[str, float],
-        circuit_breaker_states: Dict[str, str],
+        circuit_breaker_states: Dict[str, ...]
         mtbf: float,
     ) -> t.StringList:
         """Generate reliability improvement recommendations."""

@@ -73,7 +73,7 @@ class FlextMeltanoModelsSingerCatalog:
         # cannot reference a sibling nested class before the namespace body
         # finishes executing; the assigned empty tuple keeps the same default.
         metadata: Annotated[
-            t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata],
+            tuple[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata, ...],
             m.Field(description="Singer stream metadata blocks"),
         ] = ()
         key_properties: t.StrTuple = m.Field(
@@ -119,7 +119,7 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
         streams: Annotated[
-            t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry],
+            tuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry, ...],
             m.Field(description="Singer catalog stream entries"),
         ] = ()
 

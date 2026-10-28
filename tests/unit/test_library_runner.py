@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests import c, m, meltano, p, t, tm
+from tests import c, m, meltano, p, tm
 
 
 @pytest.mark.docker
@@ -20,7 +20,7 @@ class TestsFlextMeltanoLibraryRunner:
     """Assert the public library-runner contract via the ``meltano`` facade."""
 
     # Attributes the typed CommandExecutionResult exposes per the public contract.
-    _COMMAND_RESULT_ATTRIBUTES: t.VariadicTuple[str] = (
+    _COMMAND_RESULT_ATTRIBUTES: tuple[str, ...] = (
         c.HandlerMode.COMMAND,
         "success",
         "output",

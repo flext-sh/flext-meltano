@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 from tests import t
 
-MELTANO_COMPONENT_CASES: t.VariadicTuple[t.Meltano.ComponentCase] = (
+MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
     ("tap", "tap-csv", "source_name"),
     ("target", "target-jsonl", "sink_name"),
     ("dbt", "analytics", "transformation_name"),

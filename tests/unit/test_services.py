@@ -18,7 +18,7 @@ class TestsFlextMeltanoServices:
 
     @staticmethod
     def test_component_factory_returns_specialized_facade(
-        meltano_component_case: tuple[str, str, str],
+        meltano_component_case: tuple[str, str, ...],
     ) -> None:
         """Each public factory returns a specialized facade with the right name.
 

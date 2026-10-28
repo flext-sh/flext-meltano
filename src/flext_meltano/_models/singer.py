@@ -192,7 +192,7 @@ class FlextMeltanoModelsSinger:
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[
-            t.VariadicTuple[t.JsonMapping],
+            tuple[t.JsonMapping, ...],
             m.Field(description="Fetched records"),
         ] = m.Field(
             default_factory=tuple[t.JsonMapping, ...],
