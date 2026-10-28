@@ -10,10 +10,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import m, tf, tm
 from flext_tests.docker import FlextTestsDocker
 
-from tests import c, u
+from tests import c, m, tf, tm, u
 
 if TYPE_CHECKING:
     from collections.abc import Generator

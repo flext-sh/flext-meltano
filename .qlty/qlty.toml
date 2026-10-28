@@ -5,29 +5,6 @@
 
 config_version = "0"
 
-exclude_patterns = [
-  "**/protos/**",
-  "**/conftest.py",
-  "**/examples/__init__.py",
-  "**/src/flext_meltano/__init__.py",
-  "**/src/flext_meltano/__version__.py",
-  "**/src/flext_meltano/_constants/__init__.py",
-  "**/src/flext_meltano/_models/__init__.py",
-  "**/src/flext_meltano/_protocols/__init__.py",
-  "**/src/flext_meltano/_typings/__init__.py",
-  "**/src/flext_meltano/_utilities/__init__.py",
-  "**/src/flext_meltano/constants.py",
-  "**/src/flext_meltano/models.py",
-  "**/src/flext_meltano/protocols.py",
-  "**/src/flext_meltano/services/__init__.py",
-  "**/src/flext_meltano/services/consumer_bases/__init__.py",
-  "**/src/flext_meltano/typings.py",
-  "**/src/flext_meltano/utilities.py",
-  "**/tests/__init__.py",
-  "**/tests/integration/__init__.py",
-  "**/tests/unit/__init__.py",
-]
-
 [smells]
 mode = "block"
 

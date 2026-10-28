@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 from flext_cli import cli as flext_cli
 
-from flext_meltano.cli import FlextMeltanoCli
+from flext_meltano import FlextMeltanoCli
 from tests import c, m, p, tm, u
 
 
@@ -47,7 +47,6 @@ class TestsFlextMeltanoPipelineCliManagers:
         return result
 
     @pytest.fixture
-    @staticmethod
     def meltano_cli() -> FlextMeltanoCli:
         """Provide the public CLI facade used by every command scenario.
 

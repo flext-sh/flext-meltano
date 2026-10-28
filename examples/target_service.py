@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from typing import Annotated, ClassVar
 
-from examples import ExamplesFlextMeltanoTargetSink
-from flext_meltano import FlextMeltanoTargetServiceBase, m, p, t
+from examples import ExamplesFlextMeltanoTargetSink, m, p, t
+from flext_meltano import FlextMeltanoTargetServiceBase
 
 
 class ExamplesFlextMeltanoTargetService(FlextMeltanoTargetServiceBase):

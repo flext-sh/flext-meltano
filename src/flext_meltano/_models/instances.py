@@ -12,7 +12,7 @@ from typing import Annotated, Self
 from flext_cli import m
 
 from flext_meltano import c, t
-from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano._models import FlextMeltanoModelsSources
 
 
 class FlextMeltanoModelsInstances:

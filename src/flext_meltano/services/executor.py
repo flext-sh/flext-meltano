@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_meltano import c, p, r, t
-from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
+from flext_meltano.services import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):

@@ -9,9 +9,18 @@ from __future__ import annotations
 import sys
 from typing import ClassVar
 
-from flext_cli import cli
-
-from flext_meltano import FlextMeltano, FlextMeltanoPipelineManager, c, e, m, p, r, t, u
+from flext_meltano import (
+    FlextMeltano,
+    FlextMeltanoPipelineManager,
+    c,
+    cli,
+    e,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoCli:

@@ -13,9 +13,8 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano import meltano
-from flext_meltano.api import FlextMeltano
-from tests import tm
+from flext_meltano import FlextMeltano
+from tests import meltano, tm
 
 
 class TestsFlextMeltanoSingerSdkAdapter:

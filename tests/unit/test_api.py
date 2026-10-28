@@ -8,8 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano import meltano
-from tests import tm
+from tests import meltano, tm
 
 
 class TestsFlextMeltanoApi:

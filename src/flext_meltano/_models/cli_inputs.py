@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from flext_cli import m, t
+from flext_cli import m
+
+from flext_meltano import t
 
 
 class FlextMeltanoModelsCliInputs:

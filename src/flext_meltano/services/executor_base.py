@@ -14,7 +14,6 @@ from io import StringIO
 from pathlib import Path
 from typing import Annotated, override
 
-from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -24,6 +23,7 @@ from flext_meltano import (
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
+    cli,
     m,
     p,
     r,

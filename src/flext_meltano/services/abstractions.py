@@ -21,7 +21,7 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
+from flext_meltano.services import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoAbstractions(FlextMeltanoServiceBase):

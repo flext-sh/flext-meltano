@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import t
+from examples import t
 
 
 class ExamplesFlextMeltanoTargetSink:

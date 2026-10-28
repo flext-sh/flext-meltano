@@ -12,8 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano import m, meltano, p, t
-from tests import c, tm
+from tests import c, m, meltano, p, t, tm
 
 
 @pytest.mark.docker
@@ -31,7 +30,6 @@ class TestsFlextMeltanoLibraryRunner:
     )
 
     @pytest.fixture(scope="class")
-    @staticmethod
     def dbt_result() -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run one DBT transformation once and share its typed outcome.
 

@@ -6,8 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import m, p
-from tests import tm
+from tests import m, p, tm
 
 
 class TestsFlextMeltanoDbtConnectionProfile:

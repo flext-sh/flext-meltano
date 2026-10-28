@@ -14,8 +14,8 @@ from typing import cast
 from jsonschema import Draft202012Validator, ValidationError
 from typing_extensions import TypeForm
 
-from examples import c, u
-from flext_meltano import FlextMeltanoSettings, m, meltano, p, t
+from examples import c, m, meltano, p, t, u
+from flext_meltano import FlextMeltanoSettings
 
 
 class ExamplesFlextMeltanoSimple:

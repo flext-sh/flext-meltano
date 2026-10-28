@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 from flext_cli import config as cli_config
 
-from flext_meltano import FlextMeltanoConfig, config, m, meltano, settings
-from tests import tm, u
+from flext_meltano import FlextMeltanoConfig, config, settings
+from tests import m, meltano, tm, u
 
 
 class TestsFlextMeltanoServiceSettingsContract:

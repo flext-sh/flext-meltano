@@ -7,14 +7,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING, ClassVar, Self
+from typing import ClassVar, Self
 
 from flext_core import FlextSettings
 
-from flext_meltano._constants.base import FlextMeltanoConstantsEnums
-
-if TYPE_CHECKING:
-    from flext_cli import t
+from flext_meltano import t
+from flext_meltano._constants import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsSettings(FlextSettings):

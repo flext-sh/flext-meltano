@@ -10,8 +10,7 @@ from typing import override
 
 from flext_tests import FlextTestsServiceBase
 
-from flext_meltano import m
-from tests.settings import TestsFlextMeltanoSettings
+from tests import TestsFlextMeltanoSettings, m
 
 
 class TestsFlextMeltanoServiceBase(FlextTestsServiceBase):

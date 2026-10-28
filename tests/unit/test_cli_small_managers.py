@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano.cli import FlextMeltanoCli
+from flext_meltano import FlextMeltanoCli
 from tests import c, tm, u
 
 
@@ -21,7 +21,6 @@ class TestsFlextMeltanoCliSmallManagers:
     """Exercise the public ``run`` contract of the Meltano CLI facade."""
 
     @pytest.fixture
-    @staticmethod
     def meltano_cli() -> FlextMeltanoCli:
         """Provide a freshly constructed CLI facade for each test.
 

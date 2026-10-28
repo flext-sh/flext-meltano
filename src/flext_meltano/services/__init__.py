@@ -14,16 +14,6 @@ from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-    from flext_meltano.services.consumer_bases.dbt_service_base import (
-        FlextMeltanoDbtServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.facade import FlextMeltanoConsumerBases
-    from flext_meltano.services.consumer_bases.tap_service_base import (
-        FlextMeltanoTapServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.target_service_base import (
-        FlextMeltanoTargetServiceBase,
-    )
     from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
     from flext_meltano.services.executor import FlextMeltanoExecutor
     from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
@@ -39,8 +29,6 @@ if TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "FlextMeltanoAbstractions",
-    "FlextMeltanoConsumerBases",
-    "FlextMeltanoDbtServiceBase",
     "FlextMeltanoDeclarativeTap",
     "FlextMeltanoExecutor",
     "FlextMeltanoExecutorBase",
@@ -49,9 +37,7 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoProjectService",
     "FlextMeltanoService",
     "FlextMeltanoSingerTapAdapter",
-    "FlextMeltanoTapServiceBase",
     "FlextMeltanoTargetAbstractions",
-    "FlextMeltanoTargetServiceBase",
 )
 
 install_lazy_exports(
@@ -59,8 +45,6 @@ install_lazy_exports(
     globals(),
     MappingProxyType({
         "FlextMeltanoAbstractions": ".abstractions",
-        "FlextMeltanoConsumerBases": ".consumer_bases.facade",
-        "FlextMeltanoDbtServiceBase": ".consumer_bases.dbt_service_base",
         "FlextMeltanoDeclarativeTap": ".declarative_tap",
         "FlextMeltanoExecutor": ".executor",
         "FlextMeltanoExecutorBase": ".executor_base",
@@ -69,9 +53,7 @@ install_lazy_exports(
         "FlextMeltanoProjectService": ".project_service",
         "FlextMeltanoService": ".service",
         "FlextMeltanoSingerTapAdapter": ".singer_sdk",
-        "FlextMeltanoTapServiceBase": ".consumer_bases.tap_service_base",
         "FlextMeltanoTargetAbstractions": ".singer_target",
-        "FlextMeltanoTargetServiceBase": ".consumer_bases.target_service_base",
     }),
     public_exports=__all__,
 )

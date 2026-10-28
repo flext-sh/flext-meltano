@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_meltano import FlextMeltano, FlextMeltanoCli, FlextMeltanoSettings, meltano
-from tests import c, tm, u
+from flext_meltano import FlextMeltano, FlextMeltanoCli, FlextMeltanoSettings
+from tests import c, meltano, tm, u
 
 
 class TestsFlextMeltanoExecutors:
