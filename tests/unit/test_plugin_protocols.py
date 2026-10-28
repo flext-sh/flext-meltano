@@ -16,7 +16,7 @@ import pytest
 from tests import c, m, t, tm
 
 
-class TestsFlextMeltanoPluginProtocols:
+class TestsFlextMeltanoProtocolsPlugin:
     """Public-contract tests for the Meltano Singer catalog models."""
 
     # --- construction / return values -----------------------------------

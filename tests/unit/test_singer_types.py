@@ -16,7 +16,7 @@ import pytest
 from tests import TestsFlextMeltanoTypes, t, tm
 
 
-class TestsFlextMeltanoSingerTypes:
+class TestsFlextMeltanoTypesSinger:
     """Behavioral contract for the Meltano Singer typing namespace."""
 
     # (alias name, resolved __value__ repr fragment) — real public contract table.
