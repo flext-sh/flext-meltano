@@ -11,7 +11,7 @@ from typing import Annotated, ClassVar
 
 from flext_cli import c
 
-from flext_meltano._constants._base import FlextMeltanoConstantsEnums
+from flext_meltano._constants import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsBase:
