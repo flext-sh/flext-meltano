@@ -12,7 +12,7 @@
   - [Phase 4 Scope & Objectives](#phase-4-scope-objectives)
 - [🚨 CRITICAL BLOCKERS IDENTIFIED](#critical-blockers-identified)
   - [Blocker 1: Missing flext-tests Dependency (Priority: Critical)](#blocker-1-missing-flext-tests-dependency-priority-critical)
-  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)](#blocker-2-flextmodelsbasemodel-inheritance-issues-priority-critical)
+  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)](#blocker-2-Flextmodelsbasemodel-inheritance-issues-priority-critical)
   - [Blocker 3: Test Environment Configuration (Priority: High)](#blocker-3-test-environment-configuration-priority-high)
 - [📋 PHASE 4 IMPLEMENTATION ROADMAP](#phase-4-implementation-roadmap)
   - [Immediate Actions Required (Next 24-48 Hours)](#immediate-actions-required-next-24-48-hours)

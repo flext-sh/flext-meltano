@@ -615,7 +615,7 @@ runtime-evaluated-base-classes = [
   "flext_meltano.services.FlextMeltanoExecutor",
   "flext_meltano.services.FlextMeltanoExecutorBase",
   "flext_meltano.services.FlextMeltanoLibraryRunner",
-  "flext_meltano.services.FlextMeltanoPluginDiscoveryMixin",
+  "flext_meltano.services.FlextMeltanoPluginDiscovery",
   "flext_meltano.services.FlextMeltanoService",
   "flext_meltano.services.consumer_bases.FlextMeltanoDbtServiceBase",
   "flext_meltano.services.consumer_bases.FlextMeltanoTapServiceBase",

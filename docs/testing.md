@@ -13,7 +13,7 @@
   - [END-TO-END TESTS (Directory Exists - 70% Complete, 0% Executable)](#end-to-end-tests-directory-exists-70-complete-0-executable)
 - [🚨 CRITICAL BLOCKERS RESOLUTION PLAN](#critical-blockers-resolution-plan)
   - [Blocker 1: Missing flext-tests Dependency (VERIFIED)](#blocker-1-missing-flext-tests-dependency-verified)
-  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (VERIFIED)](#blocker-2-flextmodelsbasemodel-inheritance-issues-verified)
+  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (VERIFIED)](#blocker-2-Flextmodelsbasemodel-inheritance-issues-verified)
   - [Blocker 3: Test Environment Configuration](#blocker-3-test-environment-configuration)
 - [📋 TEST EXECUTION & VALIDATION PLAN](#test-execution-validation-plan)
   - [Phase 1: Infrastructure Resolution (Week 1)](#phase-1-infrastructure-resolution-week-1)

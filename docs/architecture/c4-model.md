@@ -275,7 +275,7 @@ Package "Service Layer" as services {
         +health()
     }
 
-    Class FlextMeltanoPluginDiscoveryMixin {
+    Class FlextMeltanoPluginDiscovery {
         +discover_plugins()
         +fetch_plugin_info()
     }

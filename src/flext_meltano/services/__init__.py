@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
     from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
     from flext_meltano.services.meltano_plugin_discovery import (
-        FlextMeltanoPluginDiscoveryMixin,
+        FlextMeltanoPluginDiscovery,
     )
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.service import FlextMeltanoService
@@ -33,7 +33,7 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoExecutor",
     "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
-    "FlextMeltanoPluginDiscoveryMixin",
+    "FlextMeltanoPluginDiscovery",
     "FlextMeltanoProjectService",
     "FlextMeltanoService",
     "FlextMeltanoSingerTapAdapter",
@@ -49,7 +49,7 @@ install_lazy_exports(
         "FlextMeltanoExecutor": ".executor",
         "FlextMeltanoExecutorBase": ".executor_base",
         "FlextMeltanoLibraryRunner": ".library_runner",
-        "FlextMeltanoPluginDiscoveryMixin": ".meltano_plugin_discovery",
+        "FlextMeltanoPluginDiscovery": ".meltano_plugin_discovery",
         "FlextMeltanoProjectService": ".project_service",
         "FlextMeltanoService": ".service",
         "FlextMeltanoSingerTapAdapter": ".singer_sdk",

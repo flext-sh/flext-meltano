@@ -13,7 +13,7 @@ from flext_meltano.services import (
     FlextMeltanoAbstractions,
     FlextMeltanoExecutor,
     FlextMeltanoLibraryRunner,
-    FlextMeltanoPluginDiscoveryMixin,
+    FlextMeltanoPluginDiscovery,
     FlextMeltanoService,
 )
 from flext_meltano.services.consumer_bases import FlextMeltanoConsumerBases
@@ -24,7 +24,7 @@ class FlextMeltano(
     FlextMeltanoConsumerBases,
     FlextMeltanoExecutor,
     FlextMeltanoLibraryRunner,
-    FlextMeltanoPluginDiscoveryMixin,
+    FlextMeltanoPluginDiscovery,
     FlextMeltanoService,
 ):
     """MRO facade over all Meltano services. All operations return r[T]."""

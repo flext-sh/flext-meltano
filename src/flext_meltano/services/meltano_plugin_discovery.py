@@ -10,7 +10,7 @@ from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 from flext_meltano.services import FlextMeltanoAbstractions, FlextMeltanoProjectService
 
 
-class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
+class FlextMeltanoPluginDiscovery(FlextMeltanoServiceBase):
     """Mixin providing plugin discovery and info retrieval."""
 
     @staticmethod
@@ -180,4 +180,4 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             return r[t.StrMapping].fail(error_msg)
 
 
-__all__: list[str] = ["FlextMeltanoPluginDiscoveryMixin"]
+__all__: list[str] = ["FlextMeltanoPluginDiscovery"]
