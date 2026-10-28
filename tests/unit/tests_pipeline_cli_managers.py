@@ -238,7 +238,7 @@ class TestsFlextMeltanoPipelineCliManagers:
             )
             tm.ok(create_result)
 
-            ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
+            ensure_pid_dir_result = u.Cli.ensure_dir(pid_path.parent)
             tm.ok(ensure_pid_dir_result)
             write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
             tm.ok(write_pid_result)

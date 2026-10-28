@@ -192,7 +192,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
                 error=exc,
                 result_type=r[str],
             )
-        ensure_result = flext_cli.ensure_dir(
+        ensure_result = u.Cli.ensure_dir(
             self._pipeline_dir(name_result.value),
         )
         if ensure_result.failure:

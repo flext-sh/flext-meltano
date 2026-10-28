@@ -37,7 +37,7 @@ class FlextMeltanoUtilitiesRuntime:
             return u.to_str(part).strip()
 
         def _is_non_empty_part(part: str) -> bool:
-            return u.chk(part, empty=False)
+            return u.string_non_empty(part)
 
         stripped_values = u.map(u.to_str_list(values), _strip_part)
         return list(u.filter(stripped_values, _is_non_empty_part))
@@ -165,7 +165,7 @@ class FlextMeltanoUtilitiesRuntime:
         }
         name_val = raw_mapping.get("name", "")
         plugin_name = str(name_val).strip() if name_val is not None else ""
-        if not u.chk(plugin_name, empty=False):
+        if not u.string_non_empty(plugin_name):
             return None
         ns_val = raw_mapping.get("namespace", "")
         pip_val = raw_mapping.get("pip_url", "")
@@ -179,9 +179,9 @@ class FlextMeltanoUtilitiesRuntime:
             "variant": str(variant_val).strip() if variant_val is not None else "",
         }
         return {
-            key: str(value)
+            key: value
             for key, value in plugin_data.items()
-            if u.chk(value, empty=False)
+            if u.string_non_empty(value)
         }
 
     @staticmethod
