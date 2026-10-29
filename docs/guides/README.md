@@ -13,6 +13,7 @@ sourced from code and docstrings.
 - [Codemod rules](codemod-rules.md)
 - [Configuration](configuration.md)
 - [Development](development.md)
+- [Engine](engine.md)
 - [Generic library plan](generic-library-plan.md)
 - [Getting started](getting-started.md)
 - [Implementation_status](implementation_status.md)

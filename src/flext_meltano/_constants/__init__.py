@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Internal package for constants.
+"""Flext Meltano. Constants package.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
     from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
+
 
 __all__: tuple[str, ...] = (
     "FlextMeltanoConstantsBase",

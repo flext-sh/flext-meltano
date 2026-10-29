@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import t
+from flext_cli import t as flext_cli_t
 
 from flext_meltano._typings import (
     FlextMeltanoTypingsBase,
@@ -16,7 +16,7 @@ from flext_meltano._typings import (
 )
 
 
-class FlextMeltanoTypes(t):
+class FlextMeltanoTypes(flext_cli_t):
     """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
