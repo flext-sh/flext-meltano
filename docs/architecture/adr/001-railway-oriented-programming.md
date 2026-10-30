@@ -80,6 +80,15 @@ result = (
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
@@ -158,6 +167,15 @@ def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
 ```python
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
@@ -180,6 +198,15 @@ class PipelineError(FlextMeltanoError):
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult]:
     return (
@@ -197,6 +224,15 @@ def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def test_pipeline_failure_handling():
     # Given
@@ -206,7 +242,7 @@ def test_pipeline_failure_handling():
     result = service.create_pipeline(invalid_config)
 
     # Then
-    assert result.failure
+    tm.fail(result)
     assert isinstance(result.error_value, ConfigurationError)
     assert "invalid_param" in str(result.error_value)
 ```

@@ -6,27 +6,27 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import m, tf, tm
 from flext_tests.docker import FlextTestsDocker
 
-from tests import c, u
+from tests import c, m, tf, tm, u
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from tests import t
+from tests import t
 
-MELTANO_COMPONENT_CASES: t.VariadicTuple[t.Meltano.ComponentCase] = (
+MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
     ("tap", "tap-csv", "source_name"),
     ("target", "target-jsonl", "sink_name"),
     ("dbt", "analytics", "transformation_name"),
 )
 
-MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
+MELTANO_COMPONENT_IDS: Sequence[str] = ("tap", "target", "dbt")
 
 
 @pytest.fixture(
@@ -46,7 +46,7 @@ def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.Componen
 
 
 @pytest.fixture(
-    params=["version", "service_name", "status", "handlers"],
+    params=["version", c.ContextKey.SERVICE_NAME, "status", "handlers"],
     ids=["version", "service-name", "status", "handlers"],
 )
 def meltano_execute_field(request: pytest.FixtureRequest) -> str:
@@ -150,7 +150,7 @@ def meltano_project(
         "directory": meltano_project_dir,
         "config_path": meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
-        "version": "1",
+        "version": c.ParserBooleanToken.ONE,
         "settings": meltano_yml_config,
     }
 

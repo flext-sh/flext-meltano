@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from typing import ClassVar
 
 from flext_cli import cli
@@ -30,7 +31,7 @@ class FlextMeltanoCli:
         )
         self._register_commands()
 
-    def run(self, args: t.StrSequence | None = None) -> p.Result[bool]:
+    def run(self, args: Sequence[str] | None = None) -> p.Result[bool]:
         """Run the CLI with the given arguments.
 
         Returns:
@@ -88,7 +89,7 @@ class FlextMeltanoCli:
         cli.add_group(self._app, name=c.Meltano.CliCommand.STATUS, group=status_group)
 
     def _handle_status_show(self, _model: m.Meltano.StatusShowInput) -> p.Result[str]:
-        return self._service.run_cli([]).flat_map(
+        return self._service.run_cli().flat_map(
             lambda payload: u.Cli.json_dumps(
                 u.json_dict_adapter().validate_python(payload),
             ),
@@ -211,7 +212,7 @@ class FlextMeltanoCli:
             )
             .flat_map(
                 lambda payload: u.Cli.json_dumps(
-                    list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload)),
+                    list(u.Cli.JSON_LIST_ADAPTER.validate_python(payload)),
                 ),
             )
         )

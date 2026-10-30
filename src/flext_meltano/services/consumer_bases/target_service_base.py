@@ -1,7 +1,7 @@
 """Base service for FLEXT target consumer projects.
 
-Provides sink management, record processing, batch lifecycle, and connection
-management via MRO. Consumer targets override ``create_sink()`` only.
+Provides sink management, record processing, and batch lifecycle via MRO.
+Consumer targets declare ``sink_factory`` only.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,55 +9,41 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Annotated, override
+from collections.abc import MutableMapping, Sequence
+from typing import Annotated, ClassVar, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping
 
-
-class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
+class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     """Base for all FLEXT target service projects.
 
-    Subclasses MUST define:
+    Subclasses declare:
     - ``target_name``: canonical target identifier (e.g. ``"target-oracle"``)
-    - ``create_sink(stream_name, schema)``: factory returning a Sink instance
+    - ``sink_factory``: the member's stateless ``u.<Namespace>.create_sink``
 
     This base provides via MRO:
     - CLI dispatch (``cli_main``)
-    - Sink management (``get_or_create_sink``, ``flush``)
-    - Record and batch processing
-    - Connection lifecycle (``connect`` / ``disconnect``)
-    - Singleton accessor (``get_instance``)
+    - Sink management (``fetch_or_create_sink``, ``flush``)
+    - Record processing
     """
 
     target_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical target name (e.g. target-oracle)"),
+        m.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
-    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
+    sink_factory: ClassVar[p.Meltano.SinkFactory]
+
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = m.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
-
-    @abstractmethod
-    def create_sink(
-        self,
-        stream_name: str,
-        schema: t.JsonMapping,
-    ) -> p.Meltano.SingerDrainSink:
-        """Create a Sink instance for a stream.
-
-        Consumer implements this with domain-specific sink logic.
-        """
 
     # ------------------------------------------------------------------
     # CLI dispatch
     # ------------------------------------------------------------------
 
-    def cli_main(self, args: t.StrSequence | None = None) -> int:
+    def cli_main(self, args: Sequence[str] | None = None) -> int:
         """Drain the Singer message stream from stdin into the sink registry.
 
         A Singer target owns no argument surface: messages arrive on stdin, so
@@ -135,11 +121,15 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         try:
             if stream_name in self._sinks:
                 return r[p.Meltano.SingerDrainSink].ok(self._sinks[stream_name])
-            sink = self.create_sink(stream_name, schema)
+            sink = type(self).sink_factory(
+                stream_name=stream_name,
+                schema=schema,
+                target_config=self.settings_overrides or {},
+            )
             self._sinks[stream_name] = sink
             self.logger.debug("Sink created", stream=stream_name)
             return r[p.Meltano.SingerDrainSink].ok(sink)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc), exception=exc)
 
     def flush(self, stream_name: str | None = None) -> p.Result[bool]:
@@ -160,7 +150,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
                 sink.process_batch(context)
                 sink.mark_drained()
             return r[bool].ok(value=True)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[bool].fail(str(exc), exception=exc)
 
     # ------------------------------------------------------------------
@@ -187,52 +177,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
-        except c.Meltano.OPERATION_ERRORS as exc:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as exc:
             return r[bool].fail(str(exc), exception=exc)
-
-    def process_batch(
-        self,
-        stream_name: str,
-        records: t.SequenceOf[t.JsonMapping],
-        schema: t.JsonMapping,
-    ) -> p.Result[int]:
-        """Process a batch of records.
-
-        Returns:
-            The resulting ``p.Result[int]``.
-
-        """
-        processed = 0
-        for record in records:
-            result = self.process_record(stream_name, record, schema)
-            if result.failure:
-                return r[int].from_failure(result)
-            processed += 1
-        return r[int].ok(processed)
-
-    # ------------------------------------------------------------------
-    # Connection lifecycle
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def connect() -> p.Result[bool]:
-        """Connect to the target data store. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return r[bool].ok(value=True)
-
-    def disconnect(self) -> p.Result[bool]:
-        """Disconnect from the target data store. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        self._sinks.clear()
-        return r[bool].ok(value=True)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

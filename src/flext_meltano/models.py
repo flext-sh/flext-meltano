@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT pipeline models.
 
 Provides Pydantic models for data pipeline operations.
@@ -8,67 +9,48 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliModels
+from flext_cli import m as flext_cli_m
 
-from flext_meltano._models.base import FlextMeltanoModelsBase
-from flext_meltano._models.cli_inputs import FlextMeltanoModelsCliInputs
-from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
-from flext_meltano._models.config import FlextMeltanoModelsConfig
-from flext_meltano._models.context import FlextMeltanoModelsContext
-from flext_meltano._models.core import FlextMeltanoModelsCore
-from flext_meltano._models.discovery import FlextMeltanoModelsDiscovery
-from flext_meltano._models.instances import FlextMeltanoModelsInstances
-from flext_meltano._models.instances_data import FlextMeltanoModelsInstancesData
-from flext_meltano._models.logging_config import FlextMeltanoModelsLogging
-from flext_meltano._models.payloads import FlextMeltanoModelsPayloads
-from flext_meltano._models.payloads_data import FlextMeltanoModelsPayloadsData
-from flext_meltano._models.projects import FlextMeltanoModelsProjects
-from flext_meltano._models.projects_plugin import FlextMeltanoModelsProjectsPlugin
-from flext_meltano._models.results import FlextMeltanoModelsResults
-from flext_meltano._models.results_dbt import FlextMeltanoModelsResultsDbt
-from flext_meltano._models.results_pipeline import FlextMeltanoModelsResultsPipeline
-from flext_meltano._models.singer import FlextMeltanoModelsSinger
-from flext_meltano._models.singer_catalog import FlextMeltanoModelsSingerCatalog
-from flext_meltano._models.singer_sdk import FlextMeltanoModelsSingerSdk
-from flext_meltano._models.sources import FlextMeltanoModelsSources
-from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
-from flext_meltano._models.transformations import FlextMeltanoModelsTransformations
+from flext_meltano._models import (
+    FlextMeltanoModelsBase,
+    FlextMeltanoModelsCliInputs,
+    FlextMeltanoModelsConfig,
+    FlextMeltanoModelsCore,
+    FlextMeltanoModelsDiscovery,
+    FlextMeltanoModelsInstances,
+    FlextMeltanoModelsPayloadsData,
+    FlextMeltanoModelsResultsDbt,
+    FlextMeltanoModelsSinger,
+    FlextMeltanoModelsSingerCatalog,
+    FlextMeltanoModelsSingerSdk,
+    FlextMeltanoModelsSources,
+    FlextMeltanoModelsSourcesParams,
+)
 
 
-class FlextMeltanoModels(FlextCliModels):
+class FlextMeltanoModels(flext_cli_m):
     """Generic pipeline models.
 
     Provides reusable Pydantic models for pipeline operations.
     """
 
     class Meltano(
-        FlextMeltanoModelsCliInputs,
         FlextMeltanoModelsBase,
+        FlextMeltanoModelsCliInputs,
         FlextMeltanoModelsConfig,
         FlextMeltanoModelsCore,
-        FlextMeltanoModelsLogging,
-        FlextMeltanoModelsCliParams,
-        FlextMeltanoModelsSourcesParams,
-        FlextMeltanoModelsSources,
+        FlextMeltanoModelsDiscovery,
         FlextMeltanoModelsInstances,
-        FlextMeltanoModelsInstancesData,
+        FlextMeltanoModelsPayloadsData,
+        FlextMeltanoModelsResultsDbt,
         FlextMeltanoModelsSinger,
         FlextMeltanoModelsSingerCatalog,
         FlextMeltanoModelsSingerSdk,
-        FlextMeltanoModelsPayloads,
-        FlextMeltanoModelsPayloadsData,
-        FlextMeltanoModelsContext,
-        FlextMeltanoModelsDiscovery,
-        FlextMeltanoModelsProjects,
-        FlextMeltanoModelsProjectsPlugin,
-        FlextMeltanoModelsTransformations,
-        FlextMeltanoModelsResults,
-        FlextMeltanoModelsResultsDbt,
-        FlextMeltanoModelsResultsPipeline,
+        FlextMeltanoModelsSources,
+        FlextMeltanoModelsSourcesParams,
     ):
         """Meltano domain namespace."""
 
 
 m = FlextMeltanoModels
-
-__all__ = ["FlextMeltanoModels", "m"]
+__all__: list[str] = ["FlextMeltanoModels", "m"]

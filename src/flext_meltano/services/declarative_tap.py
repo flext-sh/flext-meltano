@@ -11,14 +11,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, override
+import signal
+import threading
+from collections.abc import Iterable, Sequence
+from typing import override
 
 from singer_sdk import Stream, Tap
 
 from flext_meltano import m, p, t
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 
 class FlextMeltanoDeclarativeTap:
@@ -31,13 +31,7 @@ class FlextMeltanoDeclarativeTap:
             """Store the built Singer tap class used for flat-CLI dispatch."""
             self._tap_class = tap_class
 
-        @property
-        def settings(self) -> t.JsonMapping:
-            """Declarative taps carry no eager config; the CLI parses it."""
-            empty: t.JsonMapping = {}
-            return empty
-
-        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
+        def run_cli(self, args: Sequence[str], prog_name: str) -> int:
             """Run the Singer flat CLI (``--config/--discover/--catalog/--state``).
 
             Returns:
@@ -45,6 +39,14 @@ class FlextMeltanoDeclarativeTap:
 
             """
             command = self._tap_class.get_singer_command()
+            handlers = (
+                {
+                    signum: signal.getsignal(signum)
+                    for signum in (signal.SIGINT, signal.SIGTERM)
+                }
+                if threading.current_thread() is threading.main_thread()
+                else {}
+            )
             try:
                 _ = command.main(
                     args=list(args),
@@ -53,23 +55,11 @@ class FlextMeltanoDeclarativeTap:
                 )
             except SystemExit as exc:
                 return exc.code if isinstance(exc.code, int) else 1
+            finally:
+                # Singer installs process handlers even for an embedded CLI call.
+                for signum, handler in handlers.items():
+                    signal.signal(signum, handler)
             return 0
-
-        def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
-            """Discover streams through a config-free tap instance.
-
-            Returns:
-                The resulting ``t.SequenceOf[p.Meltano.SingerStreamInfo]``.
-
-            """
-            streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap_class(
-                config=None,
-                validate_config=False,
-            ).discover_streams()
-            return streams
-
-        def sync_all(self) -> None:
-            """Direct sync is CLI-driven for declarative taps."""
 
     @classmethod
     def build(
@@ -94,19 +84,19 @@ class FlextMeltanoDeclarativeTap:
                     schema=dict(stream_spec.json_schema),
                     name=stream_spec.name,
                 )
-                self._declared_primary_keys: t.StrSequence = stream_spec.primary_keys
+                self._declared_primary_keys: Sequence[str] = stream_spec.primary_keys
                 self._declared_replication_key: str | None = stream_spec.replication_key
                 self._stream_config: t.JsonMapping = config
 
             @property
             @override
-            def primary_keys(self) -> t.StrSequence:
+            def primary_keys(self) -> Sequence[str]:
                 """Keys declared by the canonical stream specification."""
                 return self._declared_primary_keys
 
             @primary_keys.setter
             @override
-            def primary_keys(self, new_value: t.StrSequence) -> None:
+            def primary_keys(self, new_value: Sequence[str]) -> None:
                 """Accept Singer catalog key selection through its public contract."""
                 self._declared_primary_keys = new_value
 

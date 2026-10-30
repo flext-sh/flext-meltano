@@ -80,7 +80,7 @@ class TestsFlextMeltanoDockerIntegration:
         """Meltano fixture yields an endpoint on the test host with a real port."""
         host, _, port = meltano_service.partition(":")
         tm.that(host, eq=c.Meltano.Tests.HOST)
-        assert int(port) > 0
+        tm.that(int(port), gt=0)
 
     @staticmethod
     @pytest.mark.docker

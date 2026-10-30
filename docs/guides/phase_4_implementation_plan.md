@@ -12,7 +12,7 @@
   - [Phase 4 Scope & Objectives](#phase-4-scope-objectives)
 - [🚨 CRITICAL BLOCKERS IDENTIFIED](#critical-blockers-identified)
   - [Blocker 1: Missing flext-tests Dependency (Priority: Critical)](#blocker-1-missing-flext-tests-dependency-priority-critical)
-  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)](#blocker-2-flextmodelsbasemodel-inheritance-issues-priority-critical)
+  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)](#blocker-2-Flextmodelsbasemodel-inheritance-issues-priority-critical)
   - [Blocker 3: Test Environment Configuration (Priority: High)](#blocker-3-test-environment-configuration-priority-high)
 - [📋 PHASE 4 IMPLEMENTATION ROADMAP](#phase-4-implementation-roadmap)
   - [Immediate Actions Required (Next 24-48 Hours)](#immediate-actions-required-next-24-48-hours)
@@ -485,6 +485,15 @@ make test
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def test_operation_returns_flext_result():
     """Test that operations return r instances."""
@@ -493,7 +502,7 @@ def test_operation_returns_flext_result():
     result = service.discover_plugins()
 
     assert isinstance(result, r)
-    assert result.success or result.failure
+    tm.ok(result.success) or result.failure
 
 
 def test_operation_success_path():
@@ -502,7 +511,7 @@ def test_operation_success_path():
 
     result = service.discover_plugins()
 
-    assert result.success
+    tm.ok(result.success)
     plugins = result.unwrap()
     assert isinstance(plugins, list)
 
@@ -514,7 +523,7 @@ def test_operation_failure_path():
     # Setup failure scenario
     result = service.run_invalid_operation()
 
-    assert result.failure
+    tm.fail(result)
     error = result.error_value
     assert isinstance(error, FlextMeltanoError)
 ```

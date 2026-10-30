@@ -378,6 +378,15 @@ Extend validation with custom rules:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # scripts/custom_architecture_rules.py
 from architecture_automation import ArchitectureValidator
 

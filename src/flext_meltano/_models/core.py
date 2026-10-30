@@ -29,7 +29,7 @@ class FlextMeltanoModelsCore:
         """
         match value:
             case Mapping():
-                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                return u.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
             case _:
                 empty: t.FlatContainerMapping = {}
                 return empty
@@ -67,20 +67,6 @@ class FlextMeltanoModelsCore:
             for key, item in value.items()
         }
 
-    @staticmethod
-    def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
-        """Normalize arbitrary values into a validated list of strings.
-
-        Returns:
-            The resulting ``t.StrSequence``.
-
-        """
-        validated: FlextMeltanoModelsCore.StringListValue = (
-            FlextMeltanoModelsCore.StringListValue.model_validate({"items": value})
-        )
-        items: t.StrTuple = validated.items
-        return items
-
     class SensitiveConfigSerializer:
         """Mixin serializing ``connection_config`` with sensitive data protection.
 
@@ -89,7 +75,7 @@ class FlextMeltanoModelsCore:
         bases so the pydantic decorator machinery collects it through the MRO.
         """
 
-        @u.field_serializer("connection_config")
+        @m.field_serializer("connection_config")
         @staticmethod
         def serialize_connection_config(
             value: t.FlatContainerMapping,
@@ -102,7 +88,7 @@ class FlextMeltanoModelsCore:
             """
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
-        @u.field_serializer("stream_config", check_fields=False)
+        @m.field_serializer("stream_config", check_fields=False)
         @staticmethod
         def serialize_stream_config(value: t.FlatContainerMapping) -> t.JsonDict:
             """Export readonly stream mappings without changing their stored values.

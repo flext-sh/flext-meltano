@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Utilities - Domain-specific Meltano utilities.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -6,14 +7,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliUtilities
+from flext_cli import u as flext_cli_u
 
-from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
-from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
+from flext_meltano._utilities import (
+    FlextMeltanoUtilitiesBase,
+    FlextMeltanoUtilitiesRuntime,
+    FlextMeltanoUtilitiesSinger,
+)
 
 
-class FlextMeltanoUtilities(FlextCliUtilities):
+class FlextMeltanoUtilities(flext_cli_u):
     """DOMAIN-SPECIFIC Meltano utilities.
 
     ONLY what cannot be generalized to flext-core.
@@ -21,9 +24,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
     """
 
     class Meltano(
-        FlextMeltanoUtilitiesBase,
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
+        FlextMeltanoUtilitiesBase,
     ):
         """Meltano domain utility methods.
 

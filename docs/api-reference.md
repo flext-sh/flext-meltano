@@ -2,1312 +2,154 @@
 
 <!-- TOC START -->
 
-- [🎯 Library Overview](#library-overview)
-  - [Architecture Principles](#architecture-principles)
-  - [Core Modules](#core-modules)
-- [🎯 Core Services](#core-services)
-  - [FlextMeltanoService](#flextmeltanoservice)
-  - [FlextMeltanoAdapter](#flextmeltanoadapter)
-  - [FlextMeltanoExecutor](#flextmeltanoexecutor)
-- [🔌 Singer Protocol Abstractions](#singer-protocol-abstractions)
-  - [FlextSingerTap](#flextsingertap)
-  - [FlextSingerTarget](#flextsingertarget)
-- [🛠️ Plugin Management Services](#plugin-management-services)
-  - [FlextPluginService](#flextpluginservice)
-  - [FlextPluginRegistry](#flextpluginregistry)
-- [🚀 Pipeline Services](#pipeline-services)
-  - [FlextMeltanoService](#flextmeltanoservice_1)
-  - [FlextMeltanoExecutor](#flextmeltanoexecutor_1)
-- [📁 Project Management](#project-management)
-  - [FlextProjectService](#flextprojectservice)
-  - [FlextMeltanoProject](#flextmeltanoproject)
-- [🔧 Configuration Management](#configuration-management)
-  - [FlextMeltanoSettings](#flextmeltanosettings)
-- [📊 Models and Types](#models-and-types)
-  - [Core Models](#core-models)
-  - [Execution Models](#execution-models)
-- [🛡️ Exception Hierarchy](#exception-hierarchy)
-  - [FlextMeltanoException](#flextmeltanoexception)
-  - [Specific Exceptions](#specific-exceptions)
-- [🔄 Integration Examples](#integration-examples)
-  - [Basic Pipeline Execution](#basic-pipeline-execution)
-  - [Advanced Pipeline Orchestration](#advanced-pipeline-orchestration)
-  - [Plugin Management](#plugin-management)
+- [Public Surface](#public-surface)
+- [The meltano Facade](#the-meltano-facade)
+- [Consumer Bases](#consumer-bases)
+- [Singer Utilities](#singer-utilities)
+- [Pipeline Manager and CLI](#pipeline-manager-and-cli)
+- [Models, Protocols, Types, Constants](#models-protocols-types-constants)
+- [Integration Examples](#integration-examples)
+  - [Runtime command](#runtime-command)
+  - [dbt transformation](#dbt-transformation)
+  - [Declarative tap](#declarative-tap)
 - [Related Documentation](#related-documentation)
 
 <!-- TOC END -->
 
-> **Manual supplement**: This page provides hand-curated API details beyond the
-> auto-generated reference. See the generated output for canonical completeness.
-
-**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline
-Integration**
-
-**Updated**: 2026-04-14 | **Status**: ✅ Current | **Quality**: 100% Type Safe |
-**Coverage**: 95%+
-
-Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration
-framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin
-development tools, and enterprise data pipeline orchestration.
-
----
-
-## 🎯 Library Overview
-
-**FLEXT-Meltano** is an **enterprise-grade Meltano integration framework** providing:
-
-- **Complete Singer Protocol Implementation** - Full tap/target development with
-  enterprise extensions
-- **Plugin Development Tools** - Automated plugin scaffolding and validation framework
-- **Pipeline Orchestration** - Advanced ELT pipeline management and execution
-- **Meltano Integration** - Native Meltano project and plugin support
-- **Enterprise Features** - Production-ready pipeline monitoring and management
-
-### **Architecture Principles**
-
-1. **Singer Protocol Compliance** - Full Singer.io specification implementation with
-   enterprise extensions
-1. **Plugin-Centric Design** - Plugin-first architecture with automated development
-   tools
-1. **Pipeline Orchestration** - Advanced pipeline execution with monitoring and recovery
-1. **Enterprise Integration** - Production-ready deployment and operations support
-1. **Type Safety** - 100% type coverage with Pydantic v2 models
-
-### **Core Modules**
-
-| Module                | Purpose                        | Key Classes                                   |
-| --------------------- | ------------------------------ | --------------------------------------------- |
-| `services.py`         | Core service orchestration     | `FlextMeltanoService`, `FlextMeltanoExecutor` |
-| `adapters.py`         | Meltano CLI integration        | `FlextMeltanoAdapter`, `FlextMeltanoBridge`   |
-| `singer.py`           | Singer protocol implementation | `FlextSingerTap`, `FlextSingerTarget`         |
-| `plugin_service.py`   | Plugin management              | `FlextPluginService`, `FlextPluginRegistry`   |
-| `pipeline_service.py` | Pipeline orchestration         | `FlextMeltanoService`, `FlextMeltanoExecutor` |
-| `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`  |
-
----
-
-## 🎯 Core Services
-
-### FlextMeltanoService
-
-**Primary service for Meltano project management and plugin operations**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoService(FlextMeltanoServiceBase):
-    """Main orchestration service for Meltano project operations."""
-
-    def __init__(
-        self,
-        project_root: Path | str | None = None,
-        settings: FlextMeltanoModels.Config | None = None,
-    ) -> None:
-        """Initialize Meltano service.
-
-        Args:
-            project_root: Path to Meltano project root directory
-            settings: Service configuration t.JsonValue
-
-        """
-```
-
-#### Core Operations
-
-##### discover_plugins()
-
-**Discover available Meltano plugins in the project**
-
-```text
-from __future__ import annotations
-
-
-def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
-    """Discover all available plugins in the project.
-
-    Returns:
-        r containing list of discovered plugins or error
-
-    Example:
-        >>> service = FlextMeltanoService()
-        >>> result = service.discover_plugins()
-        >>> if result.success:
-        ...     plugins = result.unwrap()
-        ...     u.Cli.print(f"Found {len(plugins)} plugins")
-
-    """
-```
-
-##### install_plugin(plugin_name, version=None)
-
-**Install a Meltano plugin**
-
-```text
-from __future__ import annotations
-
-
-def install_plugin(
-    self, plugin_name: str, version: str | None = None
-) -> p.Result[FlextMeltanoModels.PluginInstallResult]:
-    """Install a Meltano plugin.
-
-    Args:
-        plugin_name: Name of the plugin to install
-        version: Specific version to install (optional)
-
-    Returns:
-        r containing installation result or error
-
-    """
-```
-
-##### execute_tap(tap_name, settings=None, state=None)
-
-**Execute a Singer tap**
-
-```text
-from __future__ import annotations
-
-
-def execute_tap(
-    self, tap_name: str, settings: m.Dict | None = None, state: m.Dict | None = None
-) -> p.Result[FlextMeltanoModels.TapExecutionResult]:
-    """Execute a Singer tap with configuration and state.
-
-    Args:
-        tap_name: Name of the tap to execute
-        settings: Tap configuration dictionary
-        state: Tap state dictionary for incremental sync
-
-    Returns:
-        r containing execution result or error
-
-    """
-```
-
-##### execute_target(target_name, records, settings=None)
-
-**Execute a Singer target**
-
-```text
-from __future__ import annotations
-
-
-def execute_target(
-    self,
-    target_name: str,
-    records: t.SequenceOf[m.Dict],
-    settings: m.Dict | None = None,
-) -> p.Result[FlextMeltanoModels.TargetExecutionResult]:
-    """Execute a Singer target with records.
-
-    Args:
-        target_name: Name of the target to execute
-        records: List of records to load
-        settings: Target configuration dictionary
-
-    Returns:
-        r containing execution result or error
-
-    """
-```
-
-### FlextMeltanoAdapter
-
-**Meltano CLI integration and execution adapter**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoAdapter(s):
-    """Adapter for Meltano CLI integration and execution."""
-
-    def __init__(self, project_root: Path | str | None = None) -> None:
-        """Initialize Meltano adapter."""
-```
-
-#### Pipeline Operations
-
-##### run_pipeline(tap_name, target_name, settings=None)
-
-**Execute complete ELT pipeline**
-
-```text
-from __future__ import annotations
-
-
-def run_pipeline(
-    self, tap_name: str, target_name: str, settings: m.Dict | None = None
-) -> p.Result[FlextMeltanoModels.PipelineResult]:
-    """Execute complete ELT pipeline from tap to target.
-
-    Args:
-        tap_name: Name of the tap to execute
-        target_name: Name of the target to execute
-        settings: Pipeline configuration dictionary
-
-    Returns:
-        r containing pipeline execution result
-
-    """
-```
-
-##### validate_project()
-
-**Validate Meltano project configuration**
-
-```text
-from __future__ import annotations
-
-
-def validate_project(self) -> p.Result[FlextMeltanoModels.ProjectValidation]:
-    """Validate Meltano project configuration and structure.
-
-    Returns:
-        r containing validation result or error
-
-    """
-```
-
-##### list_plugins(plugin_type=None)
-
-**List available Meltano plugins**
-
-```text
-from __future__ import annotations
-
-
-def list_plugins(
-    self, plugin_type: str | None = None
-) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
-    """List available Meltano plugins.
-
-    Args:
-        plugin_type: Filter by plugin type (tap, target, transformer)
-
-    Returns:
-        r containing list of plugins or error
-
-    """
-```
-
-### FlextMeltanoExecutor
-
-**Advanced pipeline execution engine**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoExecutor(s):
-    """Advanced pipeline execution engine with orchestration."""
-```
-
-#### Advanced Execution
-
-##### execute_pipeline_advanced(options)
-
-**Execute pipeline with advanced options**
-
-```text
-from __future__ import annotations
-
-
-def execute_pipeline_advanced(
-    self, options: FlextMeltanoModels.PipelineOptions
-) -> p.Result[FlextMeltanoModels.PipelineResult]:
-    """Execute pipeline with advanced configuration options.
-
-    Args:
-        options: Advanced pipeline execution options
-
-    Returns:
-        r containing execution result
-
-    """
-```
-
-##### execute_parallel_pipelines(pipelines)
-
-**Execute multiple pipelines in parallel**
-
-```text
-from __future__ import annotations
-
-
-def execute_parallel_pipelines(
-    self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
-) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
-    """Execute multiple pipelines in parallel.
-
-    Args:
-        pipelines: List of pipeline configurations
-
-    Returns:
-        r containing list of execution results
-
-    """
-```
-
----
-
-## 🔌 Singer Protocol Abstractions
-
-### FlextSingerTap
-
-**Singer tap implementation with enterprise features**
-
-```text
-from __future__ import annotations
-
-
-class FlextSingerTap(s):
-    """Singer tap implementation with discovery, sync, and state management."""
-
-    def __init__(
-        self, tap_name: str, settings: m.Dict, state: m.Dict | None = None
-    ) -> None:
-        """Initialize Singer tap.
-
-        Args:
-            tap_name: Name of the tap plugin
-            settings: Tap configuration dictionary
-            state: Initial state for incremental sync
-
-        """
-```
-
-#### Tap Operations
-
-##### discover()
-
-**Discover Singer catalog for the tap**
-
-```text
-from __future__ import annotations
-
-
-def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
-    """Discover Singer catalog for the tap.
-
-    Returns:
-        r containing catalog or error
-
-    Example:
-        >>> tap = FlextSingerTap("tap-gitlab", {"api_url": "https://gitlab.com"})
-        >>> result = tap.discover()
-        >>> if result.success:
-        ...     catalog = result.unwrap()
-        ...     u.Cli.print(f"Discovered {len(catalog.streams)} streams")
-
-    """
-```
-
-##### sync(streams=None, state=None)
-
-**Execute tap synchronization**
-
-```text
-from __future__ import annotations
-
-
-def sync(
-    self, streams: t.StringList | None = None, state: m.Dict | None = None
-) -> p.Result[FlextMeltanoModels.SyncResult]:
-    """Execute tap synchronization.
-
-    Args:
-        streams: List of streams to sync (None for all)
-        state: State dictionary for incremental sync
-
-    Returns:
-        r containing sync result or error
-
-    """
-```
-
-##### validate_config()
-
-**Validate tap configuration**
-
-```text
-from __future__ import annotations
-
-
-def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
-    """Validate tap configuration.
-
-    Returns:
-        r containing validation result
-
-    """
-```
-
-### FlextSingerTarget
-
-**Singer target implementation with batch processing**
-
-```text
-from __future__ import annotations
-
-
-class FlextSingerTarget(s):
-    """Singer target implementation with batch processing and error handling."""
-
-    def __init__(self, target_name: str, settings: m.Dict) -> None:
-        """Initialize Singer target."""
-```
-
-#### Target Operations
-
-##### load_records(records)
-
-**Load records into the target**
-
-```text
-from __future__ import annotations
-
-
-def load_records(
-    self, records: t.SequenceOf[m.Dict]
-) -> p.Result[FlextMeltanoModels.LoadResult]:
-    """Load records into the target.
-
-    Args:
-        records: List of records to load
-
-    Returns:
-        r containing load result or error
-
-    """
-```
-
-##### flush()
-
-**Flush any buffered records**
-
-```text
-from __future__ import annotations
-
-
-def flush(self) -> p.Result[FlextMeltanoModels.FlushResult]:
-    """Flush any buffered records to the target.
-
-    Returns:
-        r containing flush result
-
-    """
-```
-
-##### validate_config()
-
-**Validate target configuration**
-
-```text
-from __future__ import annotations
-
-
-def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
-    """Validate target configuration.
-
-    Returns:
-        r containing validation result
-
-    """
-```
-
----
-
-## 🛠️ Plugin Management Services
-
-### FlextPluginService
-
-**Plugin lifecycle management and operations**
-
-```text
-from __future__ import annotations
-
-
-class FlextPluginService(s):
-    """Service for plugin lifecycle management and operations."""
-
-    def __init__(self, project_root: Path | str | None = None) -> None:
-        """Initialize plugin service."""
-```
-
-#### Plugin Lifecycle
-
-##### discover_plugins()
-
-**Discover all plugins in the project**
-
-```text
-from __future__ import annotations
-
-
-def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
-    """Discover all plugins in the project.
-
-    Returns:
-        r containing list of discovered plugins
-
-    """
-```
-
-##### install_plugin(plugin_name, version=None)
-
-**Install a plugin**
-
-```text
-from __future__ import annotations
-
-
-def install_plugin(
-    self, plugin_name: str, version: str | None = None
-) -> p.Result[FlextMeltanoModels.PluginInstallResult]:
-    """Install a plugin.
-
-    Args:
-        plugin_name: Name of the plugin to install
-        version: Specific version to install
-
-    Returns:
-        r containing installation result
-
-    """
-```
-
-##### uninstall_plugin(plugin_name)
-
-**Uninstall a plugin**
-
-```text
-from __future__ import annotations
-
-
-def uninstall_plugin(
-    self, plugin_name: str
-) -> p.Result[FlextMeltanoModels.PluginUninstallResult]:
-    """Uninstall a plugin.
-
-    Args:
-        plugin_name: Name of the plugin to uninstall
-
-    Returns:
-        r containing uninstall result
-
-    """
-```
-
-##### update_plugin(plugin_name, version=None)
-
-**Update a plugin to latest or specific version**
-
-```text
-from __future__ import annotations
-
-
-def update_plugin(
-    self, plugin_name: str, version: str | None = None
-) -> p.Result[FlextMeltanoModels.PluginUpdateResult]:
-    """Update a plugin.
-
-    Args:
-        plugin_name: Name of the plugin to update
-        version: Specific version to update to
-
-    Returns:
-        r containing update result
-
-    """
-```
-
-### FlextPluginRegistry
-
-**Plugin registry and discovery system**
-
-```text
-from __future__ import annotations
-
-
-class FlextPluginRegistry(s):
-    """Plugin registry for plugin discovery and management."""
-```
-
-#### Registry Operations
-
-##### register_plugin(plugin_info)
-
-**Register a plugin in the registry**
-
-```text
-from __future__ import annotations
-
-
-def register_plugin(self, plugin_info: FlextMeltanoModels.PluginInfo) -> p.Result[bool]:
-    """Register a plugin in the registry.
-
-    Args:
-        plugin_info: Plugin information to register
-
-    Returns:
-        r indicating success or failure
-
-    """
-```
-
-##### find_plugin(plugin_name, plugin_type=None)
-
-**Find a plugin by name and type**
-
-```text
-from __future__ import annotations
-
-
-def find_plugin(
-    self, plugin_name: str, plugin_type: str | None = None
-) -> p.Result[FlextMeltanoModels.PluginInfo | None]:
-    """Find a plugin by name and optional type.
-
-    Args:
-        plugin_name: Name of the plugin to find
-        plugin_type: Type of plugin (tap, target, transformer)
-
-    Returns:
-        r containing plugin info or None
-
-    """
-```
-
-##### list_plugins_by_type(plugin_type)
-
-**List plugins by type**
-
-```text
-from __future__ import annotations
-
-
-def list_plugins_by_type(
-    self, plugin_type: str
-) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
-    """List plugins by type.
-
-    Args:
-        plugin_type: Type of plugins to list
-
-    Returns:
-        r containing list of plugins
-
-    """
-```
-
----
-
-## 🚀 Pipeline Services
-
-### FlextMeltanoService
-
-**Pipeline orchestration and execution service**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoService(FlextMeltanoServiceBase):
-    """Service for pipeline orchestration and execution."""
-```
-
-#### Pipeline Management
-
-##### create_pipeline(settings)
-
-**Create a new pipeline configuration**
-
-```text
-from __future__ import annotations
-
-
-def create_pipeline(
-    self, settings: FlextMeltanoModels.PipelineConfig
-) -> p.Result[FlextMeltanoModels.Pipeline]:
-    """Create a new pipeline configuration.
-
-    Args:
-        settings: Pipeline configuration
-
-    Returns:
-        r containing created pipeline
-
-    """
-```
-
-##### execute_pipeline(pipeline_name, options=None)
-
-**Execute a configured pipeline**
-
-```text
-from __future__ import annotations
-
-
-def execute_pipeline(
-    self, pipeline_name: str, options: FlextMeltanoModels.PipelineOptions | None = None
-) -> p.Result[FlextMeltanoModels.PipelineResult]:
-    """Execute a configured pipeline.
-
-    Args:
-        pipeline_name: Name of the pipeline to execute
-        options: Execution options
-
-    Returns:
-        r containing execution result
-
-    """
-```
-
-##### monitor_pipeline(pipeline_id)
-
-**Monitor pipeline execution**
-
-```text
-from __future__ import annotations
-
-
-def monitor_pipeline(
-    self, pipeline_id: str
-) -> p.Result[FlextMeltanoModels.PipelineStatus]:
-    """Monitor pipeline execution status.
-
-    Args:
-        pipeline_id: ID of the pipeline to monitor
-
-    Returns:
-        r containing pipeline status
-
-    """
-```
-
-### FlextMeltanoExecutor
-
-**Advanced pipeline execution engine**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoExecutor(s):
-    """Advanced pipeline execution engine with orchestration."""
-```
-
-#### Advanced Execution
-
-##### execute_parallel_pipelines(pipelines)
-
-**Execute multiple pipelines in parallel**
-
-```text
-from __future__ import annotations
-
-
-def execute_parallel_pipelines(
-    self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
-) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
-    """Execute multiple pipelines in parallel.
-
-    Args:
-        pipelines: List of pipeline configurations
-
-    Returns:
-        r containing list of execution results
-
-    """
-```
-
-##### execute_conditional_pipeline(condition, pipeline)
-
-**Execute pipeline based on condition**
-
-```text
-from __future__ import annotations
-
-
-def execute_conditional_pipeline(
-    self,
-    condition: FlextMeltanoModels.Condition,
-    pipeline: FlextMeltanoModels.PipelineConfig,
-) -> p.Result[FlextMeltanoModels.PipelineResult | None]:
-    """Execute pipeline based on condition evaluation.
-
-    Args:
-        condition: Condition to evaluate
-        pipeline: Pipeline to execute if condition is met
-
-    Returns:
-        r containing execution result or None
-
-    """
-```
-
----
-
-## 📁 Project Management
-
-### FlextProjectService
-
-**Meltano project management service**
-
-```text
-from __future__ import annotations
-
-
-class FlextProjectService(s):
-    """Service for Meltano project management."""
-```
-
-#### Project Operations
-
-##### create_project(project_config)
-
-**Create a new Meltano project**
-
-```text
-from __future__ import annotations
-
-
-def create_project(
-    self, project_config: FlextMeltanoModels.ProjectConfig
-) -> p.Result[FlextMeltanoModels.Project]:
-    """Create a new Meltano project.
-
-    Args:
-        project_config: Project configuration
-
-    Returns:
-        r containing created project
-
-    """
-```
-
-##### validate_project(project_root)
-
-**Validate Meltano project structure**
-
-```text
-from __future__ import annotations
-
-
-def validate_project(
-    self, project_root: Path | str
-) -> p.Result[FlextMeltanoModels.ProjectValidation]:
-    """Validate Meltano project structure and configuration.
-
-    Args:
-        project_root: Path to project root directory
-
-    Returns:
-        r containing validation result
-
-    """
-```
-
-##### get_project_info(project_root)
-
-**Get project information and metadata**
-
-```text
-from __future__ import annotations
-
-
-def get_project_info(
-    self, project_root: Path | str
-) -> p.Result[FlextMeltanoModels.ProjectInfo]:
-    """Get project information and metadata.
-
-    Args:
-        project_root: Path to project root directory
-
-    Returns:
-        r containing project information
-
-    """
-```
-
-### FlextMeltanoProject
-
-**Meltano project representation**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoProject:
-    """Representation of a Meltano project."""
-```
-
-#### Project Properties
-
-#### r
-
-**Project root directory path**
-
-```text
-from __future__ import annotations
-
-
-@property
-def root_path(self) -> Path:
-    """Get project root directory path."""
-```
-
-##### meltano_yml_path
-
-**Path to meltano.yml configuration file**
-
-```text
-from __future__ import annotations
-
-
-@property
-def meltano_yml_path(self) -> Path:
-    """Get path to meltano.yml configuration file."""
-```
-
-##### plugins
-
-**List of configured plugins**
-
-```text
-from __future__ import annotations
-
-
-@property
-def plugins(self) -> t.SequenceOf[FlextMeltanoModels.PluginInfo]:
-    """Get list of configured plugins."""
-```
-
----
-
-## 🔧 Configuration Management
-
-### FlextMeltanoSettings
-
-**Meltano configuration management**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoSettings(FlextSettings):
-    """Meltano-specific configuration management."""
-```
-
-#### Configuration Sections
-
-##### project_config
-
-**Project-level configuration**
-
-```text
-from __future__ import annotations
-
-
-@property
-def project_config(self) -> FlextMeltanoModels.ProjectConfig:
-    """Get project-level configuration."""
-```
-
-##### plugin_configs
-
-**Plugin-specific configurations**
-
-```text
-from __future__ import annotations
-
-
-@property
-def plugin_configs(self) -> t.MappingKV[str, m.Dict]:
-    """Get plugin-specific configurations."""
-```
-
-##### pipeline_configs
-
-**Pipeline execution configurations**
-
-```text
-from __future__ import annotations
-
-
-@property
-def pipeline_configs(self) -> t.MappingKV[str, FlextMeltanoModels.PipelineConfig]:
-    """Get pipeline execution configurations."""
-```
-
----
-
-## 📊 Models and Types
-
-### Core Models
-
-#### FlextMeltanoModels.Config
-
-**Main configuration model**
-
-```text
-from __future__ import annotations
-
-
-class Config(FlextBaseModel):
-    """Main configuration model for FLEXT-Meltano."""
-
-    project_root: Path | None = None
-    default_environment: str = "dev"
-    log_level: str = "INFO"
-    plugin_dir: Path | None = None
-    state_dir: Path | None = None
-```
-
-#### FlextMeltanoModels.PluginInfo
-
-**Plugin information model**
-
-```text
-from __future__ import annotations
-
-
-class PluginInfo(FlextBaseModel):
-    """Plugin information model."""
-
-    name: str
-    namespace: str
-    variant: str
-    pip_url: str | None = None
-    executable: str | None = None
-    settings: m.Dict | None = None
-    version: str | None = None
-```
-
-#### FlextMeltanoModels.PipelineConfig
-
-**Pipeline configuration model**
-
-```text
-from __future__ import annotations
-
-
-class PipelineConfig(FlextBaseModel):
-    """Pipeline configuration model."""
-
-    name: str
-    tap: str
-    target: str | None = None
-    transformer: str | None = None
-    schedule: str | None = None
-    incremental: bool = False
-    parallelism: int = 1
-```
-
-### Execution Models
-
-#### FlextMeltanoModels.TapExecutionResult
-
-**Tap execution result model**
-
-```text
-from __future__ import annotations
-
-
-class TapExecutionResult(FlextBaseModel):
-    """Tap execution result model."""
-
-    success: bool
-    records_extracted: int = 0
-    streams_discovered: int = 0
-    execution_time: float = 0.0
-    state: m.Dict | None = None
-    error: str | None = None
-```
-
-#### FlextMeltanoModels.TargetExecutionResult
-
-**Target execution result model**
-
-```text
-from __future__ import annotations
-
-
-class TargetExecutionResult(FlextBaseModel):
-    """Target execution result model."""
-
-    success: bool
-    records_loaded: int = 0
-    execution_time: float = 0.0
-    error: str | None = None
-```
-
-#### FlextMeltanoModels.PipelineResult
-
-**Pipeline execution result model**
-
-```text
-from __future__ import annotations
-
-
-class PipelineResult(FlextBaseModel):
-    """Pipeline execution result model."""
-
-    success: bool
-    tap_result: TapExecutionResult | None = None
-    target_result: TargetExecutionResult | None = None
-    transformer_result: m.Dict | None = None
-    execution_time: float = 0.0
-    error: str | None = None
-```
-
----
-
-## 🛡️ Exception Hierarchy
-
-### FlextMeltanoException
-
-**Base exception for FLEXT-Meltano**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoException(FlextException):
-    """Base exception for FLEXT-Meltano errors."""
-```
-
-### Specific Exceptions
-
-#### FlextMeltanoPluginException
-
-**Plugin-related errors**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoPluginException(FlextMeltanoException):
-    """Exception raised for plugin-related errors."""
-```
-
-#### FlextMeltanoPipelineException
-
-**Pipeline execution errors**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoPipelineException(FlextMeltanoException):
-    """Exception raised for pipeline execution errors."""
-```
-
-#### FlextMeltanoConfigurationException
-
-**Configuration-related errors**
-
-```text
-from __future__ import annotations
-
-
-class FlextMeltanoConfigurationException(FlextMeltanoException):
-    """Exception raised for configuration errors."""
-```
-
----
-
-## 🔄 Integration Examples
-
-### Basic Pipeline Execution
-
-```python
-from flext_meltano import FlextMeltanoService
-
-# Initialize service
-service = FlextMeltanoService()
-
-# Execute tap
-tap_result = service.execute_tap(
-    tap_name="tap-csv",
-    settings={"files": ["data/sales.csv"]},
+> **Manual supplement**: This page summarizes the public surface that the
+> runtime exposes today. The generated reference and the package root
+> `flext_meltano.__all__` are the canonical, complete inventory.
+
+Every operation returns `p.Result[T]` (`r[T]`); failures carry the original
+error text.
+
+## Public Surface
+
+Import every public name from the package root:
+
+```{.python .notest}
+from flext_meltano import (
+    FlextMeltano,  # MRO facade class
+    FlextMeltanoAbstractions,  # Meltano runtime abstraction (tap entry points)
+    FlextMeltanoDbtServiceBase,  # dbt consumer base
+    FlextMeltanoLibraryRunner,  # dbt transformation runner
+    FlextMeltanoSingerTapAdapter,  # bridge for a singer_sdk tap instance
+    FlextMeltanoTapServiceBase,  # Singer tap consumer base
+    FlextMeltanoTargetAbstractions,  # Singer target entry-point base
+    FlextMeltanoTargetServiceBase,  # Singer target consumer base
+    c,
+    m,
+    meltano,  # shared facade instance
+    p,
+    settings,
+    t,
+    u,
 )
-
-if tap_result.success:
-    records = tap_result.unwrap().records
-
-    # Execute target
-    target_result = service.execute_target(
-        target_name="target-jsonl",
-        records=records,
-        settings={"destination_path": "output/sales.jsonl"},
-    )
 ```
 
-### Advanced Pipeline Orchestration
+Consumers never import `flext_meltano.services.*` or private `_*` modules; the
+`rewire-consumer-deep-import-to-root` codemod rule rewrites such imports to the
+root.
 
-```python
-from flext_meltano import FlextMeltanoExecutor, u
+## The `meltano` Facade
 
-# Initialize executor
-executor = FlextMeltanoExecutor()
+`FlextMeltano` composes the runtime services by MRO; `meltano` is its shared
+instance.
 
-# Execute pipeline with configuration options
-result = executor.execute_pipeline(
-    tap_name="tap-salesforce",
-    target_name="target-snowflake",
-    config={"incremental": True},
-)
+| Operation                                      | Purpose                                                         |
+| ---------------------------------------------- | --------------------------------------------------------------- |
+| `fetch_version()`                              | Installed Meltano distribution version                          |
+| `discover_installed_plugins()`                 | Names of the plugins declared in the active Meltano project     |
+| `fetch_project_plugins(plugin_type=None)`      | Plugin definitions of the active project, optionally filtered   |
+| `discover_plugins()` / `fetch_plugin_info(...)` | Plugin discovery used by the `plugin list` / `plugin info` CLI  |
+| `execute_meltano_command(command)`             | Run a Meltano CLI command in-process; typed `CommandExecutionResult` |
+| `execute_dbt_command(subcommand, args)`        | Run `meltano invoke dbt-postgres:<subcommand>`                  |
+| `run_dbt_transformation(models, project_dir)`  | Run dbt models through the executor                             |
+| `health()`                                     | Meltano runtime health payload                                  |
+| `run_cli()`                                    | CLI readiness payload used by `status show`                     |
+| `tap(name)` / `target(name)` / `dbt(name)`     | Specialized facade bound to a source, sink, or transformation   |
+| `execute()`                                    | Service status payload                                          |
 
-if result.success:
-    u.Cli.print(f"Pipeline completed: {result.unwrap()}")
+## Consumer Bases
+
+Connector projects (`flext-tap-*`, `flext-target-*`, `flext-dbt-*`) are thin
+drivers over these bases (ADR-006):
+
+- `FlextMeltanoTapServiceBase` — implement `create_tap_instance()`; the base
+  provides `cli_main()` and `build_declarative_tap(spec, fetcher)`, which turns
+  an `m.Meltano.TapSpec` plus a `p.Meltano.RecordFetcher` into a real Singer tap.
+- `FlextMeltanoTargetServiceBase` — declare `sink_factory:
+  ClassVar[p.Meltano.SinkFactory]` bound to the member's stateless
+  `u.<Namespace>.create_sink` (no method in `api.py`); the base drains
+  Singer messages from stdin (`cli_main()`), manages sinks
+  (`fetch_or_create_sink`, `flush`) and processes records.
+- `FlextMeltanoDbtServiceBase` — implement `connection_profile`; the base
+  dispatches `run`, `test`, `compile` and `docs` from `cli_main()`.
+- `FlextMeltanoAbstractions` / `FlextMeltanoTargetAbstractions` — entry-point
+  bases for taps and targets that run through the Meltano runtime.
+
+## Singer Utilities
+
+- `u.Meltano.process_stdin(handler)` — route Singer SCHEMA/RECORD/STATE
+  messages from stdin to a `p.Meltano.SingerTargetHandler`.
+- `u.Meltano.build_catalog_entry(...)` — build an `m.Meltano.SingerCatalogEntry`.
+- `m.Meltano.Singer*` — the Singer SDK base classes and typing wrappers
+  (`SingerTapBase`, `SingerStreamBase`, `SingerProperty`, ...).
+
+## Pipeline Manager and CLI
+
+The `flext-meltano` console script (`flext_meltano.cli:main`) exposes `version`,
+`status show|health`, `tap`, `target`, `dbt`, `plugin list|info|install`, and
+`pipeline create|run|list|status|stop|delete`. Pipeline commands are served by
+`FlextMeltanoPipelineManager`, which persists pipeline definitions under
+`settings.Meltano.pipelines_dir`.
+
+## Models, Protocols, Types, Constants
+
+- `m.Meltano` — Singer messages and catalog, tap/target configuration
+  (`TapConfig`, `TargetConfig`), `StreamDefinition`, `TapInstance`,
+  `CommandExecutionResult`, CLI input models, plugin discovery models.
+- `p.Meltano` — `MeltanoExecutor`, `DbtConnectionProfile`, `SingerTapInstance`,
+  `RecordFetcher`, `SingerDrainSink`, `SingerTargetHandler`.
+- `t.Meltano` — `DbtProject`, `NestedStrMapping`, `ValidatorInput`,
+  `SingerSchema`, `NormalizedValue`, `MutableContainerValueMapping`.
+- `c.Meltano` — Meltano/Singer/dbt enumerations and runtime constants.
+
+## Integration Examples
+
+### Runtime command
+
+```{.python .notest}
+from flext_meltano import meltano
+
+result = meltano.execute_meltano_command(["meltano", "--version"])
+if result.success and result.value.success:
+    print(result.value.output)
 ```
 
-### Plugin Management
+### dbt transformation
 
-```python
-from flext_meltano import FlextMeltanoComponentService, u
+```{.python .notest}
+from flext_meltano import meltano
 
-# Initialize plugin component service
-plugin_service = FlextMeltanoComponentService()
-
-# Discover plugins from Meltano Hub
-discovery_result = plugin_service.discover_plugins()
-if discovery_result.success:
-    available_taps = [
-        plugin
-        for plugin in discovery_result.unwrap()
-        if plugin.get("plugin_type") == "tap"
-    ]
-    u.Cli.print(f"Found {len(available_taps)} taps")
+result = meltano.run_dbt_transformation(models=["staging_orders"])
 ```
 
----
+### Declarative tap
 
-**Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
+```{.python .notest}
+from flext_meltano import FlextMeltanoTapServiceBase, m, p
+
+
+class MyTapService(FlextMeltanoTapServiceBase):
+    def create_tap_instance(self, _settings=None) -> p.Meltano.SingerTapInstance:
+        return self.build_declarative_tap(MY_TAP_SPEC, MyFetcher())
+```
+
+`examples/simple_working.py` (`make examples`) exercises the facade end to end.
 
 ## Related Documentation
 
-**Within Project**:
-
-- [Getting Started](getting-started.md) - Installation and basic usage
-- [Architecture](architecture.md) - Architecture and design patterns
-- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) -
-  Working code examples
-
-**Across Projects**:
-
-- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/api-reference/foundation.md) -
-  Core APIs and patterns
-- [flext-plugin API](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/api-reference.md) -
-  Plugin API reference
-- [flext-quality Automation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-quality/AGENTS.md) -
-  Quality analysis and automation
-
-**External Resources**:
-
-- [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
-- [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+- [Getting Started](getting-started.md)
+- [Architecture](architecture.md)
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/)

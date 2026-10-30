@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 from flext_cli import cli as flext_cli
 
-from flext_meltano.cli import FlextMeltanoCli
+from flext_meltano import FlextMeltanoCli
 from tests import c, m, p, tm, u
 
 
@@ -46,7 +46,6 @@ class TestsFlextMeltanoPipelineCliManagers:
         capsys.readouterr()
         return result
 
-    @staticmethod
     @pytest.fixture
     def meltano_cli() -> FlextMeltanoCli:
         """Provide the public CLI facade used by every command scenario.
@@ -125,7 +124,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         previous_root = self._activate_pipelines_root(tmp_path)
         meltano_cli = FlextMeltanoCli()
         pipeline_name = "daily-pipeline"
-        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        config_json_result = u.Cli.json_dumps({c.HandlerMode.COMMAND: ["help"]})
         config_path = (
             tmp_path
             / "pipelines"
@@ -185,8 +184,8 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.that(list_output, has=pipeline_name)
         tm.that(status_output, has="stopped")
         tm.that(run_output.lower(), has="usage:")
-        tm.that(stored_payload.values, eq={"command": ["help"]})
-        tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
+        tm.that(stored_payload.values, eq={c.HandlerMode.COMMAND: ["help"]})
+        tm.fail((tmp_path / "pipelines" / pipeline_name).exists())
 
     def test_pipeline_create_requires_runtime_configuration(
         self,
@@ -220,7 +219,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         previous_root = self._activate_pipelines_root(tmp_path)
         meltano_cli = FlextMeltanoCli()
         pipeline_name = "status-pipeline"
-        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        config_json_result = u.Cli.json_dumps({c.HandlerMode.COMMAND: ["help"]})
         pid_path = (
             tmp_path
             / "pipelines"
@@ -239,7 +238,7 @@ class TestsFlextMeltanoPipelineCliManagers:
             )
             tm.ok(create_result)
 
-            ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
+            ensure_pid_dir_result = u.Cli.ensure_dir(pid_path.parent)
             tm.ok(ensure_pid_dir_result)
             write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
             tm.ok(write_pid_result)
@@ -266,4 +265,4 @@ class TestsFlextMeltanoPipelineCliManagers:
         tm.ok(stop_result)
         tm.that(running_output, has="running")
         tm.that(stop_output, has="stopped")
-        tm.that(pid_path.exists(), eq=False)
+        tm.fail(pid_path.exists())

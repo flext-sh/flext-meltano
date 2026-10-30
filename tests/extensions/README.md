@@ -164,7 +164,7 @@ def test_custom_tap_extension():
 
     # Test custom business logic
     result = custom_tap.extract_data()
-    assert result.success
+    tm.ok(result.success)
     assert custom_tap.validate_business_rules(result.data)
 ```
 
@@ -177,6 +177,7 @@ def test_custom_tap_extension():
 def test_oracle_oic_extension():
     """Test Oracle Integration Cloud specialized extension."""
 
+from tests import c, r
 from tests import OracleOicExtension
 
     # Test OIC-specific functionality
@@ -199,6 +200,7 @@ from tests import OracleOicExtension
 def test_compliance_extension():
     """Test regulatory compliance extension functionality."""
 
+from tests import c, r
 from tests import ComplianceExtension
 
     compliance = ComplianceExtension()

@@ -164,8 +164,8 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 | Container         | Technology         | Purpose              | Key Classes                                     |
 | ----------------- | ------------------ | -------------------- | ----------------------------------------------- |
 | **API Layer**     | FastAPI/Python     | External interface   | `FlextMeltano`, `FlextMeltanoCLI`               |
-| **Service Layer** | Python             | Business logic       | `FlextMeltanoService`, `FlextMeltanoExecutor`   |
-| **Adapter Layer** | Python             | External integration | `FlextMeltanoAdapter`, `FlextMeltanoDbtService` |
+| **Service Layer** | Python             | Business logic       | `FlextMeltanoExecutor`, `FlextMeltanoAbstractions` |
+| **Consumer Bases** | Python            | Connector foundation | `FlextMeltanoTapServiceBase`, `FlextMeltanoTargetServiceBase`, `FlextMeltanoDbtServiceBase` |
 | **Domain Model**  | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoSettings`    |
 | **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables   |
 | **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
@@ -267,70 +267,65 @@ Rel(dbt_adapter, file_manager, "Manages", "DBT project structure")
 title FLEXT-Meltano - Code Structure (Service Layer)
 
 Package "Service Layer" as services {
-    Class FlextMeltanoService {
-        +discover_plugins()
-        +validate_plugins()
-        +install_plugins()
-        +execute_pipeline()
-    }
-
     Class FlextMeltanoExecutor {
-        +execute_tap()
-        +execute_target()
-        +run_pipeline()
-        +monitor_execution()
+        +execute_meltano_command()
+        +execute_dbt_command()
+        +fetch_project_plugins()
+        +discover_installed_plugins()
+        +health()
     }
 
-    Class FlextMeltanoPluginService {
-        +discover_available_plugins()
-        +install_plugin()
-        +validate_plugin_config()
-        +test_plugin()
+    Class FlextMeltanoPluginDiscovery {
+        +discover_plugins()
+        +fetch_plugin_info()
+    }
+
+    Class FlextMeltanoLibraryRunner {
+        +run_dbt_transformation()
     }
 }
 
-Package "Adapter Layer" as adapters {
-    Class FlextMeltanoAdapter {
-        +run_meltano_command()
-        +get_meltano_version()
-        +create_project()
-        +add_plugin()
+Package "Consumer Bases" as bases {
+    Class FlextMeltanoTapServiceBase {
+        +cli_main()
+        +build_declarative_tap()
     }
 
-    Class FlextMeltanoDbtService {
-        +run_dbt_command()
-        +validate_models()
-        +generate_docs()
+    Class FlextMeltanoTargetServiceBase {
+        +cli_main()
+        +fetch_or_create_sink()
+        +flush()
+    }
+
+    Class FlextMeltanoDbtServiceBase {
+        +cli_main()
+        +run_models()
         +run_tests()
+        +compile_models()
+        +generate_docs()
     }
 }
 
 Package "Domain Model" as models {
     Class FlextMeltanoModels {
-        +TapRunParams
-        +TargetRunParams
-        +PipelineConfig
-        +FlextPluginSettings
+        +SingerCatalog
+        +TapConfig
+        +TargetConfig
+        +CommandExecutionResult
     }
 
     Class FlextMeltanoSettings {
-        +load_from_file()
-        +validate_config()
-        +get_environment_vars()
+        +Meltano
     }
 }
 
 ' Relationships
-FlextMeltanoService --> FlextMeltanoExecutor : uses
-FlextMeltanoService --> FlextMeltanoPluginService : uses
-FlextMeltanoExecutor --> FlextMeltanoAdapter : integrates
-FlextMeltanoExecutor --> FlextMeltanoDbtService : orchestrates
-FlextMeltanoPluginService --> FlextMeltanoAdapter : manages
+FlextMeltanoLibraryRunner --> FlextMeltanoExecutor : uses
+FlextMeltanoDbtServiceBase --> FlextMeltanoExecutor : uses
+FlextMeltanoExecutor --> FlextMeltanoSettings : configures
+FlextMeltanoExecutor --> FlextMeltanoModels : returns
 
-FlextMeltanoService --> FlextMeltanoModels : validates
-FlextMeltanoService --> FlextMeltanoSettings : configures
-
-note right of FlextMeltanoService
+note right of FlextMeltanoExecutor
     Railway-oriented error handling
     with r[T] pattern
 end note
@@ -343,9 +338,8 @@ end note
 | Class                    | Purpose                  | Key Methods                           | Dependencies                |
 | ------------------------ | ------------------------ | ------------------------------------- | --------------------------- |
 | **FlextMeltano**         | Main API facade          | Unified public interface              | All service classes         |
-| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, settings  |
-| **FlextMeltanoAdapter**  | Meltano integration      | CLI operations, project management    | Meltano CLI, file system    |
-| **FlextMeltanoExecutor** | Pipeline orchestration   | Tap/target execution, monitoring      | Singer service, DBT service |
+| **FlextMeltanoExecutor** | Meltano runtime          | In-process commands, dbt, plugins     | Meltano library, settings   |
+| **Consumer bases**       | Connector foundation     | Tap/target/dbt CLI dispatch           | Executor, singer_sdk bridge |
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |
 | **FlextMeltanoSettings** | Configuration management | Settings loading, validation          | YAML, environment variables |
 

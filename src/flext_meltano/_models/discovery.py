@@ -13,7 +13,7 @@ from typing import Annotated
 from flext_cli import m
 
 from flext_meltano import t
-from flext_meltano._models.core import FlextMeltanoModelsCore
+from flext_meltano._models import FlextMeltanoModelsCore
 
 
 class FlextMeltanoModelsDiscovery:

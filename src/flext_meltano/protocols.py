@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Protocols - All protocol definitions for the domain.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -6,22 +7,18 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p as flext_cli_p
 
-from flext_meltano._protocols.base import FlextMeltanoProtocolsBase
-from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
-from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
-from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
-from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
+from flext_meltano._protocols import (
+    FlextMeltanoProtocolsBase,
+    FlextMeltanoProtocolsSinger,
+)
 
 
-class FlextMeltanoProtocols(FlextCliProtocols):
+class FlextMeltanoProtocols(flext_cli_p):
     """Unified Meltano protocols extending FlextCliProtocols."""
 
     class Meltano(
-        FlextMeltanoProtocolsPlugin,
-        FlextMeltanoProtocolsProject,
-        FlextMeltanoProtocolsServices,
         FlextMeltanoProtocolsSinger,
         FlextMeltanoProtocolsBase,
     ):
@@ -29,4 +26,4 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
 
 p = FlextMeltanoProtocols
-__all__ = ["FlextMeltanoProtocols", "p"]
+__all__: list[str] = ["FlextMeltanoProtocols", "p"]

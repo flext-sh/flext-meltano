@@ -13,20 +13,24 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano._constants.base import (
-        FlextMeltanoConstantsBase,
-        FlextMeltanoConstantsEnums,
-    )
+    from flext_meltano._constants.base import FlextMeltanoConstantsBase
+    from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+    from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 
-__all__: tuple[str, ...] = ("FlextMeltanoConstantsBase", "FlextMeltanoConstantsEnums")
+__all__: tuple[str, ...] = (
+    "FlextMeltanoConstantsBase",
+    "FlextMeltanoConstantsEnums",
+    "FlextMeltanoConstantsSettings",
+)
 
 install_lazy_exports(
     __name__,
     globals(),
     MappingProxyType({
         "FlextMeltanoConstantsBase": ".base",
-        "FlextMeltanoConstantsEnums": ".base",
+        "FlextMeltanoConstantsEnums": ".enums",
+        "FlextMeltanoConstantsSettings": ".settings",
     }),
     public_exports=__all__,
 )

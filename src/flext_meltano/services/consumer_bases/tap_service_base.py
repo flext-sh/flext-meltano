@@ -1,7 +1,7 @@
 """Base service for FLEXT tap consumer projects.
 
-Provides Singer tap lifecycle via MRO: CLI dispatch, stream discovery,
-sync execution, and connection management. Consumer taps subclass
+Provides Singer tap lifecycle via MRO: CLI dispatch and declarative tap
+construction. Consumer taps subclass
 ``singer_sdk.Tap`` (required by Singer SDK) — this base wraps the tap
 instance with FLEXT service patterns (``r[T]``, typed settings, lifecycle).
 
@@ -15,9 +15,10 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 from flext_meltano.services import FlextMeltanoDeclarativeTap
 
 
@@ -30,18 +31,15 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     This base provides via MRO:
     - CLI dispatch (``cli_main``)
-    - Singer catalog discovery (``run_discover``)
-    - Singer sync execution (``run_sync``)
-    - Connection lifecycle (``connect`` / ``disconnect``)
-    - Singleton accessor (``get_instance``)
+    - Declarative tap construction (``build_declarative_tap``)
     """
 
     tap_name: Annotated[
         t.NonEmptyStr,
-        u.Field(description="Canonical tap name (e.g. tap-oracle)"),
+        m.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
-    _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
+    _tap_instance: p.Meltano.SingerTapInstance | None = m.PrivateAttr(
         default_factory=lambda: None,
     )
 
@@ -52,7 +50,8 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     @abstractmethod
     def create_tap_instance(
         self,
-        settings: p.Settings | None = None,
+        _settings: p.Settings | None = None,
+        /,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -63,7 +62,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # CLI dispatch
     # ------------------------------------------------------------------
 
-    def cli_main(self, args: t.StrSequence | None = None) -> int:
+    def cli_main(self, args: Sequence[str] | None = None) -> int:
         """Run the main CLI entry point through the internal Singer bridge.
 
         Returns:
@@ -82,70 +81,6 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             raise SystemExit(1) from exc
         else:
             return exit_code
-
-    # ------------------------------------------------------------------
-    # Singer operations
-    # ------------------------------------------------------------------
-
-    def run_discover(self) -> p.Result[t.StrSequence]:
-        """Discover stream names from the tap.
-
-        Returns:
-            The resulting ``p.Result[t.StrSequence]``.
-
-        """
-        try:
-            tap = self._get_or_create_tap()
-            streams = tap.discover_streams()
-            stream_names: t.StrSequence = [s.name for s in streams]
-            self.logger.info(
-                "Streams discovered",
-                tap=self.tap_name,
-                count=len(stream_names),
-            )
-            return r[t.StrSequence].ok(stream_names)
-        except c.EXC_BROAD_RUNTIME_OS as exc:
-            self.logger.exception("Discovery failed", error=str(exc))
-            return r[t.StrSequence].fail(str(exc), exception=exc)
-
-    def run_sync(self) -> p.Result[str]:
-        """Execute Singer sync via tap.
-
-        Returns:
-            The resulting ``p.Result[str]``.
-
-        """
-        try:
-            tap = self._get_or_create_tap()
-            tap.sync_all()
-            return r[str].ok(self.tap_name)
-        except c.EXC_BROAD_RUNTIME_OS as exc:
-            self.logger.exception("Sync failed", error=str(exc))
-            return r[str].fail(str(exc), exception=exc)
-
-    # ------------------------------------------------------------------
-    # Connection lifecycle
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def connect() -> p.Result[bool]:
-        """Connect to the data source. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return r[bool].ok(value=True)
-
-    @staticmethod
-    def disconnect() -> p.Result[bool]:
-        """Disconnect from the data source. Override in consumer.
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return r[bool].ok(value=True)
 
     # ------------------------------------------------------------------
     # Internal

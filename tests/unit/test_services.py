@@ -8,14 +8,13 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano import meltano
-from tests import c, tm
-
-pytestmark = pytest.mark.unit
+from tests import c, meltano, tm
 
 
 class TestsFlextMeltanoServices:
     """Tests for ``FlextMeltanoServices``."""
+
+    pytestmark = pytest.mark.unit
 
     @staticmethod
     def test_component_factory_returns_specialized_facade(
@@ -107,9 +106,9 @@ class TestsFlextMeltanoServices:
         tm.that(tap_service.source_name, eq="tap-a")
         tm.that(target_service.sink_name, eq="target-a")
         tm.that(dbt_service.transformation_name, eq="dbt-a")
-        tm.that(tap_service is not target_service, eq=True)
-        tm.that(target_service is not dbt_service, eq=True)
-        tm.that(dbt_service is not tap_service, eq=True)
+        tm.ok(tap_service is not target_service)
+        tm.ok(target_service is not dbt_service)
+        tm.ok(dbt_service is not tap_service)
 
     @staticmethod
     def test_execute_returns_active_status_payload() -> None:
@@ -119,10 +118,10 @@ class TestsFlextMeltanoServices:
         tm.ok(result)
         payload = result.value
         tm.that(payload["status"], eq="active")
-        tm.that(payload["service_name"], eq=meltano.service_name)
+        tm.that(payload[c.ContextKey.SERVICE_NAME], eq=meltano.service_name)
         tm.that(payload["version"], eq=meltano.service_version)
-        tm.that("timestamp" in payload, eq=True)
-        tm.that("handlers" in payload, eq=True)
+        tm.ok("timestamp" in payload)
+        tm.ok("handlers" in payload)
 
     @staticmethod
     def test_execute_is_idempotent_across_calls() -> None:
@@ -133,6 +132,9 @@ class TestsFlextMeltanoServices:
         tm.that(second, ok=True)
         tm.ok(first)
         tm.ok(second)
-        tm.that(first.value["service_name"], eq=second.value["service_name"])
+        tm.that(
+            first.value[c.ContextKey.SERVICE_NAME],
+            eq=second.value[c.ContextKey.SERVICE_NAME],
+        )
         tm.that(first.value["version"], eq=second.value["version"])
         tm.that(first.value["handlers"], eq=second.value["handlers"])

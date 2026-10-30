@@ -5,57 +5,57 @@
 - [Resumo](#resumo)
 - [Como usar](#como-usar)
 - [Issues](#issues)
-  - [1 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#1-critical-code_smell-pythons1192)
-  - [2 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#2-critical-code_smell-pythons1192)
-  - [3 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#3-critical-code_smell-pythons1192)
-  - [4 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#4-critical-code_smell-pythons3776)
-  - [5 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#5-critical-code_smell-pythons1192)
-  - [6 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#6-critical-code_smell-pythons5754)
-  - [7 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#7-critical-code_smell-pythons3776)
-  - [8 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#8-critical-code_smell-pythons3776)
-  - [9 · 🟠 CRITICAL · CODE_SMELL · python:S5727](#9-critical-code_smell-pythons5727)
-  - [10 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#10-critical-code_smell-pythons3776)
-  - [11 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#11-critical-code_smell-pythons5754)
+  - [1 · 🟠 CRITICAL · CODE\_SMELL · python:S1192](#1-critical-code_smell-pythons1192)
+  - [2 · 🟠 CRITICAL · CODE\_SMELL · python:S1192](#2-critical-code_smell-pythons1192)
+  - [3 · 🟠 CRITICAL · CODE\_SMELL · python:S1192](#3-critical-code_smell-pythons1192)
+  - [4 · 🟠 CRITICAL · CODE\_SMELL · python:S3776](#4-critical-code_smell-pythons3776)
+  - [5 · 🟠 CRITICAL · CODE\_SMELL · python:S1192](#5-critical-code_smell-pythons1192)
+  - [6 · 🟠 CRITICAL · CODE\_SMELL · python:S5754](#6-critical-code_smell-pythons5754)
+  - [7 · 🟠 CRITICAL · CODE\_SMELL · python:S3776](#7-critical-code_smell-pythons3776)
+  - [8 · 🟠 CRITICAL · CODE\_SMELL · python:S3776](#8-critical-code_smell-pythons3776)
+  - [9 · 🟠 CRITICAL · CODE\_SMELL · python:S5727](#9-critical-code_smell-pythons5727)
+  - [10 · 🟠 CRITICAL · CODE\_SMELL · python:S3776](#10-critical-code_smell-pythons3776)
+  - [11 · 🟠 CRITICAL · CODE\_SMELL · python:S5754](#11-critical-code_smell-pythons5754)
   - [12 · 🟡 MAJOR · VULNERABILITY · githubactions:S8264](#12-major-vulnerability-githubactionss8264)
   - [13 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#13-major-vulnerability-githubactionss8233)
   - [14 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#14-major-vulnerability-githubactionss8233)
   - [15 · 🟡 MAJOR · VULNERABILITY · text:S8565](#15-major-vulnerability-texts8565)
-  - [16 · ⚪ MINOR · CODE_SMELL · python:S7504](#16-minor-code_smell-pythons7504)
-  - [17 · ⚪ MINOR · CODE_SMELL · python:S116](#17-minor-code_smell-pythons116)
-  - [18 · ⚪ MINOR · CODE_SMELL · python:S116](#18-minor-code_smell-pythons116)
-  - [19 · ⚪ MINOR · CODE_SMELL · python:S116](#19-minor-code_smell-pythons116)
-  - [20 · ⚪ MINOR · CODE_SMELL · python:S116](#20-minor-code_smell-pythons116)
-  - [21 · ⚪ MINOR · CODE_SMELL · python:S116](#21-minor-code_smell-pythons116)
-  - [22 · ⚪ MINOR · CODE_SMELL · python:S116](#22-minor-code_smell-pythons116)
-  - [23 · ⚪ MINOR · CODE_SMELL · python:S116](#23-minor-code_smell-pythons116)
-  - [24 · ⚪ MINOR · CODE_SMELL · python:S116](#24-minor-code_smell-pythons116)
-  - [25 · ⚪ MINOR · CODE_SMELL · python:S116](#25-minor-code_smell-pythons116)
-  - [26 · ⚪ MINOR · CODE_SMELL · python:S116](#26-minor-code_smell-pythons116)
-  - [27 · ⚪ MINOR · CODE_SMELL · python:S116](#27-minor-code_smell-pythons116)
-  - [28 · ⚪ MINOR · CODE_SMELL · python:S116](#28-minor-code_smell-pythons116)
-  - [29 · ⚪ MINOR · CODE_SMELL · python:S116](#29-minor-code_smell-pythons116)
-  - [30 · ⚪ MINOR · CODE_SMELL · python:S116](#30-minor-code_smell-pythons116)
-  - [31 · ⚪ MINOR · CODE_SMELL · python:S116](#31-minor-code_smell-pythons116)
-  - [32 · ⚪ MINOR · CODE_SMELL · python:S116](#32-minor-code_smell-pythons116)
-  - [33 · ⚪ MINOR · CODE_SMELL · python:S116](#33-minor-code_smell-pythons116)
-  - [34 · ⚪ MINOR · CODE_SMELL · python:S116](#34-minor-code_smell-pythons116)
-  - [35 · ⚪ MINOR · CODE_SMELL · python:S116](#35-minor-code_smell-pythons116)
-  - [36 · ⚪ MINOR · CODE_SMELL · python:S116](#36-minor-code_smell-pythons116)
-  - [37 · ⚪ MINOR · CODE_SMELL · python:S116](#37-minor-code_smell-pythons116)
-  - [38 · ⚪ MINOR · CODE_SMELL · python:S116](#38-minor-code_smell-pythons116)
-  - [39 · ⚪ MINOR · CODE_SMELL · python:S116](#39-minor-code_smell-pythons116)
-  - [40 · ⚪ MINOR · CODE_SMELL · python:S116](#40-minor-code_smell-pythons116)
-  - [41 · ⚪ MINOR · CODE_SMELL · python:S116](#41-minor-code_smell-pythons116)
-  - [42 · ⚪ MINOR · CODE_SMELL · python:S116](#42-minor-code_smell-pythons116)
-  - [43 · ⚪ MINOR · CODE_SMELL · python:S116](#43-minor-code_smell-pythons116)
-  - [44 · ⚪ MINOR · CODE_SMELL · python:S116](#44-minor-code_smell-pythons116)
-  - [45 · ⚪ MINOR · CODE_SMELL · python:S116](#45-minor-code_smell-pythons116)
-  - [46 · ⚪ MINOR · CODE_SMELL · python:S116](#46-minor-code_smell-pythons116)
-  - [47 · ⚪ MINOR · CODE_SMELL · python:S116](#47-minor-code_smell-pythons116)
-  - [48 · ⚪ MINOR · CODE_SMELL · python:S116](#48-minor-code_smell-pythons116)
-  - [49 · ⚪ MINOR · CODE_SMELL · python:S116](#49-minor-code_smell-pythons116)
-  - [50 · ⚪ MINOR · CODE_SMELL · python:S116](#50-minor-code_smell-pythons116)
-  - [51 · ⚪ MINOR · CODE_SMELL · python:S116](#51-minor-code_smell-pythons116)
+  - [16 · ⚪ MINOR · CODE\_SMELL · python:S7504](#16-minor-code_smell-pythons7504)
+  - [17 · ⚪ MINOR · CODE\_SMELL · python:S116](#17-minor-code_smell-pythons116)
+  - [18 · ⚪ MINOR · CODE\_SMELL · python:S116](#18-minor-code_smell-pythons116)
+  - [19 · ⚪ MINOR · CODE\_SMELL · python:S116](#19-minor-code_smell-pythons116)
+  - [20 · ⚪ MINOR · CODE\_SMELL · python:S116](#20-minor-code_smell-pythons116)
+  - [21 · ⚪ MINOR · CODE\_SMELL · python:S116](#21-minor-code_smell-pythons116)
+  - [22 · ⚪ MINOR · CODE\_SMELL · python:S116](#22-minor-code_smell-pythons116)
+  - [23 · ⚪ MINOR · CODE\_SMELL · python:S116](#23-minor-code_smell-pythons116)
+  - [24 · ⚪ MINOR · CODE\_SMELL · python:S116](#24-minor-code_smell-pythons116)
+  - [25 · ⚪ MINOR · CODE\_SMELL · python:S116](#25-minor-code_smell-pythons116)
+  - [26 · ⚪ MINOR · CODE\_SMELL · python:S116](#26-minor-code_smell-pythons116)
+  - [27 · ⚪ MINOR · CODE\_SMELL · python:S116](#27-minor-code_smell-pythons116)
+  - [28 · ⚪ MINOR · CODE\_SMELL · python:S116](#28-minor-code_smell-pythons116)
+  - [29 · ⚪ MINOR · CODE\_SMELL · python:S116](#29-minor-code_smell-pythons116)
+  - [30 · ⚪ MINOR · CODE\_SMELL · python:S116](#30-minor-code_smell-pythons116)
+  - [31 · ⚪ MINOR · CODE\_SMELL · python:S116](#31-minor-code_smell-pythons116)
+  - [32 · ⚪ MINOR · CODE\_SMELL · python:S116](#32-minor-code_smell-pythons116)
+  - [33 · ⚪ MINOR · CODE\_SMELL · python:S116](#33-minor-code_smell-pythons116)
+  - [34 · ⚪ MINOR · CODE\_SMELL · python:S116](#34-minor-code_smell-pythons116)
+  - [35 · ⚪ MINOR · CODE\_SMELL · python:S116](#35-minor-code_smell-pythons116)
+  - [36 · ⚪ MINOR · CODE\_SMELL · python:S116](#36-minor-code_smell-pythons116)
+  - [37 · ⚪ MINOR · CODE\_SMELL · python:S116](#37-minor-code_smell-pythons116)
+  - [38 · ⚪ MINOR · CODE\_SMELL · python:S116](#38-minor-code_smell-pythons116)
+  - [39 · ⚪ MINOR · CODE\_SMELL · python:S116](#39-minor-code_smell-pythons116)
+  - [40 · ⚪ MINOR · CODE\_SMELL · python:S116](#40-minor-code_smell-pythons116)
+  - [41 · ⚪ MINOR · CODE\_SMELL · python:S116](#41-minor-code_smell-pythons116)
+  - [42 · ⚪ MINOR · CODE\_SMELL · python:S116](#42-minor-code_smell-pythons116)
+  - [43 · ⚪ MINOR · CODE\_SMELL · python:S116](#43-minor-code_smell-pythons116)
+  - [44 · ⚪ MINOR · CODE\_SMELL · python:S116](#44-minor-code_smell-pythons116)
+  - [45 · ⚪ MINOR · CODE\_SMELL · python:S116](#45-minor-code_smell-pythons116)
+  - [46 · ⚪ MINOR · CODE\_SMELL · python:S116](#46-minor-code_smell-pythons116)
+  - [47 · ⚪ MINOR · CODE\_SMELL · python:S116](#47-minor-code_smell-pythons116)
+  - [48 · ⚪ MINOR · CODE\_SMELL · python:S116](#48-minor-code_smell-pythons116)
+  - [49 · ⚪ MINOR · CODE\_SMELL · python:S116](#49-minor-code_smell-pythons116)
+  - [50 · ⚪ MINOR · CODE\_SMELL · python:S116](#50-minor-code_smell-pythons116)
+  - [51 · ⚪ MINOR · CODE\_SMELL · python:S116](#51-minor-code_smell-pythons116)
 
 <!-- TOC END -->
 
@@ -119,15 +119,15 @@ padrão.
 > configured" 3 times.
 
 ```text
-      108      ) -> p.Result[t.StrSequence]:
+      108      ) -> p.Result[Sequence[str]]:
       109          config_result = self._load_pipeline_config(pipeline_name)
       110          if config_result.failure:
-      111              return r[t.StrSequence].fail(
+      111              return r[Sequence[str]].fail(
 >>>   112                  config_result.error or "Pipeline execution not configured"
       113              )
-      114          command_value = config_result.value.get("command")
+      114          command_value = config_result.value.get(c.HandlerMode.COMMAND)
       115          if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
-      116              return r[t.StrSequence].fail("Pipeline execution not configured")
+      116              return r[Sequence[str]].fail("Pipeline execution not configured")
 ```
 
 **Decisão**: pendente
@@ -165,7 +165,7 @@ padrão.
        71      # CLI dispatch
        72      # ------------------------------------------------------------------
        73
->>>    74      def cli_main(self, args: t.StrSequence | None = None) -> int:
+>>>    74      def cli_main(self, args: Sequence[str] | None = None) -> int:
        75          """Run the main CLI entry point for dbt project."""
        76
        77          def _run_cli_main() -> int:
@@ -184,7 +184,7 @@ padrão.
        45              c.Meltano.DbtResourceType.MODEL
        46          )
        47          if model_nodes_result.failure:
-       48              return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+       48              return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
 >>>    49                  model_nodes_result.error or "Unknown error"
        50              )
        51          try:
@@ -209,7 +209,7 @@ padrão.
        48                  return exc.code if isinstance(exc.code, int) else 1
        49              return 0
        50
-       51          def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+       51          def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
 ```
 
 **Decisão**: pendente
@@ -227,7 +227,7 @@ padrão.
       202
 >>>   203      def execute_meltano_command(
       204          self,
-      205          command: t.StrSequence,
+      205          command: Sequence[str],
       206          timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
       207          _cwd: Path | None = None,
 ```
@@ -249,7 +249,7 @@ padrão.
       322          self, tap_name: str, target_name: str, config: t.JsonMapping | No ...
       323      ) -> p.Result[m.Meltano.CommandExecutionResult]:
       324          """Execute a complete ELT pipeline."""
-      325          prepared_command: t.StrSequence | None = None
+      325          prepared_command: Sequence[str] | None = None
 ```
 
 **Decisão**: pendente
@@ -284,11 +284,11 @@ padrão.
 ```text
        69              error_msg = f"Failed to discover plugins: {e}"
        70              self.logger.exception(error_msg, error=str(e))
-       71              return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
+       71              return r[Sequence[Mapping[str, str]]].fail(error_msg)
        72
 >>>    73      def _discover_plugins(
        74          self, project: t.JsonPayload | t.Meltano.DbtProject | None
-       75      ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+       75      ) -> p.Result[Sequence[Mapping[str, str]]]:
        76          """Discover plugins without owning the exception boundary."""
        77          self.logger.info("Discovering Meltano plugins")
 ```
@@ -309,7 +309,7 @@ padrão.
 >>>    70          except SystemExit as exc:
        71              return exc.code if isinstance(exc.code, int) else 1
        72
-       73      def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+       73      def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
        74          """Delegate stream discovery to the raw Singer tap."""
 ```
 
@@ -868,7 +868,7 @@ padrão.
        31
 >>>    32      PluginType = c.Meltano.PluginType
        33
-       34      type VariantValue = str | t.StrSequence | t.ScalarMapping | None
+       34      type VariantValue = str | Sequence[str] | Mapping[str, t.Scalar] | None
        35      """Normalized plugin variant: string, string list, scalar mapping, or null."""
        36
 ```

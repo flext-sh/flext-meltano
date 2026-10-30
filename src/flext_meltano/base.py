@@ -10,12 +10,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from typing import Annotated, Self, override
 
 from flext_core import FlextService, FlextSettings
 
-from flext_meltano import FlextMeltanoSettings, c, m, p, t, u
+from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
 
 class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
@@ -29,7 +29,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
     # Pydantic field; inject the Meltano default by overriding the field default
     # (replaces the orphaned _settings_type PrivateAttr + redundant __init__ that only
     # forwarded the now-native runtime_settings kwarg).
-    settings_type: t.SettingsClass | None = u.Field(
+    settings_type: t.Port[p.SettingsType] | None = m.Field(
         default=FlextMeltanoSettings,
         exclude=True,
         description="Default FlextMeltanoSettings class for Meltano services.",
@@ -37,29 +37,29 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
 
     service_name: Annotated[
         t.NonEmptyStr,
-        u.Field(
+        m.Field(
             default="flext_meltano_service",
             description="Canonical Meltano service instance name",
         ),
     ] = "flext_meltano_service"
     service_version: Annotated[
         t.NonEmptyStr,
-        u.Field(
+        m.Field(
             default=c.Meltano.DEFAULT_SERVICE_VERSION,
             description="Canonical Meltano service version",
         ),
     ] = c.Meltano.DEFAULT_SERVICE_VERSION
     source_name: Annotated[
         str | None,
-        u.Field(default=None, description="Optional source specialization name"),
+        m.Field(default=None, description="Optional source specialization name"),
     ] = None
     sink_name: Annotated[
         str | None,
-        u.Field(default=None, description="Optional sink specialization name"),
+        m.Field(default=None, description="Optional sink specialization name"),
     ] = None
     transformation_name: Annotated[
         str | None,
-        u.Field(
+        m.Field(
             default=None,
             description="Optional transformation specialization name",
         ),
@@ -69,22 +69,22 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
     @classmethod
     def _normalize_settings_alias(
         cls,
-        data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
-    ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
+        data: Mapping[str, t.JsonPayload | p.Base | type | None] | Self,
+    ) -> Mapping[str, t.JsonPayload | p.Base | type | None] | Self:
         """Accept ``settings`` as an alias for ``runtime_settings``.
 
         Returns:
-            The resulting ``t.MappingKV[str, t.JsonPayload | p.Base | type | None] |
+            The resulting ``Mapping[str, t.JsonPayload | p.Base | type | None] |
                 Self``.
 
         """
         if isinstance(data, cls) or not isinstance(data, Mapping):
             return data
-        normalized: t.MutableMappingKV[str, t.JsonPayload | p.Base | type | None] = (
-            dict(data)
+        normalized: MutableMapping[str, t.JsonPayload | p.Base | type | None] = dict(
+            data
         )
         settings = normalized.pop("settings", None)
-        for field_name in ("service_name", "service_version"):
+        for field_name in (c.ContextKey.SERVICE_NAME, c.ContextKey.SERVICE_VERSION):
             if normalized.get(field_name) is None:
                 normalized.pop(field_name, None)
         if settings is None or "runtime_settings" in normalized:
