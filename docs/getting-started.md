@@ -86,26 +86,14 @@ u.Cli.print(f"Meltano {version}")
 
 ### **Singer Protocol Operations**
 
-```python
-from flext_meltano import FlextMeltanoTapServiceBase
-
-# Tap connectors subclass FlextMeltanoTapServiceBase, implement
-# create_tap_instance(), and run the flat Singer CLI through cli_main().
-```
+Tap connectors subclass `FlextMeltanoTapServiceBase`, implement
+`create_tap_instance()`, and run the flat Singer CLI through `cli_main()`; see
+the declarative tap example in [API reference](api-reference.md).
 
 ### **r Pattern**
 
 ```python
 from __future__ import annotations
-
-from collections.abc import (
-    Iterable,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    MutableSequence,
-    Sequence,
-)
 
 from flext_cli import u
 from flext_core import e

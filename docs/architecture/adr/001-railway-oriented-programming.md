@@ -167,15 +167,6 @@ def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
 ```python
 from __future__ import annotations
 
-from collections.abc import (
-    Iterable,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    MutableSequence,
-    Sequence,
-)
-
 
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
