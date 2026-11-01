@@ -39,27 +39,27 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # durable cure is a dunder carve-out in the flext-infra rule owner.
     def __new__(
         cls,
-        *args: object,  # ast-grep-ignore: ban-broad-annotation
-        **kwargs: object,  # ast-grep-ignore: ban-broad-annotation
+        *args: object,
+        **kwargs: object,
     ) -> Self:
         _ = args, kwargs
         return object.__new__(cls)
 
     def __init__(
         self,
-        *args: object,  # ast-grep-ignore: ban-broad-annotation
-        **kwargs: object,  # ast-grep-ignore: ban-broad-annotation
+        *args: object,
+        **kwargs: object,
     ) -> None:
         _ = self, args, kwargs
 
     def __setattr__(
         self,
         name: str,
-        value: object,  # ast-grep-ignore: ban-broad-annotation
+        value: object,
     ) -> None:
         object.__setattr__(self, name, value)
 
-    def __eq__(self, other: object) -> bool:  # ast-grep-ignore: ban-broad-annotation
+    def __eq__(self, other: object) -> bool:
         """Identity equality per the namespace-holder contract.
 
         Returns:
