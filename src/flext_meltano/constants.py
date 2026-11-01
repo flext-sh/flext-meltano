@@ -7,6 +7,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TypeAlias
+
 from flext_cli import c as flext_cli_c
 
 from flext_meltano._constants import (
@@ -16,7 +18,11 @@ from flext_meltano._constants import (
 )
 
 
-class FlextMeltanoConstants(flext_cli_c):
+class FlextMeltanoConstants(
+    flext_cli_c,
+    FlextMeltanoConstantsBase,
+    FlextMeltanoConstantsEnums,
+):
     """Domain constants for the flext-meltano package."""
 
     class Meltano(
@@ -25,6 +31,8 @@ class FlextMeltanoConstants(flext_cli_c):
         FlextMeltanoConstantsSettings,
     ):
         """Meltano domain constants namespace."""
+
+    FlextMeltanoConstantsSettings: TypeAlias = FlextMeltanoConstantsSettings
 
 
 c = FlextMeltanoConstants

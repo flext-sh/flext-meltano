@@ -45,6 +45,24 @@ from flext_meltano import (
     t,
     u,
 )
+
+public_surface = (
+    FlextMeltano,
+    FlextMeltanoAbstractions,
+    FlextMeltanoDbtServiceBase,
+    FlextMeltanoLibraryRunner,
+    FlextMeltanoSingerTapAdapter,
+    FlextMeltanoTapServiceBase,
+    FlextMeltanoTargetAbstractions,
+    FlextMeltanoTargetServiceBase,
+    c,
+    m,
+    meltano,
+    p,
+    settings,
+    t,
+    u,
+)
 ```
 
 Consumers never import `flext_meltano.services.*` or private `_*` modules; the
@@ -138,12 +156,38 @@ result = meltano.run_dbt_transformation(models=["staging_orders"])
 ### Declarative tap
 
 ```python
-from flext_meltano import FlextMeltanoTapServiceBase, m, p
+from typing import override
+
+from flext_meltano import FlextMeltanoTapServiceBase, m, p, r
 
 
 class MyTapService(FlextMeltanoTapServiceBase):
-    def create_tap_instance(self, _settings=None) -> p.Meltano.SingerTapInstance:
-        return self.build_declarative_tap(MY_TAP_SPEC, MyFetcher())
+    """Declarative tap: one spec plus a fetcher that owns the domain reads."""
+
+    class Fetcher:
+        """Record fetcher satisfying ``p.Meltano.RecordFetcher``."""
+
+        def fetch(
+            self, request: m.Meltano.FetchRequest
+        ) -> p.Result[m.Meltano.FetchResult]:
+            """Return the records of one stream."""
+            _ = request
+            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult())
+
+    @override
+    def create_tap_instance(
+        self, settings: p.Settings | None = None
+    ) -> p.Meltano.SingerTapInstance:
+        """Build the Singer tap from its declarative spec."""
+        _ = settings
+        spec = m.Meltano.TapSpec(
+            tap_name="tap-example",
+            config_jsonschema={"type": "object"},
+            streams=(
+                m.Meltano.StreamSpec(name="items", json_schema={"type": "object"}),
+            ),
+        )
+        return self.build_declarative_tap(spec, self.Fetcher())
 ```
 
 `examples/simple_working.py` (`make examples`) exercises the facade end to end.
