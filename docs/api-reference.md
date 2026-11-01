@@ -27,7 +27,7 @@ error text.
 
 Import every public name from the package root:
 
-```{.python .notest}
+```python
 from flext_meltano import (
     FlextMeltano,  # MRO facade class
     FlextMeltanoAbstractions,  # Meltano runtime abstraction (tap entry points)
@@ -119,7 +119,7 @@ The `flext-meltano` console script (`flext_meltano.cli:main`) exposes `version`,
 
 ### Runtime command
 
-```{.python .notest}
+```python
 from flext_meltano import meltano
 
 result = meltano.execute_meltano_command(["meltano", "--version"])
@@ -129,7 +129,7 @@ if result.success and result.value.success:
 
 ### dbt transformation
 
-```{.python .notest}
+```python
 from flext_meltano import meltano
 
 result = meltano.run_dbt_transformation(models=["staging_orders"])
@@ -137,7 +137,7 @@ result = meltano.run_dbt_transformation(models=["staging_orders"])
 
 ### Declarative tap
 
-```{.python .notest}
+```python
 from flext_meltano import FlextMeltanoTapServiceBase, m, p
 
 

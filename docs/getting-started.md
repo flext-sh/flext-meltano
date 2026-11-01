@@ -86,7 +86,7 @@ u.Cli.print(f"Meltano {version}")
 
 ### **Singer Protocol Operations**
 
-```{.python .notest}
+```python
 from flext_meltano import FlextMeltanoTapServiceBase
 
 # Tap connectors subclass FlextMeltanoTapServiceBase, implement
