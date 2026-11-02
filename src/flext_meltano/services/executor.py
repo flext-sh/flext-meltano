@@ -32,7 +32,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 "args": args_payload,
             }
             return (
-                executor.run(args).map(t.Cli.JSON_MAPPING_ADAPTER.validate_python)
+                executor.run(args).map(u.Cli.JSON_MAPPING_ADAPTER.validate_python)
                 if args
                 else r[t.JsonMapping].ok(ready_payload)
             )

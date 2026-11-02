@@ -371,7 +371,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                     )
             except c.Meltano.OPERATION_ERRORS as e:
                 return r[m.Cli.PipelineStageResult].fail(str(e), exception=e)
-            command_output = t.Cli.JSON_MAPPING_ADAPTER.validate_python({
+            command_output = u.Cli.JSON_MAPPING_ADAPTER.validate_python({
                 c.Meltano.PIPELINE_SHARED_KEY_COMMAND: command,
             })
             prepared_command = m.Meltano.StringListValue.model_validate({

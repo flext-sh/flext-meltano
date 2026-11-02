@@ -105,7 +105,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
         """
         if isinstance(project, Mapping):
-            project_mapping = t.Cli.JSON_MAPPING_ADAPTER.validate_python(project)
+            project_mapping = u.Cli.JSON_MAPPING_ADAPTER.validate_python(project)
             for key in ("root_dir", "root"):
                 mapping_value = project_mapping.get(key)
                 if isinstance(mapping_value, str) and mapping_value:
@@ -275,7 +275,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         if settings.stream_config and stream_name in settings.stream_config:
             val = settings.stream_config[stream_name]
             if isinstance(val, Mapping):
-                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(val)
+                return u.Cli.JSON_MAPPING_ADAPTER.validate_python(val)
         return {}
 
     @staticmethod

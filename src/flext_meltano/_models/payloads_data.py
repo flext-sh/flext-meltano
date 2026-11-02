@@ -49,7 +49,7 @@ class FlextMeltanoModelsPayloadsData:
             """
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return u.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
                     empty_schema: t.FlatContainerMapping = {}
                     return empty_schema
@@ -90,7 +90,7 @@ class FlextMeltanoModelsPayloadsData:
             """
             if isinstance(value, (list, tuple)):
                 return tuple(
-                    t.Cli.JSON_MAPPING_ADAPTER.validate_python(record)
+                    u.Cli.JSON_MAPPING_ADAPTER.validate_python(record)
                     for record in value
                     if isinstance(record, Mapping)
                 )
@@ -114,7 +114,7 @@ class FlextMeltanoModelsPayloadsData:
 
             """
             if isinstance(value, Mapping):
-                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                return u.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
             return {}
 
         @m.field_validator("values", mode="after")

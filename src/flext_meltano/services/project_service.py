@@ -225,7 +225,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             The resulting ``p.Result[t.JsonMapping]``.
 
         """
-        settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+        settings_payload = u.Cli.JSON_MAPPING_ADAPTER.validate_python(
             meltano_config.model_dump(),
         )
         payload: t.JsonDict = {

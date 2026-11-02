@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytest
 
 from flext_meltano.cli import FlextMeltanoCli
-from tests import c, t, tm, u
+from tests import c, tm, u
 
 
 class TestsFlextMeltanoCliSmallManagers:
@@ -52,10 +52,7 @@ class TestsFlextMeltanoCliSmallManagers:
 
         tm.that(result.success, eq=True)
 
-        parsed = u.Cli.json_loads(capsys.readouterr().out)
-        tm.ok(parsed)
-
-        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        payload = u.Cli.JSON_MAPPING_ADAPTER.validate_json(capsys.readouterr().out)
         tm.that(payload.get("status"), eq=c.Meltano.OperationStatus.READY)
 
     @staticmethod
@@ -71,10 +68,7 @@ class TestsFlextMeltanoCliSmallManagers:
 
         tm.that(result.success, eq=True)
 
-        parsed = u.Cli.json_loads(capsys.readouterr().out)
-        tm.ok(parsed)
-
-        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        payload = u.Cli.JSON_MAPPING_ADAPTER.validate_json(capsys.readouterr().out)
         tm.that("status" in payload, eq=True)
 
     @staticmethod
