@@ -6,10 +6,18 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flext_cli import p
+
+    from flext_meltano._constants import FlextMeltanoConstantsEnums
+
+
 from collections.abc import Sequence
 from typing import Protocol, runtime_checkable
 
-from flext_cli import p
+from flext_cli import FlextCliProtocols
 
 from flext_meltano import t
 
@@ -35,8 +43,8 @@ class FlextMeltanoProtocolsSinger:
 
         def fetch(
             self,
-            request: p.Meltano.FetchRequest,
-        ) -> p.Result[p.Meltano.FetchResult]:
+            request: FlextMeltanoProtocolsSinger.FetchRequest,
+        ) -> p.Result[FlextMeltanoProtocolsSinger.FetchResult]:
             """Fetch records for one stream from the consumer domain."""
             ...
 
@@ -96,20 +104,204 @@ class FlextMeltanoProtocolsSinger:
 
         def handle_schema(
             self,
-            message: p.Meltano.SingerSchemaMessage,
+            message: FlextMeltanoProtocolsSinger.SingerSchemaMessage,
         ) -> p.Result[bool]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
             self,
-            message: p.Meltano.SingerRecordMessage,
+            message: FlextMeltanoProtocolsSinger.SingerRecordMessage,
         ) -> p.Result[bool]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: p.Meltano.SingerStateMessage) -> p.Result[bool]:
+        def handle_state(
+            self, message: FlextMeltanoProtocolsSinger.SingerStateMessage
+        ) -> p.Result[bool]:
             """Handle a STATE message."""
+            ...
+
+    @runtime_checkable
+    class SingerSchemaMessage(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
+            """Singer message discriminator."""
+            ...
+
+        @property
+        def stream(self) -> t.NonEmptyStr:
+            """Singer stream name."""
+            ...
+
+        @property
+        def schema_definition(self) -> t.FlatContainerMapping:
+            """Singer JSON schema payload."""
+            ...
+
+        @property
+        def key_properties(self) -> t.StrTuple:
+            """Singer stream key properties."""
+            ...
+
+        @property
+        def bookmark_properties(self) -> t.StrTuple:
+            """Singer bookmark columns for incremental replication."""
+            ...
+
+        @property
+        def intermediate_encodings(self) -> t.StrTuple:
+            """Singer intermediate encodings (e.g. 'utf8')."""
+            ...
+
+    @runtime_checkable
+    class SingerRecordMessage(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
+            """Singer message discriminator."""
+            ...
+
+        @property
+        def stream(self) -> str:
+            """Singer stream name."""
+            ...
+
+        @property
+        def record(self) -> t.FlatContainerMapping:
+            """Singer record payload."""
+            ...
+
+        @property
+        def time_extracted(self) -> str | None:
+            """ISO 8601 timestamp when the record was extracted."""
+            ...
+
+        @property
+        def version(self) -> int | None:
+            """Stream version number for activate_version protocol."""
+            ...
+
+    @runtime_checkable
+    class SingerStateMessage(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
+            """Singer message discriminator."""
+            ...
+
+        @property
+        def value(self) -> t.MutableFlatContainerMapping:
+            """Singer state bookmark payload."""
+            ...
+
+    @runtime_checkable
+    class SingerActivateVersionMessage(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
+            """Singer message discriminator."""
+            ...
+
+        @property
+        def stream(self) -> str:
+            """Singer stream name."""
+            ...
+
+        @property
+        def version(self) -> t.PositiveInt:
+            """Stream version to activate."""
+            ...
+
+    @runtime_checkable
+    class StreamSpec(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def domain_events(self) -> Sequence[p.DomainEvent]:
+            """List of uncommitted domain events for event sourcing."""
+            ...
+
+        @property
+        def name(self) -> str:
+            """Stream name."""
+            ...
+
+        @property
+        def json_schema(self) -> t.FlatContainerMapping:
+            """JSON schema for the stream."""
+            ...
+
+        @property
+        def primary_keys(self) -> t.StrTuple:
+            """Primary key properties."""
+            ...
+
+        @property
+        def replication_key(self) -> str | None:
+            """Incremental replication key."""
+            ...
+
+    @runtime_checkable
+    class TapSpec(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def domain_events(self) -> Sequence[p.DomainEvent]:
+            """List of uncommitted domain events for event sourcing."""
+            ...
+
+        @property
+        def tap_name(self) -> str:
+            """Tap name."""
+            ...
+
+        @property
+        def config_jsonschema(self) -> t.FlatContainerMapping:
+            """Tap config JSON schema."""
+            ...
+
+        @property
+        def streams(self) -> tuple[FlextMeltanoProtocolsSinger.StreamSpec, ...]:
+            """Declared tap streams."""
+            ...
+
+    @runtime_checkable
+    class FetchRequest(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def domain_events(self) -> Sequence[p.DomainEvent]:
+            """List of uncommitted domain events for event sourcing."""
+            ...
+
+        @property
+        def stream_name(self) -> str:
+            """Stream name to fetch."""
+            ...
+
+        @property
+        def config(self) -> t.JsonMapping:
+            """Runtime tap configuration."""
+            ...
+
+    @runtime_checkable
+    class FetchResult(FlextCliProtocols.Model, Protocol):
+        """Structural data contract projected from the owning model."""
+
+        @property
+        def domain_events(self) -> Sequence[p.DomainEvent]:
+            """List of uncommitted domain events for event sourcing."""
+            ...
+
+        @property
+        def records(self) -> tuple[t.JsonMapping, ...]:
+            """Fetched records."""
             ...
 
 

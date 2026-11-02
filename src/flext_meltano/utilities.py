@@ -7,13 +7,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TypeAlias
+
 from flext_cli import u as flext_cli_u
 
-from flext_meltano._utilities import (
-    FlextMeltanoUtilitiesBase,
-    FlextMeltanoUtilitiesRuntime,
-    FlextMeltanoUtilitiesSinger,
-)
+from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
+from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
+from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
 class FlextMeltanoUtilities(flext_cli_u):
@@ -26,7 +26,6 @@ class FlextMeltanoUtilities(flext_cli_u):
     class Meltano(
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
-        FlextMeltanoUtilitiesBase,
     ):
         """Meltano domain utility methods.
 
@@ -34,6 +33,8 @@ class FlextMeltanoUtilities(flext_cli_u):
         processing, catalog construction) alongside settings, project,
         and YAML utilities.
         """
+
+        FlextMeltanoUtilitiesBase: TypeAlias = FlextMeltanoUtilitiesBase
 
 
 u = FlextMeltanoUtilities
