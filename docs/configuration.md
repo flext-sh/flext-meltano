@@ -306,7 +306,7 @@ Tap and target configuration is validated by the Pydantic models themselves;
 invalid input raises a validation error at construction:
 
 ```python
-from flext_meltano import m
+from flext_meltano import m, p
 
 tap_config = m.Meltano.TapConfig.model_validate({
     "tap_type": "tap-csv",
@@ -439,7 +439,7 @@ Stream schemas are validated by `m.Meltano.StreamDefinition`, which requires a
 `properties` mapping and a known stream status:
 
 ```python
-from flext_meltano import m
+from flext_meltano import m, p
 
 stream = m.Meltano.StreamDefinition.model_validate({
     "stream_name": "users",

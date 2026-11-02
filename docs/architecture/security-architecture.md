@@ -58,7 +58,7 @@ and values stored under other key names are not redacted.
 ```python
 import secrets
 
-from flext_meltano import m
+from flext_meltano import m, p
 
 secret = secrets.token_urlsafe(16)
 tap = m.Meltano.TapConfig.model_validate({
