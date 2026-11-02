@@ -200,15 +200,15 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         command: Sequence[str],
         timeout: int = c.Meltano.DEFAULT_TIMEOUT_SECONDS,
         _cwd: Path | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a Meltano runtime command in-process and capture its output.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         if timeout <= 0:
-            return r[m.Meltano.CommandExecutionResult].fail(
+            return r[p.Meltano.CommandExecutionResult].fail(
                 "Command timeout must be greater than zero",
             )
 
@@ -220,7 +220,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.normalize_runtime_command(command),
             )
             if not normalized_command:
-                return r[m.Meltano.CommandExecutionResult].fail(
+                return r[p.Meltano.CommandExecutionResult].fail(
                     "Command cannot be empty",
                 )
             needs_project_context = normalized_command[0] not in {
@@ -296,7 +296,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 error=error_output,
                 execution_time=execution_time,
             )
-            return r[m.Meltano.CommandExecutionResult].ok(result)
+            return r[p.Meltano.CommandExecutionResult].ok(result)
 
         try:
             return _run_execute_meltano_command()
@@ -310,17 +310,17 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ImportError,
         ) as e:
             self.logger.exception("Command execution failed", error=str(e))
-            return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
+            return r[p.Meltano.CommandExecutionResult].fail(str(e), exception=e)
 
     def execute_dbt_command(
         self,
         dbt_command: str,
         args: Sequence[str] | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a DBT command.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         try:
@@ -328,7 +328,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.build_dbt_runtime_command(dbt_command, args),
             )
         except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
-            return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
+            return r[p.Meltano.CommandExecutionResult].fail(str(e), exception=e)
 
 
 __all__: list[str] = ["FlextMeltanoExecutorBase"]

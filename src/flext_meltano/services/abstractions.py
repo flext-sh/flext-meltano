@@ -56,13 +56,13 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
         """
         cwd = Path(self._settings().Meltano.project_root)
-        run_result: p.Result[m.Meltano.CommandExecutionResult] = (
+        run_result: p.Result[p.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(list(args), _cwd=cwd)
         )
         if run_result.failure:
             error_msg = run_result.error or "Unknown error"
             return r[str].fail_op("Meltano command", error_msg)
-        completed: m.Meltano.CommandExecutionResult = run_result.value
+        completed: p.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
             stderr_out = completed.error.strip() or completed.output.strip()
             return r[str].fail(
@@ -159,7 +159,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
     def discover_streams(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Discover available streams via ``meltano select --list``.
 

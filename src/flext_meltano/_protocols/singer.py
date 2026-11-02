@@ -7,14 +7,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from flext_cli import p
 
 from flext_meltano import t
-
-if TYPE_CHECKING:
-    from flext_meltano import m
 
 
 class FlextMeltanoProtocolsSinger:
@@ -38,8 +35,8 @@ class FlextMeltanoProtocolsSinger:
 
         def fetch(
             self,
-            request: m.Meltano.FetchRequest,
-        ) -> p.Result[m.Meltano.FetchResult]:
+            request: p.Meltano.FetchRequest,
+        ) -> p.Result[p.Meltano.FetchResult]:
             """Fetch records for one stream from the consumer domain."""
             ...
 
@@ -99,19 +96,19 @@ class FlextMeltanoProtocolsSinger:
 
         def handle_schema(
             self,
-            message: m.Meltano.SingerSchemaMessage,
+            message: p.Meltano.SingerSchemaMessage,
         ) -> p.Result[bool]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
             self,
-            message: m.Meltano.SingerRecordMessage,
+            message: p.Meltano.SingerRecordMessage,
         ) -> p.Result[bool]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[bool]:
+        def handle_state(self, message: p.Meltano.SingerStateMessage) -> p.Result[bool]:
             """Handle a STATE message."""
             ...
 

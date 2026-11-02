@@ -61,11 +61,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         self,
         subcommand: str,
         rest: list[str],
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Dispatch one resolved dbt subcommand to its typed service call.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         models: Sequence[str] | None = rest or None
@@ -79,12 +79,12 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             case c.Meltano.DbtCommand.DOCS:
                 return self.generate_docs()
             case _:
-                return r[m.Meltano.CommandExecutionResult].fail(subcommand)
+                return r[p.Meltano.CommandExecutionResult].fail(subcommand)
 
     def _finalize_dbt_cli_result(
         self,
         subcommand: str,
-        result: p.Result[m.Meltano.CommandExecutionResult],
+        result: p.Result[p.Meltano.CommandExecutionResult],
     ) -> int:
         """Translate one dbt command result into the CLI exit contract.
 
@@ -135,11 +135,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         subcommand: str,
         models: Sequence[str] | None = None,
         extra_args: Sequence[str] | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a dbt command via the canonical typed executor (SSOT).
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         # NOTE (multi-agent, bead mro-wfc8.3.9): delegate to the single typed
@@ -153,11 +153,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def run_models(
         self,
         models: Sequence[str] | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run dbt models.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
@@ -165,11 +165,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def run_tests(
         self,
         models: Sequence[str] | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run dbt tests.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
@@ -177,20 +177,20 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def compile_models(
         self,
         models: Sequence[str] | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Compile dbt models.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
 
-    def generate_docs(self) -> p.Result[m.Meltano.CommandExecutionResult]:
+    def generate_docs(self) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Generate dbt documentation.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         return self._run_dbt_cmd(

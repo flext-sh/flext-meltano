@@ -168,11 +168,11 @@ class MyTapService(FlextMeltanoTapServiceBase):
         """Record fetcher satisfying ``p.Meltano.RecordFetcher``."""
 
         def fetch(
-            self, request: m.Meltano.FetchRequest
-        ) -> p.Result[m.Meltano.FetchResult]:
+            self, request: p.Meltano.FetchRequest
+        ) -> p.Result[p.Meltano.FetchResult]:
             """Return the records of one stream."""
             _ = request
-            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult())
+            return r[p.Meltano.FetchResult].ok(m.Meltano.FetchResult())
 
     @override
     def create_tap_instance(

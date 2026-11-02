@@ -337,7 +337,7 @@ from collections.abc import (
 
 from flext_meltano import meltano
 from tests import c, r
-from tests import c, tm
+from tests import c, p, tm
 
 
 def test_runtime_command_normalizes_meltano_prefix() -> None:

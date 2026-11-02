@@ -8,14 +8,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from flext_cli import p
 
 from flext_meltano import t
-
-if TYPE_CHECKING:
-    from flext_meltano import m
 
 
 class FlextMeltanoProtocolsBase:
@@ -30,7 +27,7 @@ class FlextMeltanoProtocolsBase:
             command: Sequence[str],
             timeout: int = ...,
             _cwd: Path | None = None,
-        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[p.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
@@ -46,7 +43,7 @@ class FlextMeltanoProtocolsBase:
             self,
             dbt_command: str,
             args: Sequence[str] | None = None,
-        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[p.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 

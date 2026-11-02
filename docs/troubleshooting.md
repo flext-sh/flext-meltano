@@ -99,7 +99,7 @@ from collections.abc import (
 # Use concrete union types: t.JsonMapping | None
 
 
-def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
+def process_data(data: dict) -> p.Result[Optional[p.Dict]]:
     # Implementation
     pass
 ```
@@ -248,7 +248,7 @@ def risky_operation():
 
 
 # ✅ Correct
-def safe_operation() -> p.Result[m.Dict]:
+def safe_operation() -> p.Result[p.Dict]:
     try:
         # operation
         return r.ok(data)
@@ -284,7 +284,7 @@ class UtilityClass:
 
 
 class FlextMeltanoUtilityService(s):
-    def do_something(self) -> p.Result[m.Dict]:
+    def do_something(self) -> p.Result[p.Dict]:
         # Implementation with proper error handling
         pass
 ```

@@ -60,7 +60,7 @@ class FlextMeltanoCli:
             ),
         )
 
-    def _handle_version(self, _model: m.Meltano.VersionInput) -> p.Result[str]:
+    def _handle_version(self, _model: p.Meltano.VersionInput) -> p.Result[str]:
         return self._service.fetch_version()
 
     def _register_status_commands(self) -> None:
@@ -88,7 +88,7 @@ class FlextMeltanoCli:
         )
         cli.add_group(self._app, name=c.Meltano.CliCommand.STATUS, group=status_group)
 
-    def _handle_status_show(self, _model: m.Meltano.StatusShowInput) -> p.Result[str]:
+    def _handle_status_show(self, _model: p.Meltano.StatusShowInput) -> p.Result[str]:
         return self._service.run_cli().flat_map(
             lambda payload: u.Cli.json_dumps(
                 u.json_dict_adapter().validate_python(payload),
@@ -97,7 +97,7 @@ class FlextMeltanoCli:
 
     def _handle_status_health(
         self,
-        _model: m.Meltano.StatusHealthInput,
+        _model: p.Meltano.StatusHealthInput,
     ) -> p.Result[str]:
         return self._service.health().flat_map(
             lambda payload: u.Cli.json_dumps(
@@ -117,7 +117,7 @@ class FlextMeltanoCli:
         )
 
     @staticmethod
-    def _handle_tap(model: m.Meltano.TapInput) -> p.Result[str]:
+    def _handle_tap(model: p.Meltano.TapInput) -> p.Result[str]:
         if model.operation is None or u.Meltano.requests_help([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Tap operation '{model.operation}' is not supported")
@@ -134,7 +134,7 @@ class FlextMeltanoCli:
         )
 
     @staticmethod
-    def _handle_target(model: m.Meltano.TargetInput) -> p.Result[str]:
+    def _handle_target(model: p.Meltano.TargetInput) -> p.Result[str]:
         if model.operation is None or u.Meltano.requests_help([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Target operation '{model.operation}' is not supported")
@@ -150,7 +150,7 @@ class FlextMeltanoCli:
             ),
         )
 
-    def _handle_dbt(self, model: m.Meltano.DbtInput) -> p.Result[str]:
+    def _handle_dbt(self, model: p.Meltano.DbtInput) -> p.Result[str]:
         if u.Meltano.requests_help([model.subcommand]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         result = self._service.execute_dbt_command(model.subcommand, model.args)
@@ -194,7 +194,7 @@ class FlextMeltanoCli:
         )
         cli.add_group(self._app, name=c.Meltano.CliCommand.PLUGIN, group=plugin_group)
 
-    def _handle_plugin_list(self, model: m.Meltano.PluginListInput) -> p.Result[str]:
+    def _handle_plugin_list(self, model: p.Meltano.PluginListInput) -> p.Result[str]:
         plugin_type = (
             u.Meltano.normalize_plugin_group(model.plugin_type)
             if model.plugin_type is not None
@@ -217,7 +217,7 @@ class FlextMeltanoCli:
             )
         )
 
-    def _handle_plugin_info(self, model: m.Meltano.PluginInfoInput) -> p.Result[str]:
+    def _handle_plugin_info(self, model: p.Meltano.PluginInfoInput) -> p.Result[str]:
         plugin_type = u.Meltano.normalize_plugin_group(model.plugin_type)
         if plugin_type is None:
             return r[str].fail("Plugin info requires a valid plugin type")
@@ -229,7 +229,7 @@ class FlextMeltanoCli:
 
     @staticmethod
     def _handle_plugin_install(
-        _model: m.Meltano.PluginInstallInput,
+        _model: p.Meltano.PluginInstallInput,
     ) -> p.Result[str]:
         return r[str].fail("Plugin install is not supported by this CLI")
 
@@ -300,7 +300,7 @@ class FlextMeltanoCli:
 
     def _handle_pipeline_create(
         self,
-        model: m.Meltano.PipelineCreateInput,
+        model: p.Meltano.PipelineCreateInput,
     ) -> p.Result[str]:
         config_payload: t.JsonMapping | None = None
         if model.config_json is not None:
@@ -321,13 +321,13 @@ class FlextMeltanoCli:
                 )
         return self._pipeline_mgr.create_pipeline(model.pipeline_name, config_payload)
 
-    def _handle_pipeline_run(self, model: m.Meltano.PipelineRunInput) -> p.Result[str]:
+    def _handle_pipeline_run(self, model: p.Meltano.PipelineRunInput) -> p.Result[str]:
         command_args = model.args or None
         return self._pipeline_mgr.execute_pipeline(model.pipeline_name, command_args)
 
     def _handle_pipeline_list(
         self,
-        _model: m.Meltano.PipelineListInput,
+        _model: p.Meltano.PipelineListInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.list_pipelines().map(
             lambda pipelines: ", ".join(pipelines) or "none",
@@ -335,19 +335,19 @@ class FlextMeltanoCli:
 
     def _handle_pipeline_status(
         self,
-        model: m.Meltano.PipelineNameInput,
+        model: p.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.fetch_pipeline_status(model.pipeline_name)
 
     def _handle_pipeline_stop(
         self,
-        model: m.Meltano.PipelineNameInput,
+        model: p.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.stop_pipeline(model.pipeline_name)
 
     def _handle_pipeline_delete(
         self,
-        model: m.Meltano.PipelineNameInput,
+        model: p.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.delete_pipeline(model.pipeline_name)
 

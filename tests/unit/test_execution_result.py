@@ -11,7 +11,7 @@ from collections.abc import Sequence
 
 import pytest
 
-from tests import c, m, tm
+from tests import c, m, p, tm
 
 
 class TestsFlextMeltanoExecutionResult:
@@ -35,7 +35,7 @@ class TestsFlextMeltanoExecutionResult:
     @staticmethod
     def _build_result(
         case: TestsFlextMeltanoExecutionResult._ExecutionResultCase,
-    ) -> m.Meltano.CommandExecutionResult:
+    ) -> p.Meltano.CommandExecutionResult:
         """Construct the public result from one parametrized case tuple.
 
         Returns:

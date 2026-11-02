@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests import c, m, meltano, p, tm
+from tests import c, meltano, p, tm
 
 
 @pytest.mark.docker
@@ -30,18 +30,18 @@ class TestsFlextMeltanoLibraryRunner:
     )
 
     @pytest.fixture(scope="class")
-    def dbt_result() -> p.Result[m.Meltano.CommandExecutionResult]:
+    def dbt_result() -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run one DBT transformation once and share its typed outcome.
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         return meltano.run_dbt_transformation(models=["model1"])
 
     @staticmethod
     def test_run_dbt_transformation_succeeds(
-        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
+        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
     ) -> None:
         """A DBT transformation reports a successful ``r[T]`` outcome."""
         tm.ok(dbt_result)
@@ -49,7 +49,7 @@ class TestsFlextMeltanoLibraryRunner:
     @staticmethod
     @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
     def test_dbt_result_exposes_command_execution_fields(
-        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
+        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
         attribute: str,
     ) -> None:
         """The typed CommandExecutionResult carries every documented field."""
@@ -57,7 +57,7 @@ class TestsFlextMeltanoLibraryRunner:
 
     @staticmethod
     def test_dbt_result_command_targets_requested_models(
-        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
+        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
     ) -> None:
         """The executed dbt command carries the requested model name."""
         tm.that(dbt_result.unwrap().command, has="model1")

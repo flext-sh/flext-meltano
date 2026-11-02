@@ -160,7 +160,7 @@ class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
     def __init__(
-        self, tap_name: str, settings: m.Dict, state: m.Dict | None = None
+        self, tap_name: str, settings: p.Dict, state: p.Dict | None = None
     ) -> None: ...
     async def discover(self) -> p.Result[Catalog]: ...
     async def sync(
@@ -186,9 +186,9 @@ from collections.abc import (
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, settings: m.Dict) -> None: ...
+    def __init__(self, target_name: str, settings: p.Dict) -> None: ...
     async def load_records(
-        self, records: Sequence[m.Dict]
+        self, records: Sequence[p.Dict]
     ) -> p.Result[LoadResult]: ...
     async def flush(self) -> p.Result[FlushResult]: ...
 ```

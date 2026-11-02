@@ -69,7 +69,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             raise SystemExit(1)
         return 0
 
-    def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> p.Result[bool]:
+    def handle_schema(self, message: p.Meltano.SingerSchemaMessage) -> p.Result[bool]:
         """Register the stream sink declared by a SCHEMA message.
 
         Returns:
@@ -84,7 +84,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             return r[bool].from_failure(sink_result)
         return r[bool].ok(value=True)
 
-    def handle_record(self, message: m.Meltano.SingerRecordMessage) -> p.Result[bool]:
+    def handle_record(self, message: p.Meltano.SingerRecordMessage) -> p.Result[bool]:
         """Route a RECORD message into its stream sink.
 
         Returns:
@@ -93,7 +93,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         """
         return self.process_record(message.stream, message.record, {})
 
-    def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[bool]:
+    def handle_state(self, message: p.Meltano.SingerStateMessage) -> p.Result[bool]:
         """Persist every pending sink batch at a STATE boundary.
 
         Returns:

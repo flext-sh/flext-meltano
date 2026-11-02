@@ -12,13 +12,11 @@ from typing import TYPE_CHECKING
 
 from flext_cli import u
 
-from flext_meltano import c, m, t
+from flext_meltano import c, m, p, t
 
 if TYPE_CHECKING:
     from meltano.core.plugin.base import PluginType as MeltanoPluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
-
-    from flext_meltano import p
 
 
 class FlextMeltanoUtilitiesRuntime:
@@ -209,7 +207,7 @@ class FlextMeltanoUtilitiesRuntime:
     def build_plugin_discovery_item(
         plugin_name: str,
         plugin_type: str,
-        source: m.Meltano.PluginDiscoverySource,
+        source: p.Meltano.PluginDiscoverySource,
     ) -> Mapping[str, str]:
         """Build canonical plugin discovery payload from raw Meltano metadata.
 

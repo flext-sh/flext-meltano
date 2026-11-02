@@ -63,8 +63,8 @@ class FlextExampleTapService(FlextMeltanoTapServiceBase):
 
 
 class ExampleFetcher:
-    def fetch(self, request: m.Meltano.FetchRequest) -> p.Result[m.Meltano.FetchResult]:
-        return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=()))
+    def fetch(self, request: p.Meltano.FetchRequest) -> p.Result[p.Meltano.FetchResult]:
+        return r[p.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=()))
 ```
 
 Taps that already own a `singer_sdk` tap class (subclassing

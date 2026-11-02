@@ -313,8 +313,8 @@ from collections.abc import (
 
 def execute_tap(
     tap_name: str,
-    settings: m.Dict,
-    state: m.Dict | None = None,
+    settings: p.Dict,
+    state: p.Dict | None = None,
     streams: t.StringList | None = None,
 ) -> p.Result[TapExecutionResult]:
     """Execute Singer tap with configuration.
@@ -347,7 +347,7 @@ from collections.abc import (
 
 
 def execute_target(
-    target_name: str, records: Sequence[m.Dict], settings: m.Dict
+    target_name: str, records: Sequence[p.Dict], settings: p.Dict
 ) -> p.Result[TargetExecutionResult]:
     """Execute Singer target with records.
 

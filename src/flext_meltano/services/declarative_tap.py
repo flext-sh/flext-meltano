@@ -64,7 +64,7 @@ class FlextMeltanoDeclarativeTap:
     @classmethod
     def build(
         cls,
-        spec: m.Meltano.TapSpec,
+        spec: p.Meltano.TapSpec,
         fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Return a Singer tap instance driven by ``spec`` and ``fetcher``."""
@@ -76,7 +76,7 @@ class FlextMeltanoDeclarativeTap:
             def __init__(
                 self,
                 tap: Tap,
-                stream_spec: m.Meltano.StreamSpec,
+                stream_spec: p.Meltano.StreamSpec,
                 config: t.JsonMapping,
             ) -> None:
                 super().__init__(
@@ -115,8 +115,8 @@ class FlextMeltanoDeclarativeTap:
             @override
             def get_records(
                 self,
-                context: m.Meltano.SingerContext | None,
-            ) -> Iterable[m.Meltano.SingerRecord]:
+                context: p.Meltano.SingerContext | None,
+            ) -> Iterable[p.Meltano.SingerRecord]:
                 _ = context
                 request = m.Meltano.FetchRequest(
                     stream_name=self.name,

@@ -30,7 +30,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         self,
         models: Sequence[str] | None = None,
         project_dir: Path | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.
 
         Returns the executor's typed CommandExecutionResult directly (SSOT). Callers
@@ -40,7 +40,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         dict whose models_run/execution_method keys never existed).
 
         Returns:
-            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+            The resulting ``p.Result[p.Meltano.CommandExecutionResult]``.
 
         """
         executor = (

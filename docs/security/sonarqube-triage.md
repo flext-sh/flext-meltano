@@ -243,11 +243,11 @@ padrão.
 ```text
       317              )
       318          except c.Meltano.OPERATION_ERRORS as e:
-      319              return r[m.Meltano.CommandExecutionResult].fail(str(e))
+      319              return r[p.Meltano.CommandExecutionResult].fail(str(e))
       320
 >>>   321      def execute_pipeline(
       322          self, tap_name: str, target_name: str, config: t.JsonMapping | No ...
-      323      ) -> p.Result[m.Meltano.CommandExecutionResult]:
+      323      ) -> p.Result[p.Meltano.CommandExecutionResult]:
       324          """Execute a complete ELT pipeline."""
       325          prepared_command: Sequence[str] | None = None
 ```
@@ -266,10 +266,10 @@ padrão.
       396                  else "Failed to run Meltano pipeline"
       397              )
 >>>   398          if completed_result is None:
-      399              return r[m.Meltano.CommandExecutionResult].fail(
+      399              return r[p.Meltano.CommandExecutionResult].fail(
       400                  "Pipeline execution result missing"
       401              )
-      402          return r[m.Meltano.CommandExecutionResult].ok(completed_result)
+      402          return r[p.Meltano.CommandExecutionResult].ok(completed_result)
 ```
 
 **Decisão**: pendente
