@@ -32,15 +32,7 @@ class FlextMeltanoUtilitiesRuntime:
             The resulting ``Sequence[str]``.
 
         """
-
-        def _strip_part(part: str) -> str:
-            return u.to_str(part).strip()
-
-        def _is_non_empty_part(part: str) -> bool:
-            return u.string_non_empty(part)
-
-        stripped_values = u.map(u.to_str_list(values), _strip_part)
-        return list(u.filter(stripped_values, _is_non_empty_part))
+        return [part.strip() for part in values if part.strip()]
 
     @staticmethod
     def normalize_runtime_command(command: Sequence[str]) -> Sequence[str]:
