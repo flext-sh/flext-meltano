@@ -8,24 +8,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
+if TYPE_CHECKING:
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsCore:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class StringListValue(FlextCliProtocols.Model, Protocol):
+    class StringListValue(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def items(self) -> t.StrTuple:
-            """Normalized tuple of string values."""
-            ...
+        items: t.StrTuple
 
 
 __all__: list[str] = [

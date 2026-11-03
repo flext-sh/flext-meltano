@@ -12,9 +12,8 @@ from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
-
 if TYPE_CHECKING:
+    from flext_meltano import t
     from flext_meltano._constants import FlextMeltanoConstantsEnums
 
 
@@ -22,30 +21,19 @@ class FlextMeltanoProtocolsSingerCatalog:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class SingerCatalogMetadata(FlextCliProtocols.Model, Protocol):
+    class SingerCatalogMetadata(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         breadcrumb: t.StrTuple
         metadata: t.FlatContainerMapping
 
     @runtime_checkable
-    class SingerCatalogEntry(FlextCliProtocols.Model, Protocol):
+    class SingerCatalogEntry(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def tap_stream_id(self) -> str:
-            """Tap stream identifier."""
-            ...
-
-        @property
-        def stream(self) -> str:
-            """Singer stream name."""
-            ...
-
-        @property
-        def schema_definition(self) -> t.FlatContainerMapping:
-            """Singer stream schema payload."""
-            ...
+        tap_stream_id: str
+        stream: str
+        schema_definition: t.FlatContainerMapping
 
         @property
         def metadata(
@@ -55,41 +43,15 @@ class FlextMeltanoProtocolsSingerCatalog:
             ...
 
         key_properties: t.StrTuple
-
-        @property
-        def replication_key(self) -> str | None:
-            """Column used for incremental replication."""
-            ...
-
-        @property
-        def replication_method(
-            self,
-        ) -> Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None:
-            """Replication method for this stream."""
-            ...
-
-        @property
-        def is_view(self) -> bool | None:
-            """Whether this stream is a database view."""
-            ...
-
-        @property
-        def table_name(self) -> str | None:
-            """Source table name."""
-            ...
-
-        @property
-        def database_name(self) -> str | None:
-            """Source database name."""
-            ...
-
-        @property
-        def row_count(self) -> int | None:
-            """Estimated row count from source."""
-            ...
+        replication_key: str | None
+        replication_method: Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None
+        is_view: bool | None
+        table_name: str | None
+        database_name: str | None
+        row_count: int | None
 
     @runtime_checkable
-    class SingerCatalog(FlextCliProtocols.Model, Protocol):
+    class SingerCatalog(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property

@@ -18,130 +18,79 @@ class FlextMeltanoProtocolsCliInputs:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class PipelineCreateInput(FlextCliProtocols.Model, Protocol):
+    class PipelineCreateInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def pipeline_name(self) -> str:
-            """Name of the pipeline to create."""
-            ...
-
-        @property
-        def config_json(self) -> str | None:
-            """Pipeline configuration as a JSON string."""
-            ...
+        pipeline_name: str
+        config_json: str | None
 
     @runtime_checkable
-    class PipelineRunInput(FlextCliProtocols.Model, Protocol):
+    class PipelineRunInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def pipeline_name(self) -> str:
-            """Name of the pipeline to run."""
-            ...
-
-        @property
-        def args(self) -> Sequence[str]:
-            """Extra arguments forwarded to the pipeline command."""
-            ...
+        pipeline_name: str
+        args: Sequence[str]
 
     @runtime_checkable
-    class PipelineNameInput(FlextCliProtocols.Model, Protocol):
+    class PipelineNameInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def pipeline_name(self) -> str:
-            """Name of the pipeline."""
-            ...
+        pipeline_name: str
 
     @runtime_checkable
-    class PipelineListInput(FlextCliProtocols.Model, Protocol):
+    class PipelineListInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
     @runtime_checkable
-    class PluginListInput(FlextCliProtocols.Model, Protocol):
+    class PluginListInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def plugin_type(self) -> str | None:
-            """Optional plugin type filter (e.g. tap, target)."""
-            ...
+        plugin_type: str | None
 
     @runtime_checkable
-    class PluginInfoInput(FlextCliProtocols.Model, Protocol):
+    class PluginInfoInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def plugin_type(self) -> str:
-            """Plugin type (e.g. tap, target)."""
-            ...
-
-        @property
-        def plugin_name(self) -> str:
-            """Plugin name."""
-            ...
+        plugin_type: str
+        plugin_name: str
 
     @runtime_checkable
-    class PluginInstallInput(FlextCliProtocols.Model, Protocol):
+    class PluginInstallInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def plugin_name(self) -> str:
-            """Plugin name to install."""
-            ...
+        plugin_name: str
 
     @runtime_checkable
-    class StatusShowInput(FlextCliProtocols.Model, Protocol):
+    class StatusShowInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
     @runtime_checkable
-    class StatusHealthInput(FlextCliProtocols.Model, Protocol):
+    class StatusHealthInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
     @runtime_checkable
-    class DbtInput(FlextCliProtocols.Model, Protocol):
+    class DbtInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def subcommand(self) -> str:
-            """DBT subcommand (run, test, compile, docs)."""
-            ...
-
-        @property
-        def args(self) -> Sequence[str]:
-            """Extra arguments forwarded to DBT."""
-            ...
+        subcommand: str
+        args: Sequence[str]
 
     @runtime_checkable
-    class TapInput(FlextCliProtocols.Model, Protocol):
+    class TapInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def operation(self) -> str | None:
-            """Tap operation name."""
-            ...
-
-        @property
-        def args(self) -> Sequence[str]:
-            """Extra arguments forwarded to the tap operation."""
-            ...
+        operation: str | None
+        args: Sequence[str]
 
     @runtime_checkable
-    class TargetInput(FlextCliProtocols.Model, Protocol):
+    class TargetInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def operation(self) -> str | None:
-            """Target operation name."""
-            ...
-
-        @property
-        def args(self) -> Sequence[str]:
-            """Extra arguments forwarded to the target operation."""
-            ...
+        operation: str | None
+        args: Sequence[str]
 
     @runtime_checkable
-    class VersionInput(FlextCliProtocols.Model, Protocol):
+    class VersionInput(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
 

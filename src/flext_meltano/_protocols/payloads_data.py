@@ -9,30 +9,28 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
+if TYPE_CHECKING:
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsPayloadsData:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class ConfigMappingPayload(FlextCliProtocols.Model, Protocol):
+    class ConfigMappingPayload(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         values: t.JsonMapping
 
     @runtime_checkable
-    class PathPayload(FlextCliProtocols.Model, Protocol):
+    class PathPayload(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def value(self) -> Path:
-            """Normalized path."""
-            ...
+        value: Path
 
 
 __all__: list[str] = [

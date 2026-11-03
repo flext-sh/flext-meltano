@@ -9,49 +9,27 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
+if TYPE_CHECKING:
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsResultsDbt:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class CommandExecutionResult(FlextCliProtocols.Model, Protocol):
+    class CommandExecutionResult(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def command(self) -> Sequence[str]:
-            """Command that was executed."""
-            ...
-
-        @property
-        def success(self) -> bool:
-            """Whether the command succeeded."""
-            ...
-
-        @property
-        def exit_code(self) -> int:
-            """Process exit code."""
-            ...
-
-        @property
-        def output(self) -> str:
-            """Standard output."""
-            ...
-
-        @property
-        def error(self) -> str:
-            """Standard error."""
-            ...
-
-        @property
-        def execution_time(self) -> t.NonNegativeFloat:
-            """Execution time in seconds."""
-            ...
+        command: Sequence[str]
+        success: bool
+        exit_code: int
+        output: str
+        error: str
+        execution_time: t.NonNegativeFloat
 
         @property
         def timestamp(self) -> str:

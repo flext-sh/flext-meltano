@@ -9,73 +9,39 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
+if TYPE_CHECKING:
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsDiscovery:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class PluginDiscoverySource(FlextCliProtocols.Model, Protocol):
+    class PluginDiscoverySource(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def default_variant(self) -> str:
-            """Plugin default variant."""
-            ...
-
+        default_variant: str
         variants: t.FlatContainerMapping
-
-        @property
-        def logo_url(self) -> str:
-            """Plugin logo URL."""
-            ...
-
-        @property
-        def description(self) -> str:
-            """Plugin description."""
-            ...
+        logo_url: str
+        description: str
 
     @runtime_checkable
-    class PluginDiscoveryItem(FlextCliProtocols.Model, Protocol):
+    class PluginDiscoveryItem(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def name(self) -> t.NonEmptyStr:
-            """Plugin name."""
-            ...
-
-        @property
-        def type(self) -> t.NonEmptyStr:
-            """Plugin type."""
-            ...
-
-        @property
-        def default_variant(self) -> str:
-            """Default plugin variant."""
-            ...
-
-        @property
-        def variants(self) -> str:
-            """Comma-separated variants."""
-            ...
-
-        @property
-        def logo_url(self) -> str:
-            """Plugin logo URL."""
-            ...
-
-        @property
-        def description(self) -> str:
-            """Plugin description."""
-            ...
+        name: t.NonEmptyStr
+        type: t.NonEmptyStr
+        default_variant: str
+        variants: str
+        logo_url: str
+        description: str
 
     @runtime_checkable
-    class PluginDiscoveryCatalog(FlextCliProtocols.Model, Protocol):
+    class PluginDiscoveryCatalog(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property

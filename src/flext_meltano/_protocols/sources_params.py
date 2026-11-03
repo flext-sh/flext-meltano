@@ -13,17 +13,17 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
-
 if TYPE_CHECKING:
     from flext_cli import p
+
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsSourcesParams:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class StreamDefinition(FlextCliProtocols.Model, Protocol):
+    class StreamDefinition(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property
@@ -31,30 +31,11 @@ class FlextMeltanoProtocolsSourcesParams:
             """List of uncommitted domain events for event sourcing."""
             ...
 
-        @property
-        def stream_name(self) -> str:
-            """Name of the stream."""
-            ...
-
-        @property
-        def stream_schema(self) -> t.FlatContainerMapping:
-            """JSON schema for the stream."""
-            ...
-
-        @property
-        def source_type(self) -> str:
-            """Type of source this stream belongs to."""
-            ...
-
-        @property
-        def status(self) -> str:
-            """Current status of the stream."""
-            ...
-
-        @property
-        def records_extracted(self) -> t.NonNegativeInt:
-            """Number of records extracted."""
-            ...
+        stream_name: str
+        stream_schema: t.FlatContainerMapping
+        source_type: str
+        status: str
+        records_extracted: t.NonNegativeInt
 
 
 __all__: list[str] = [

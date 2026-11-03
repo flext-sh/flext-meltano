@@ -17,7 +17,7 @@ class FlextMeltanoProtocolsConfig:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class MeltanoNamespace(FlextCliProtocols.Model, Protocol):
+    class MeltanoNamespace(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
 

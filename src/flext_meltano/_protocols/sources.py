@@ -13,17 +13,17 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
-
 if TYPE_CHECKING:
     from flext_cli import p
+
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsSources:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class TapConfig(FlextCliProtocols.Model, Protocol):
+    class TapConfig(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property
@@ -31,28 +31,13 @@ class FlextMeltanoProtocolsSources:
             """List of uncommitted domain events for event sourcing."""
             ...
 
-        @property
-        def connection_config(self) -> t.FlatContainerMapping:
-            """Connection configuration."""
-            ...
-
-        @property
-        def stream_config(self) -> t.FlatContainerMapping:
-            """Stream-specific configuration."""
-            ...
-
-        @property
-        def tap_type(self) -> str:
-            """Type of the tap."""
-            ...
-
-        @property
-        def tap_version(self) -> str:
-            """Tap version."""
-            ...
+        connection_config: t.FlatContainerMapping
+        stream_config: t.FlatContainerMapping
+        tap_type: str
+        tap_version: str
 
     @runtime_checkable
-    class TargetConfig(FlextCliProtocols.Model, Protocol):
+    class TargetConfig(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property
@@ -60,30 +45,11 @@ class FlextMeltanoProtocolsSources:
             """List of uncommitted domain events for event sourcing."""
             ...
 
-        @property
-        def target_type(self) -> str:
-            """Type of the target."""
-            ...
-
-        @property
-        def connection_config(self) -> t.FlatContainerMapping:
-            """Connection configuration."""
-            ...
-
-        @property
-        def batch_size(self) -> int | None:
-            """Batch size for data loading."""
-            ...
-
-        @property
-        def batch_wait_limit(self) -> float | None:
-            """Batch wait limit in seconds."""
-            ...
-
-        @property
-        def target_version(self) -> str:
-            """Target version."""
-            ...
+        target_type: str
+        connection_config: t.FlatContainerMapping
+        batch_size: int | None
+        batch_wait_limit: float | None
+        target_version: str
 
 
 __all__: list[str] = [
