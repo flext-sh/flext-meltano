@@ -11,9 +11,11 @@ from typing import TypeAlias
 
 from flext_cli import u as flext_cli_u
 
+from flext_meltano._utilities import (
+    FlextMeltanoUtilitiesRuntime,
+    FlextMeltanoUtilitiesSinger,
+)
 from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
-from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
 class FlextMeltanoUtilities(flext_cli_u):

@@ -554,14 +554,7 @@ skip-magic-trailing-comma = false
 [tool.ruff.lint]
 extend-safe-fixes = ["relative-imports", "camelcase-imported-as-lowercase"]
 extend-select = ["missing-blank-line-after-last-section"]
-ignore = [
-  "missing-trailing-comma",
-  "non-empty-init-module",
-  "runtime-import-in-type-checking-block",
-  "typing-only-first-party-import",
-  "typing-only-standard-library-import",
-  "typing-only-third-party-import",
-]
+ignore = ["TC", "missing-trailing-comma", "non-empty-init-module"]
 select = ["ALL"]
 unfixable = [
   "multi-value-repeated-key-literal",
@@ -592,39 +585,6 @@ msg = "Use cli.render_table from flext_cli."
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."
-
-[tool.ruff.lint.flake8-type-checking]
-runtime-evaluated-base-classes = [
-  "flext_cli.FlextCliConfig",
-  "flext_cli.m.ArbitraryTypesModel",
-  "flext_cli.m.BaseModel",
-  "flext_cli.m.Entity",
-  "flext_cli.m.FlexibleModel",
-  "flext_cli.m.FrozenModel",
-  "flext_core.FlextService",
-  "flext_core.FlextSettings",
-  "flext_core.m.BaseModel",
-  "flext_meltano.FlextMeltanoConfig",
-  "flext_meltano.FlextMeltanoConstants.Meltano",
-  "flext_meltano.FlextMeltanoServiceBase",
-  "flext_meltano.FlextMeltanoSettings",
-  "flext_meltano.FlextMeltanoTargetServiceBase",
-  "flext_meltano._constants.settings.FlextMeltanoConstantsSettings",
-  "flext_meltano.services.FlextMeltanoAbstractions",
-  "flext_meltano.services.FlextMeltanoExecutor",
-  "flext_meltano.services.FlextMeltanoExecutorBase",
-  "flext_meltano.services.FlextMeltanoLibraryRunner",
-  "flext_meltano.services.FlextMeltanoPluginDiscovery",
-  "flext_meltano.services.FlextMeltanoService",
-  "flext_meltano.services.consumer_bases.FlextMeltanoDbtServiceBase",
-  "flext_meltano.services.consumer_bases.FlextMeltanoTapServiceBase",
-  "flext_meltano.services.consumer_bases.FlextMeltanoTargetServiceBase",
-  "flext_tests.FlextTestsServiceBase",
-  "flext_tests.FlextTestsSettings",
-  "pydantic.BaseModel",
-  "tests.m.BaseModel",
-  "tests.m.Value",
-]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

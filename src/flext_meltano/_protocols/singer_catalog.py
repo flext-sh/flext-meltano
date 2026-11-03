@@ -10,7 +10,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
 
-from flext_cli import FlextCliProtocols, t
+from flext_cli import FlextCliProtocols
+
+from flext_meltano import t
 
 if TYPE_CHECKING:
     from flext_meltano._constants import FlextMeltanoConstantsEnums
