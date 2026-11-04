@@ -13,8 +13,7 @@ from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
 from flext_cli import FlextCliProtocols
 
 if TYPE_CHECKING:
-    from flext_meltano import t
-    from flext_meltano._constants import FlextMeltanoConstantsEnums
+    from flext_meltano import c, t
 
 
 class FlextMeltanoProtocolsSingerCatalog:
@@ -54,10 +53,7 @@ class FlextMeltanoProtocolsSingerCatalog:
     class SingerCatalog(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
-            """Singer catalog message discriminator."""
-            ...
+        type: c.Meltano.SingerMessageType
 
         @property
         def streams(

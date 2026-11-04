@@ -88,7 +88,7 @@ scenarios.
 
 ### **Test Organization**
 
-```
+```text
 e2e/
 ├── __init__.py                           # E2E test module initialization
 ├── test_complete_pipeline_e2e.py        # Full pipeline end-to-end tests

@@ -51,7 +51,7 @@ orchestration.
 
 FLEXT-Meltano implements a **layered architecture** with clear separation of concerns:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ 🎯 FLEXT-Meltano - Enterprise Data Pipeline Integration    │
 ├─────────────────────────────────────────────────────────────┤

@@ -83,7 +83,7 @@ adapters, and enterprise-specific implementations.
 
 ### **Test Organization**
 
-```
+```text
 extensions/
 ├── __init__.py                           # Extensions test module initialization
 ├── oracle_oic/                          # Oracle OIC extension tests

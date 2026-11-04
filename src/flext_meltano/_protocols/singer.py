@@ -11,15 +11,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from flext_cli import p
 
-    from flext_meltano._constants import FlextMeltanoConstantsEnums
-
 
 from collections.abc import Sequence
 from typing import Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoProtocolsSinger:
@@ -126,11 +124,7 @@ class FlextMeltanoProtocolsSinger:
     class SingerSchemaMessage(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
-            """Singer message discriminator."""
-            ...
-
+        type: c.Meltano.SingerMessageType
         stream: t.NonEmptyStr
         schema_definition: t.FlatContainerMapping
         key_properties: t.StrTuple
@@ -141,11 +135,7 @@ class FlextMeltanoProtocolsSinger:
     class SingerRecordMessage(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
-            """Singer message discriminator."""
-            ...
-
+        type: c.Meltano.SingerMessageType
         stream: str
         record: t.FlatContainerMapping
         time_extracted: str | None
@@ -155,22 +145,14 @@ class FlextMeltanoProtocolsSinger:
     class SingerStateMessage(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
-            """Singer message discriminator."""
-            ...
-
+        type: c.Meltano.SingerMessageType
         value: t.MutableFlatContainerMapping
 
     @runtime_checkable
     class SingerActivateVersionMessage(FlextCliProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> FlextMeltanoConstantsEnums.SingerMessageType:
-            """Singer message discriminator."""
-            ...
-
+        type: c.Meltano.SingerMessageType
         stream: str
         version: t.PositiveInt
 

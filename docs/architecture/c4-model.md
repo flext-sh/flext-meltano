@@ -161,14 +161,14 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 
 ### Container Responsibilities
 
-| Container         | Technology         | Purpose              | Key Classes                                     |
-| ----------------- | ------------------ | -------------------- | ----------------------------------------------- |
-| **API Layer**     | FastAPI/Python     | External interface   | `FlextMeltano`, `FlextMeltanoCLI`               |
-| **Service Layer** | Python             | Business logic       | `FlextMeltanoExecutor`, `FlextMeltanoAbstractions` |
-| **Consumer Bases** | Python            | Connector foundation | `FlextMeltanoTapServiceBase`, `FlextMeltanoTargetServiceBase`, `FlextMeltanoDbtServiceBase` |
-| **Domain Model**  | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoSettings`    |
-| **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables   |
-| **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
+| Container          | Technology         | Purpose              | Key Classes                                                                                 |
+| ------------------ | ------------------ | -------------------- | ------------------------------------------------------------------------------------------- |
+| **API Layer**      | FastAPI/Python     | External interface   | `FlextMeltano`, `FlextMeltanoCLI`                                                           |
+| **Service Layer**  | Python             | Business logic       | `FlextMeltanoExecutor`, `FlextMeltanoAbstractions`                                          |
+| **Consumer Bases** | Python             | Connector foundation | `FlextMeltanoTapServiceBase`, `FlextMeltanoTargetServiceBase`, `FlextMeltanoDbtServiceBase` |
+| **Domain Model**   | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoSettings`                                                |
+| **Configuration**  | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables                                               |
+| **State Store**    | File System/SQLite | Persistence          | JSON files, SQLite database                                                                 |
 
 ---
 
@@ -471,4 +471,4 @@ handling.
 ---
 
 **C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
-_Comprehensive system documentation following industry-standard C4 modeling approach_
+*Comprehensive system documentation following industry-standard C4 modeling approach*

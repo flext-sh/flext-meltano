@@ -55,7 +55,7 @@ to FLEXT-Meltano's architecture documentation framework.
 
 FLEXT-Meltano follows the C4 model for architecture documentation:
 
-```
+```text
 Level 1: Context Diagram
 ├── System purpose and scope
 ├── External system interactions
@@ -83,7 +83,7 @@ Level 4: Code Diagram
 
 ### Documentation Organization
 
-```
+```text
 docs/architecture/
 ├── README.md                    # Architecture overview and navigation
 ├── c4-model.md                  # Complete C4 model documentation
@@ -544,4 +544,4 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 ---
 
 **Architecture Documentation Guide**: FLEXT-Meltano Architecture Framework
-_Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation_
+*Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation*

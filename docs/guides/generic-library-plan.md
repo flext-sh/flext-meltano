@@ -143,7 +143,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 
 ### Before: CLI-Centric Architecture
 
-```
+```text
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (CLI-Dependent)      │
 ├─────────────────────────────────────┤
@@ -164,7 +164,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 
 ### After: Generic Library Architecture
 
-```
+```text
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (Generic Library)    │
 ├─────────────────────────────────────┤

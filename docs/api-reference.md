@@ -74,19 +74,19 @@ root.
 `FlextMeltano` composes the runtime services by MRO; `meltano` is its shared
 instance.
 
-| Operation                                      | Purpose                                                         |
-| ---------------------------------------------- | --------------------------------------------------------------- |
-| `fetch_version()`                              | Installed Meltano distribution version                          |
-| `discover_installed_plugins()`                 | Names of the plugins declared in the active Meltano project     |
-| `fetch_project_plugins(plugin_type=None)`      | Plugin definitions of the active project, optionally filtered   |
-| `discover_plugins()` / `fetch_plugin_info(...)` | Plugin discovery used by the `plugin list` / `plugin info` CLI  |
-| `execute_meltano_command(command)`             | Run a Meltano CLI command in-process; typed `CommandExecutionResult` |
-| `execute_dbt_command(subcommand, args)`        | Run `meltano invoke dbt-postgres:<subcommand>`                  |
-| `run_dbt_transformation(models, project_dir)`  | Run dbt models through the executor                             |
-| `health()`                                     | Meltano runtime health payload                                  |
-| `run_cli()`                                    | CLI readiness payload used by `status show`                     |
-| `tap(name)` / `target(name)` / `dbt(name)`     | Specialized facade bound to a source, sink, or transformation   |
-| `execute()`                                    | Service status payload                                          |
+| Operation                                       | Purpose                                                              |
+| ----------------------------------------------- | -------------------------------------------------------------------- |
+| `fetch_version()`                               | Installed Meltano distribution version                               |
+| `discover_installed_plugins()`                  | Names of the plugins declared in the active Meltano project          |
+| `fetch_project_plugins(plugin_type=None)`       | Plugin definitions of the active project, optionally filtered        |
+| `discover_plugins()` / `fetch_plugin_info(...)` | Plugin discovery used by the `plugin list` / `plugin info` CLI       |
+| `execute_meltano_command(command)`              | Run a Meltano CLI command in-process; typed `CommandExecutionResult` |
+| `execute_dbt_command(subcommand, args)`         | Run `meltano invoke dbt-postgres:<subcommand>`                       |
+| `run_dbt_transformation(models, project_dir)`   | Run dbt models through the executor                                  |
+| `health()`                                      | Meltano runtime health payload                                       |
+| `run_cli()`                                     | CLI readiness payload used by `status show`                          |
+| `tap(name)` / `target(name)` / `dbt(name)`      | Specialized facade bound to a source, sink, or transformation        |
+| `execute()`                                     | Service status payload                                               |
 
 ## Consumer Bases
 

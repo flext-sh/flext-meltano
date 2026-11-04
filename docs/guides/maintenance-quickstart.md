@@ -271,4 +271,4 @@ Track these indicators of maintenance success:
 
 **Ready to maintain documentation excellence!** ✨
 
-_For detailed documentation, see `docs/guides/maintenance-guide.md`_
+*For detailed documentation, see `docs/guides/maintenance-guide.md`*

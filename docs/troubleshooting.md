@@ -58,7 +58,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Problem**: Module import failures
 
-```
+```text
 ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
 ```
 

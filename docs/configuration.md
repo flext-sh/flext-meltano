@@ -216,7 +216,7 @@ stream = StreamDefinition(
 
 ### dbt Project Structure
 
-```
+```text
 transform/
 ├── dbt_project.yml
 ├── profiles/

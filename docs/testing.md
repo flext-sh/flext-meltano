@@ -245,7 +245,7 @@ and dependency resolution issues **Status**: ⚠️ **IDENTIFIED**
 
 #### **Coverage Targets by Module:**
 
-```
+```text
 src/flext_meltano/
 ├── api.py                     95% (Target: 95%)
 ├── services.py               1442 lines (Target: 95%)

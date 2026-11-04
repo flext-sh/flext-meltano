@@ -217,4 +217,4 @@ make docs
 ---
 
 **Architecture Documentation**: FLEXT-Meltano Enterprise Architecture Framework
-_Comprehensive, automated, and maintainable architecture documentation system_
+*Comprehensive, automated, and maintainable architecture documentation system*

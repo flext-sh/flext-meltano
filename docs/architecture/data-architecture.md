@@ -115,19 +115,19 @@ deactivate tap
 
 #### 1. **Extract-Load-Transform (ELT) Pattern**
 
-```
+```text
 Source System → Singer Tap → JSONL Stream → Singer Target → Raw Storage → DBT → Tran ...
 ```
 
 #### 2. **Incremental Loading Pattern**
 
-```
+```text
 State Store ← Bookmark Management ← Change Detection ← Source Query ← Filtered Extraction
 ```
 
 #### 3. **Batch Processing Pattern**
 
-```
+```text
 Record Buffer ← Streaming Ingestion ← JSONL Parsing ← Schema Validation ← Batch Loading
 ```
 
@@ -822,4 +822,4 @@ class AlertRule:
 ---
 
 **Data Architecture**: FLEXT-Meltano Enterprise Data Processing
-_Comprehensive data flow, storage, and processing architecture documentation_
+*Comprehensive data flow, storage, and processing architecture documentation*

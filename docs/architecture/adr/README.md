@@ -96,11 +96,11 @@ capture important architectural decisions, their context, and rationale.
 | [ADR-002](002-clean-architecture-ddd.md)       | Clean Architecture with Domain-Driven Design | Accepted                    | 2025-01-20 |                             |
 | [ADR-003](003-singer-protocol-abstraction.md)  | Singer Protocol Abstraction Layer            | Accepted                    | 2025-02-01 |                             |
 | [ADR-004](004-type-safety-first.md)            | Type Safety First with Python 3.13+          | Accepted                    | 2025-02-05 |                             |
-| ADR-005                                        | Plugin-Centric Architecture                  | Accepted                    | 2025-02-10 | _Documentation coming soon_ |
-| ADR-006                                        | FLEXT-Core Integration Pattern               | Accepted                    |            | _Documentation coming soon_ |
-| ADR-007                                        | State Management Strategy                    | _Documentation coming soon_ | 2025-02-20 |                             |
+| ADR-005                                        | Plugin-Centric Architecture                  | Accepted                    | 2025-02-10 | *Documentation coming soon* |
+| ADR-006                                        | FLEXT-Core Integration Pattern               | Accepted                    |            | *Documentation coming soon* |
+| ADR-007                                        | State Management Strategy                    | *Documentation coming soon* | 2025-02-20 |                             |
 | [ADR-008](008-error-handling-strategy.md)      | Error Handling Strategy                      | Accepted                    |            |                             |
-| ADR-009                                        | API Design Principles                        | Accepted                    | 2025-03-01 | _Documentation coming soon_ |
+| ADR-009                                        | API Design Principles                        | Accepted                    | 2025-03-01 | *Documentation coming soon* |
 | [ADR-010](010-testing-strategy.md)             | Testing Strategy and Infrastructure          | Accepted                    | 2025-03-05 |                             |
 
 ## ADR Status Definitions
@@ -180,5 +180,5 @@ ADRs must:
 
 - [Architecture Overview](../../architecture.md)
 - [C4 Model Documentation](../../c4-model.md)
-- Quality Attributes (_Pending_)
-- Security Architecture (_Pending_)
+- Quality Attributes (*Pending*)
+- Security Architecture (*Pending*)

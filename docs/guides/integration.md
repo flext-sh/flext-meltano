@@ -130,14 +130,14 @@ the typed `m.Meltano.CommandExecutionResult`.
 
 ## 📊 Integration Matrix
 
-| Consumer base                     | Connectors                                                   |
-| --------------------------------- | ------------------------------------------------------------ |
-| `FlextMeltanoTapServiceBase`      | flext-tap-ldap, flext-tap-ldif, flext-tap-oracle, flext-tap-oracle-oic, flext-tap-oracle-wms |
-| `FlextMeltanoTargetServiceBase`   | flext-target-ldif, flext-target-oracle, flext-target-oracle-oic, flext-target-oracle-wms |
-| `FlextMeltanoDbtServiceBase`      | flext-dbt-ldap, flext-dbt-ldif, flext-dbt-oracle, flext-dbt-oracle-wms |
-| `FlextMeltanoLibraryRunner`       | flext-dbt-oracle-wms (`run_dbt_transformation`)              |
-| `FlextMeltanoAbstractions`        | flext-tap-oracle-oic                                         |
-| `FlextMeltanoTargetAbstractions`  | flext-target-oracle-oic                                      |
+| Consumer base                    | Connectors                                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| `FlextMeltanoTapServiceBase`     | flext-tap-ldap, flext-tap-ldif, flext-tap-oracle, flext-tap-oracle-oic, flext-tap-oracle-wms |
+| `FlextMeltanoTargetServiceBase`  | flext-target-ldif, flext-target-oracle, flext-target-oracle-oic, flext-target-oracle-wms     |
+| `FlextMeltanoDbtServiceBase`     | flext-dbt-ldap, flext-dbt-ldif, flext-dbt-oracle, flext-dbt-oracle-wms                       |
+| `FlextMeltanoLibraryRunner`      | flext-dbt-oracle-wms (`run_dbt_transformation`)                                              |
+| `FlextMeltanoAbstractions`       | flext-tap-oracle-oic                                                                         |
+| `FlextMeltanoTargetAbstractions` | flext-target-oracle-oic                                                                      |
 
 ### Integration Requirements
 
