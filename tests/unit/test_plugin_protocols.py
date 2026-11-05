@@ -11,8 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
 from tests import c, m, t, tm, u
 
 
@@ -53,7 +51,7 @@ class TestsFlextMeltanoProtocolsPlugin:
         tm.that(len(catalog.streams), eq=0)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "stream_names",
         [("users",), ("users", "orders"), ("a", "b", "c")],
     )
@@ -159,7 +157,7 @@ class TestsFlextMeltanoProtocolsPlugin:
     # --- error paths -----------------------------------------------------
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("omitted", "payload"),
         [
             ("tap_stream_id", {c.ProcessingMode.STREAM: "users", "schema": {}}),

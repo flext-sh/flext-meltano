@@ -11,10 +11,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
 from flext_meltano import FlextMeltano
-from tests import meltano, tm
+from tests import c, meltano, tm
 
 
 class TestsFlextMeltanoSingerSdkAdapter:
@@ -60,7 +58,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         tm.that(facade.transformation_name, eq="analytics")
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("factory", "name", "role_field"),
         _FACTORY_CASES,
     )
@@ -77,7 +75,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         tm.that(getattr(facade, role_field), eq=name)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("factory", "name", "role_field"),
         _FACTORY_CASES,
     )
@@ -128,7 +126,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         tm.that(meltano.transformation_name, none=True)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("factory", "name"),
         [("tap", "tap-csv"), ("target", "target-jsonl"), ("dbt", "analytics")],
     )

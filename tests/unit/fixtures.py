@@ -29,11 +29,11 @@ MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
 MELTANO_COMPONENT_IDS: Sequence[str] = ("tap", "target", "dbt")
 
 
-@pytest.fixture(
+@u.Tests.fixture(
     params=tuple(range(len(MELTANO_COMPONENT_CASES))),
     ids=MELTANO_COMPONENT_IDS,
 )
-def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.ComponentCase:
+def meltano_component_case(request: t.Tests.FixtureRequest) -> t.Meltano.ComponentCase:
     """Canonical public Meltano component factories with expected selectors.
 
     Returns:
@@ -45,16 +45,16 @@ def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.Componen
     return MELTANO_COMPONENT_CASES[case_index]
 
 
-@pytest.fixture(
+@u.Tests.fixture(
     params=["version", c.ContextKey.SERVICE_NAME, "status", "handlers"],
     ids=["version", "service-name", "status", "handlers"],
 )
-def meltano_execute_field(request: pytest.FixtureRequest) -> str:
+def meltano_execute_field(request: t.Tests.FixtureRequest) -> str:
     """Return an expected field exposed by the public execute payload."""
     return str(request.param)
 
 
-@pytest.fixture
+@u.Tests.fixture
 def meltano_project_dir() -> Generator[Path]:
     """Temporary Meltano project directory for testing.
 
@@ -68,7 +68,7 @@ def meltano_project_dir() -> Generator[Path]:
         yield project_dir
 
 
-@pytest.fixture
+@u.Tests.fixture
 def meltano_yml_config() -> t.JsonMapping:
     """Sample pipeline.yml configuration for testing.
 
@@ -132,7 +132,7 @@ def meltano_yml_config() -> t.JsonMapping:
     }
 
 
-@pytest.fixture
+@u.Tests.fixture
 def meltano_project(
     meltano_project_dir: Path,
     meltano_yml_config: t.JsonMapping,
@@ -155,7 +155,7 @@ def meltano_project(
     }
 
 
-@pytest.fixture
+@u.Tests.fixture
 def singer_state() -> t.JsonMapping:
     """Sample Singer state for testing.
 
@@ -176,7 +176,7 @@ def singer_state() -> t.JsonMapping:
     }
 
 
-@pytest.fixture
+@u.Tests.fixture
 def docker_manager() -> FlextTestsDocker:
     """Docker manager fixture for Docker-based tests.
 
@@ -196,11 +196,11 @@ def docker_manager() -> FlextTestsDocker:
     )
 
 
-_DOCKER_MANAGER_KEY: pytest.StashKey[FlextTestsDocker] = pytest.StashKey()
+_DOCKER_MANAGER_KEY: t.Tests.StashKey[FlextTestsDocker] = pytest.StashKey()
 
 
-@pytest.fixture(scope="session")
-def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
+@u.Tests.fixture(scope="session")
+def _docker_stack_release(request: t.Tests.FixtureRequest) -> Generator[None]:
     """Tear the leased docker stack down once after the whole session."""
     yield
     manager = request.config.stash.get(_DOCKER_MANAGER_KEY, None)
@@ -208,11 +208,11 @@ def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
         _ = manager.down()
 
 
-@pytest.fixture
+@u.Tests.fixture
 def docker_services(
     docker_manager: FlextTestsDocker,
     _docker_stack_release: None,
-    request: pytest.FixtureRequest,
+    request: t.Tests.FixtureRequest,
 ) -> FlextTestsDocker:
     """Function-scoped Docker services fixture over the leased stack.
 
@@ -235,11 +235,11 @@ def require_docker_service(
     """Return a ready Docker service endpoint or skip the test."""
     ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
-        pytest.skip(f"{service_name} service not available")
+        u.Tests.skip(f"{service_name} service not available")
     return f"{c.Meltano.Tests.HOST}:{port}"
 
 
-@pytest.fixture
+@u.Tests.fixture
 def postgres_service(docker_services: FlextTestsDocker) -> str:
     """PostgreSQL service fixture.
 
@@ -254,7 +254,7 @@ def postgres_service(docker_services: FlextTestsDocker) -> str:
     )
 
 
-@pytest.fixture
+@u.Tests.fixture
 def redis_service(docker_services: FlextTestsDocker) -> str:
     """Redis service fixture.
 
@@ -265,7 +265,7 @@ def redis_service(docker_services: FlextTestsDocker) -> str:
     return require_docker_service(docker_services, c.Meltano.Tests.REDIS_PORT, "Redis")
 
 
-@pytest.fixture
+@u.Tests.fixture
 def meltano_service(docker_services: FlextTestsDocker) -> str:
     """Meltano service fixture.
 
@@ -275,11 +275,11 @@ def meltano_service(docker_services: FlextTestsDocker) -> str:
     """
     info = docker_services.fetch_container_info(c.Meltano.Tests.PRIMARY_CONTAINER_NAME)
     if info.failure:
-        pytest.skip(f"Meltano container unavailable: {info.error}")
+        u.Tests.skip(f"Meltano container unavailable: {info.error}")
     host_port = info.value.ports.get(f"{c.Meltano.Tests.MELTANO_PORT}/tcp")
     if host_port is None:
-        pytest.skip("Meltano service host port is not published")
+        u.Tests.skip("Meltano service host port is not published")
     ready = docker_services.wait_for_port_ready(c.Meltano.Tests.HOST, int(host_port))
     if ready.failure or not ready.value:
-        pytest.skip("Meltano service not available")
+        u.Tests.skip("Meltano service not available")
     return f"{c.Meltano.Tests.HOST}:{host_port}"

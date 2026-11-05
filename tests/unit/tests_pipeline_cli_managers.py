@@ -12,11 +12,10 @@ import time
 from multiprocessing.process import BaseProcess
 from pathlib import Path
 
-import pytest
 from flext_cli import cli as flext_cli
 
 from flext_meltano import FlextMeltanoCli
-from tests import c, m, p, tm, u
+from tests import c, m, p, t, tm, u
 
 
 class TestsFlextMeltanoPipelineCliManagers:
@@ -27,7 +26,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         meltano_cli: FlextMeltanoCli,
         pipeline_name: str,
         config_json: str,
-        capsys: pytest.CaptureFixture[str],
+        capsys: t.Tests.CaptureFixture[str],
     ) -> p.Result[bool]:
         """Create a pipeline through the real CLI, draining captured output.
 
@@ -46,7 +45,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         capsys.readouterr()
         return result
 
-    @pytest.fixture
+    @u.Tests.fixture
     def meltano_cli() -> FlextMeltanoCli:
         """Provide the public CLI facade used by every command scenario.
 
@@ -98,7 +97,7 @@ class TestsFlextMeltanoPipelineCliManagers:
     @staticmethod
     def test_pipeline_help_request_lists_subcommands(
         meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        capsys: t.Tests.CaptureFixture[str],
     ) -> None:
         """Pipeline help exposes the model-driven subcommands."""
         result = meltano_cli.run([
@@ -117,7 +116,7 @@ class TestsFlextMeltanoPipelineCliManagers:
 
     def test_pipeline_create_list_run_and_delete_use_real_storage(
         self,
-        capsys: pytest.CaptureFixture[str],
+        capsys: t.Tests.CaptureFixture[str],
         tmp_path: Path,
     ) -> None:
         """Pipeline lifecycle commands persist and execute through real helpers."""
@@ -189,7 +188,7 @@ class TestsFlextMeltanoPipelineCliManagers:
 
     def test_pipeline_create_requires_runtime_configuration(
         self,
-        capsys: pytest.CaptureFixture[str],
+        capsys: t.Tests.CaptureFixture[str],
         tmp_path: Path,
     ) -> None:
         """Pipeline creation without JSON config fails on the real handler path."""
@@ -212,7 +211,7 @@ class TestsFlextMeltanoPipelineCliManagers:
 
     def test_pipeline_status_and_stop_use_real_pid_files(
         self,
-        capsys: pytest.CaptureFixture[str],
+        capsys: t.Tests.CaptureFixture[str],
         tmp_path: Path,
     ) -> None:
         """Status and stop commands inspect a real background process pid file."""

@@ -10,9 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
-from tests import meltano, tm
+from tests import c, meltano, tm
 
 
 class TestsFlextMeltanoTargetAbstractions:
@@ -30,7 +28,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(service.transformation_name, none=True)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "sink_name",
         ["target-jsonl", "target-postgres", "target-snowflake"],
     )

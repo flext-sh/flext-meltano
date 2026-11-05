@@ -8,17 +8,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 from flext_cli import config as cli_config
 
 from flext_meltano import FlextMeltanoConfig, config, settings
-from tests import m, meltano, tm, u
+from tests import c, m, meltano, tm, u
 
 
 class TestsFlextMeltanoServiceSettingsContract:
     """Tests for the settings contract of ``FlextMeltanoServiceBase`` services."""
 
-    pytestmark = pytest.mark.unit
+    pytestmark = c.Tests.MARK.unit
 
     class YamlConfig(FlextMeltanoConfig):
         """Real config subclass consuming the typed SSOT round-trip payload."""

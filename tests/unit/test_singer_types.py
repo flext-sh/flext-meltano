@@ -11,9 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
-from tests import TestsFlextMeltanoTypes, t, tm
+from tests import TestsFlextMeltanoTypes, c, t, tm
 
 
 class TestsFlextMeltanoTypesSinger:
@@ -43,13 +41,13 @@ class TestsFlextMeltanoTypesSinger:
         tm.that(hasattr(t.Meltano, "Tests"), truth=True)
 
     @staticmethod
-    @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
+    @c.Tests.MARK.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
     def test_meltano_exposes_public_type_alias(alias_name: str) -> None:
         """Each documented Singer/Meltano type alias is publicly reachable."""
         tm.that(hasattr(t.Meltano, alias_name), truth=True)
 
     @staticmethod
-    @pytest.mark.parametrize(("alias_name", "value_fragment"), _MELTANO_TYPE_ALIASES)
+    @c.Tests.MARK.parametrize(("alias_name", "value_fragment"), _MELTANO_TYPE_ALIASES)
     def test_type_alias_resolves_to_expected_value(
         alias_name: str,
         value_fragment: str,
@@ -60,7 +58,7 @@ class TestsFlextMeltanoTypesSinger:
         tm.that(str(alias.__value__), has=value_fragment)
 
     @staticmethod
-    @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
+    @c.Tests.MARK.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
     def test_type_alias_access_is_idempotent(alias_name: str) -> None:
         """Repeated access yields the same stable alias object (no rebuild)."""
         tm.that(

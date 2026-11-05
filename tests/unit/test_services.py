@@ -6,15 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
 from tests import c, meltano, tm
 
 
 class TestsFlextMeltanoServices:
     """Tests for ``FlextMeltanoServices``."""
 
-    pytestmark = pytest.mark.unit
+    pytestmark = c.Tests.MARK.unit
 
     @staticmethod
     def test_component_factory_returns_specialized_facade(
@@ -45,7 +43,7 @@ class TestsFlextMeltanoServices:
         tm.that(service.service_version, eq=c.Meltano.DEFAULT_SERVICE_VERSION)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("component_kind", "component_name"),
         [("tap", "tap-postgres"), ("target", "target-postgres"), ("dbt", "warehouse")],
         ids=["tap", "target", "dbt"],

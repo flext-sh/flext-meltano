@@ -8,14 +8,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from flext_meltano import t
+
 if TYPE_CHECKING:
     from flext_cli import p
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
-
-from flext_meltano.typings import t
 
 
 class FlextMeltanoProtocolsBase:

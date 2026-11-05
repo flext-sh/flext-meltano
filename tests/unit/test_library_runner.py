@@ -10,12 +10,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
-from tests import c, meltano, p, tm
+from tests import c, meltano, p, tm, u
 
 
-@pytest.mark.docker
+@c.Tests.MARK.docker
 class TestsFlextMeltanoLibraryRunner:
     """Assert the public library-runner contract via the ``meltano`` facade."""
 
@@ -29,7 +27,7 @@ class TestsFlextMeltanoLibraryRunner:
         "execution_time",
     )
 
-    @pytest.fixture(scope="class")
+    @u.Tests.fixture(scope="class")
     def dbt_result() -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run one DBT transformation once and share its typed outcome.
 
@@ -47,7 +45,7 @@ class TestsFlextMeltanoLibraryRunner:
         tm.ok(dbt_result)
 
     @staticmethod
-    @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
+    @c.Tests.MARK.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
     def test_dbt_result_exposes_command_execution_fields(
         dbt_result: p.Result[p.Meltano.CommandExecutionResult],
         attribute: str,
