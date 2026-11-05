@@ -18,9 +18,7 @@ from typing import override
 
 from singer_sdk import Stream, Tap
 
-from flext_meltano.models import m
-from flext_meltano.protocols import p
-from flext_meltano.typings import t
+from flext_meltano import m, p, t
 
 
 class FlextMeltanoDeclarativeTap:

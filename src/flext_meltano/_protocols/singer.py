@@ -11,8 +11,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano.constants import c
-from flext_meltano.typings import t
+from flext_meltano import c, t
 
 if TYPE_CHECKING:
     from flext_cli import p

@@ -9,8 +9,6 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-import pytest
-
 from tests import c, m, p, tm, u
 
 
@@ -53,7 +51,7 @@ class TestsFlextMeltanoExecutionResult:
         )
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "case",
         [
             (
@@ -105,7 +103,7 @@ class TestsFlextMeltanoExecutionResult:
         )
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "case",
         [
             (

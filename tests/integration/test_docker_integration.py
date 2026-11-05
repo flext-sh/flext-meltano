@@ -18,7 +18,7 @@ import pytest
 import redis
 from flext_tests.docker import FlextTestsDocker
 
-from tests import c, tm
+from tests import c, tm, u
 
 
 class TestsFlextMeltanoDockerIntegration:
@@ -56,8 +56,8 @@ class TestsFlextMeltanoDockerIntegration:
         )
 
     @staticmethod
-    @pytest.mark.docker
-    @pytest.mark.integration
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
     def test_postgres_service_endpoint_is_published(
         postgres_service: str,
     ) -> None:
@@ -65,15 +65,15 @@ class TestsFlextMeltanoDockerIntegration:
         tm.that(postgres_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.POSTGRES_PORT}")
 
     @staticmethod
-    @pytest.mark.docker
-    @pytest.mark.integration
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
     def test_redis_service_endpoint_is_published(redis_service: str) -> None:
         """Redis fixture yields the published host:port endpoint."""
         tm.that(redis_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.REDIS_PORT}")
 
     @staticmethod
-    @pytest.mark.docker
-    @pytest.mark.integration
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
     def test_meltano_service_endpoint_has_valid_port(
         meltano_service: str,
     ) -> None:
@@ -83,8 +83,8 @@ class TestsFlextMeltanoDockerIntegration:
         tm.that(int(port), gt=0)
 
     @staticmethod
-    @pytest.mark.docker
-    @pytest.mark.integration
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
     def test_ready_probe_returns_boolean_result_for_each_service(
         docker_services: FlextTestsDocker,
     ) -> None:
@@ -92,16 +92,16 @@ class TestsFlextMeltanoDockerIntegration:
         postgres_ready = docker_services.ready(port=c.Meltano.Tests.POSTGRES_PORT)
         redis_ready = docker_services.ready(port=c.Meltano.Tests.REDIS_PORT)
         if postgres_ready.failure or redis_ready.failure:
-            pytest.skip("Docker readiness probe unavailable")
+            u.Tests.skip("Docker readiness probe unavailable")
         tm.that(postgres_ready.value, is_=bool)
         tm.that(redis_ready.value, is_=bool)
         if not (postgres_ready.value and redis_ready.value):
-            pytest.skip("Docker services not fully ready")
+            u.Tests.skip("Docker services not fully ready")
 
     @staticmethod
-    @pytest.mark.docker
-    @pytest.mark.integration
-    @pytest.mark.slow
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
+    @c.Tests.MARK.slow
     def test_manual_stack_lifecycle_starts_and_stops_successfully(
         docker_manager: FlextTestsDocker,
     ) -> None:
@@ -113,16 +113,16 @@ class TestsFlextMeltanoDockerIntegration:
             postgres_ready = docker_manager.ready(port=c.Meltano.Tests.POSTGRES_PORT)
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
-                pytest.skip("PostgreSQL service not available")
+                u.Tests.skip("PostgreSQL service not available")
             tm.that(postgres_ready.value, is_=bool)
         finally:
             stop_result = docker_manager.down()
             if should_assert_stop:
                 tm.ok(stop_result)
 
-    @pytest.mark.docker
-    @pytest.mark.integration
-    @pytest.mark.usefixtures("postgres_service")
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
+    @c.Tests.MARK.usefixtures("postgres_service")
     def test_postgres_round_trips_inserted_row(self) -> None:
         """A row written to PostgreSQL is read back unchanged (real round-trip)."""
         conn: psycopg2.extensions.connection | None = None
@@ -147,9 +147,9 @@ class TestsFlextMeltanoDockerIntegration:
             pytest.fail("PostgreSQL round-trip returned no row")
         tm.that(result[1], eq="test_record")
 
-    @pytest.mark.docker
-    @pytest.mark.integration
-    @pytest.mark.usefixtures("redis_service")
+    @c.Tests.MARK.docker
+    @c.Tests.MARK.integration
+    @c.Tests.MARK.usefixtures("redis_service")
     def test_redis_round_trips_string_and_list_values(self) -> None:
         """Values written to Redis are read back unchanged (real round-trip)."""
         client: redis.Redis[bytes] | None = None

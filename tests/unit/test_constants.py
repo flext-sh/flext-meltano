@@ -12,8 +12,6 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-import pytest
-
 from tests import c, tm
 
 
@@ -21,7 +19,7 @@ class TestsFlextMeltanoConstantsUnit:
     """Public-contract test suite for c.Meltano constants."""
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("member", "expected"),
         [
             ("EXTRACTORS", "extractors"),

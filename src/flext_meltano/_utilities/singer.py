@@ -13,17 +13,10 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 
-from flext_meltano.constants import c
-from flext_meltano.exceptions import e
-from flext_meltano.models import m
-from flext_meltano.result import r
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
+from flext_cli import e, r, u
 
-if TYPE_CHECKING:
-    from flext_meltano import p
+from flext_meltano import c, m, p, t
 
 
 class FlextMeltanoUtilitiesSinger:

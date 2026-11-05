@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_meltano.constants import c
-from flext_meltano.protocols import p
-from flext_meltano.result import r
+from flext_meltano import c, p, r, t, u
 from flext_meltano.services import (
     FlextMeltanoAbstractions,
     FlextMeltanoExecutor,
@@ -19,8 +17,6 @@ from flext_meltano.services import (
     FlextMeltanoService,
 )
 from flext_meltano.services.consumer_bases import FlextMeltanoConsumerBases
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
 
 
 class FlextMeltano(

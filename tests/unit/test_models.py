@@ -11,7 +11,6 @@ from collections.abc import MutableMapping
 from operator import methodcaller
 from types import MappingProxyType
 
-import pytest
 from jsonschema import Draft202012Validator, ValidationError, validate
 
 from tests import c, m, t, tm, u
@@ -24,7 +23,7 @@ class TestsFlextMeltanoModelsUnit:
         """Public contract for normalized, read-only pipeline ingress."""
 
         @staticmethod
-        @pytest.mark.parametrize(
+        @c.Tests.MARK.parametrize(
             "values",
             [
                 {"extractor_name": "tap-example"},
@@ -84,7 +83,7 @@ class TestsFlextMeltanoModelsUnit:
             tm.that(settings.tap_version, eq="1.0.0")
 
         @staticmethod
-        @pytest.mark.parametrize("blank_tap_type", ["", "   "])
+        @c.Tests.MARK.parametrize("blank_tap_type", ["", "   "])
         def test_tap_config_rejects_blank_tap_type(blank_tap_type: str) -> None:
             """Test tap config rejects blank tap type."""
             with u.Tests.raises(c.ValidationError, match="tap_type cannot be empty"):
@@ -240,7 +239,7 @@ class TestsFlextMeltanoModelsUnit:
             tm.that(option["token"], eq=marker)
 
         @staticmethod
-        @pytest.mark.parametrize("supplied", [False, True])
+        @c.Tests.MARK.parametrize("supplied", [False, True])
         def test_readonly_stream_config_serialization_roundtrip(
             *,
             supplied: bool,

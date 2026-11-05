@@ -6,15 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
-from tests import meltano, tm
+from tests import c, meltano, tm
 
 
 class TestsFlextMeltanoApi:
     """Behavioral test suite for the public Meltano facade."""
 
-    pytestmark = pytest.mark.unit
+    pytestmark = c.Tests.MARK.unit
 
     @staticmethod
     def test_public_facade_contract() -> None:

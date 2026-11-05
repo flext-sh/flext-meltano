@@ -13,8 +13,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
 from tests import c, m, t, tm, u
 
 
@@ -22,7 +20,7 @@ class TestsFlextMeltanoTypingsUnit:
     """Behavioral contract for the flat ``t.Meltano`` namespace and models."""
 
     @staticmethod
-    @pytest.mark.parametrize("dbt_type_name", ["DbtProject"])
+    @c.Tests.MARK.parametrize("dbt_type_name", ["DbtProject"])
     def test_dbt_types_are_flat_members_of_meltano_namespace(
         dbt_type_name: str,
     ) -> None:
@@ -31,7 +29,7 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(getattr(t.Meltano, dbt_type_name), none=False)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "composition_type_name",
         [
             "NestedStrMapping",
@@ -57,7 +55,7 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(len(composed), eq=2)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "legacy_namespace",
         ["Singer", "Dbt", "Project", "Pipeline", "Bridge", "CLI", "ELT", "Processing"],
     )
@@ -66,7 +64,7 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(not hasattr(t.Meltano, legacy_namespace), truth=True)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "removed_alias",
         [
             "MeltanoConfigDict",
@@ -103,7 +101,7 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(not hasattr(t.Meltano, "JsonMapping"), truth=True)
 
     @staticmethod
-    @pytest.mark.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
+    @c.Tests.MARK.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
     def test_runtime_singer_sdk_wrappers_live_on_models_not_typings(
         wrapper_name: str,
     ) -> None:
