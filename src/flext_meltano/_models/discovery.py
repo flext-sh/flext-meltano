@@ -12,8 +12,8 @@ from typing import Annotated
 
 from flext_cli import m
 
-from flext_meltano import t
 from flext_meltano._models import FlextMeltanoModelsCore
+from flext_meltano.typings import t
 
 
 class FlextMeltanoModelsDiscovery:

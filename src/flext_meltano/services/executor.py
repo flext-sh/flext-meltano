@@ -6,8 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import c, p, r, t
+from flext_meltano.constants import c
+from flext_meltano.protocols import p
+from flext_meltano.result import r
 from flext_meltano.services import FlextMeltanoExecutorBase
+from flext_meltano.typings import t
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):

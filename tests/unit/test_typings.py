@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests import c, m, t, tm
+from tests import c, m, t, tm, u
 
 
 class TestsFlextMeltanoTypingsUnit:
@@ -156,5 +156,5 @@ class TestsFlextMeltanoTypingsUnit:
     @staticmethod
     def test_singer_catalog_entry_rejects_missing_required_fields() -> None:
         """Constructing without required fields raises a validation error."""
-        with pytest.raises(m.ValidationError):
+        with u.Tests.raises(m.ValidationError):
             m.Meltano.SingerCatalogEntry.model_validate({})

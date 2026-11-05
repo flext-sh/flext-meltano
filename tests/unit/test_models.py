@@ -39,7 +39,7 @@ class TestsFlextMeltanoModelsUnit:
             payload = m.Meltano.ConfigMappingPayload.model_validate({"values": values})
             tm.that(payload.values, eq=values)
             tm.that(isinstance(payload.values, MappingProxyType), truth=True)
-            with pytest.raises(AttributeError, match=c.MergeStrategy.UPDATE):
+            with u.Tests.raises(AttributeError, match=c.MergeStrategy.UPDATE):
                 methodcaller(c.MergeStrategy.UPDATE, {"unexpected": True})(
                     payload.values
                 )
@@ -87,7 +87,7 @@ class TestsFlextMeltanoModelsUnit:
         @pytest.mark.parametrize("blank_tap_type", ["", "   "])
         def test_tap_config_rejects_blank_tap_type(blank_tap_type: str) -> None:
             """Test tap config rejects blank tap type."""
-            with pytest.raises(c.ValidationError, match="tap_type cannot be empty"):
+            with u.Tests.raises(c.ValidationError, match="tap_type cannot be empty"):
                 m.Meltano.TapConfig(
                     tap_type=blank_tap_type,
                     connection_config={"host": "localhost"},
@@ -96,7 +96,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_tap_config_rejects_empty_connection_config() -> None:
             """Test tap config rejects empty connection config."""
-            with pytest.raises(
+            with u.Tests.raises(
                 c.ValidationError,
                 match="Connection configuration cannot be empty",
             ):
@@ -105,7 +105,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_tap_config_rejects_non_mapping_connection_config() -> None:
             """Test tap config rejects non mapping connection config."""
-            with pytest.raises(c.ValidationError, match="valid dictionary"):
+            with u.Tests.raises(c.ValidationError, match="valid dictionary"):
                 m.Meltano.TapConfig.model_validate({
                     "tap_type": "tap-postgres",
                     "connection_config": "invalid",
@@ -156,13 +156,13 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_target_config_rejects_blank_target_type() -> None:
             """Test target config rejects blank target type."""
-            with pytest.raises(c.ValidationError, match="target_type cannot be empty"):
+            with u.Tests.raises(c.ValidationError, match="target_type cannot be empty"):
                 m.Meltano.TargetConfig(target_type="")
 
         @staticmethod
         def test_target_config_rejects_non_integer_batch_size() -> None:
             """Test target config rejects non integer batch size."""
-            with pytest.raises(c.ValidationError, match="valid integer"):
+            with u.Tests.raises(c.ValidationError, match="valid integer"):
                 m.Meltano.TargetConfig.model_validate({
                     "target_type": "target-csv",
                     "batch_size": "invalid",
@@ -266,7 +266,7 @@ class TestsFlextMeltanoModelsUnit:
                 )
                 for stream_config in (config.stream_config, restored.stream_config):
                     tm.that(not isinstance(stream_config, MutableMapping), truth=True)
-                    with pytest.raises(AttributeError, match=c.MergeStrategy.UPDATE):
+                    with u.Tests.raises(AttributeError, match=c.MergeStrategy.UPDATE):
                         methodcaller(c.MergeStrategy.UPDATE, {"users": "changed"})(
                             stream_config
                         )
@@ -320,7 +320,7 @@ class TestsFlextMeltanoModelsUnit:
                     [{"id": 1}],
                 )
                 for invalid in invalid_records:
-                    with pytest.raises(ValidationError):
+                    with u.Tests.raises(ValidationError):
                         validate(invalid, schema, cls=Draft202012Validator)
             tm.that(stream.stream_schema, eq=schema_input)
             tm.that(schema_input, lacks="type")
@@ -362,7 +362,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_stream_info_rejects_empty_stream_name() -> None:
             """Test stream info rejects empty stream name."""
-            with pytest.raises(c.ValidationError, match="at least 1 character"):
+            with u.Tests.raises(c.ValidationError, match="at least 1 character"):
                 m.Meltano.StreamInfo(
                     stream_name="",
                     stream_schema={"type": "object"},
@@ -372,7 +372,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_stream_info_rejects_records_without_batches() -> None:
             """Test stream info rejects records without batches."""
-            with pytest.raises(
+            with u.Tests.raises(
                 c.ValidationError,
                 match="Records loaded but no batches processed",
             ):
@@ -387,7 +387,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_stream_info_rejects_unknown_status() -> None:
             """Test stream info rejects unknown status."""
-            with pytest.raises(c.ValidationError, match="Status must be one of"):
+            with u.Tests.raises(c.ValidationError, match="Status must be one of"):
                 m.Meltano.StreamInfo(
                     stream_name="users",
                     stream_schema={"type": "object"},
@@ -398,7 +398,7 @@ class TestsFlextMeltanoModelsUnit:
         @staticmethod
         def test_stream_info_rejects_non_mapping_schema() -> None:
             """Test stream info rejects non mapping schema."""
-            with pytest.raises(c.ValidationError, match="valid dictionary"):
+            with u.Tests.raises(c.ValidationError, match="valid dictionary"):
                 m.Meltano.StreamInfo.model_validate({
                     "stream_name": "users",
                     "stream_schema": "invalid",

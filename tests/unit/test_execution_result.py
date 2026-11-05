@@ -11,7 +11,7 @@ from collections.abc import Sequence
 
 import pytest
 
-from tests import c, m, p, tm
+from tests import c, m, p, tm, u
 
 
 class TestsFlextMeltanoExecutionResult:
@@ -178,7 +178,7 @@ class TestsFlextMeltanoExecutionResult:
     @staticmethod
     def test_negative_execution_time_is_rejected() -> None:
         """The non-negative execution-time invariant is enforced on construction."""
-        with pytest.raises(m.ValidationError):
+        with u.Tests.raises(m.ValidationError):
             m.Meltano.CommandExecutionResult(
                 command=["meltano", "run"],
                 success=True,

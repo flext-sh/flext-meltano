@@ -11,8 +11,9 @@ from typing import Annotated, Self
 
 from flext_cli import m
 
-from flext_meltano import c, t
 from flext_meltano._models import FlextMeltanoModelsSources
+from flext_meltano.constants import c
+from flext_meltano.typings import t
 
 
 class FlextMeltanoModelsInstances:

@@ -10,9 +10,11 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from flext_cli import u
-
-from flext_meltano import c, m, p, t
+from flext_meltano.constants import c
+from flext_meltano.models import m
+from flext_meltano.protocols import p
+from flext_meltano.typings import t
+from flext_meltano.utilities import u
 
 if TYPE_CHECKING:
     from meltano.core.plugin.base import PluginType as MeltanoPluginType

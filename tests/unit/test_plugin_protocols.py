@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests import c, m, t, tm
+from tests import c, m, t, tm, u
 
 
 class TestsFlextMeltanoProtocolsPlugin:
@@ -172,7 +172,7 @@ class TestsFlextMeltanoProtocolsPlugin:
         payload: t.JsonMapping,
     ) -> None:
         """Omitting any required entry field fails validation for that field."""
-        with pytest.raises(m.ValidationError) as excinfo:
+        with u.Tests.raises(m.ValidationError) as excinfo:
             m.Meltano.SingerCatalogEntry.model_validate(payload)
 
         reported = {

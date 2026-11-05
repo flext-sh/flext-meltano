@@ -40,7 +40,7 @@ class TestsFlextMeltanoServiceSettingsContract:
         tm.that(cli_config is not current, truth=True)
         before = current.model_dump()
         for field_name, value in before.items():
-            with pytest.raises(m.ValidationError, match="frozen_instance"):
+            with u.Tests.raises(m.ValidationError, match="frozen_instance"):
                 setattr(current, field_name, value)
         tm.that(current.model_dump(), eq=before)
 
@@ -82,7 +82,7 @@ class TestsFlextMeltanoServiceSettingsContract:
                 tm.that(loaded is not config, truth=True)
                 tm.that(loaded.model_dump(), eq=expected.model_dump())
                 for field_name, value in loaded.model_dump().items():
-                    with pytest.raises(m.ValidationError, match="frozen_instance"):
+                    with u.Tests.raises(m.ValidationError, match="frozen_instance"):
                         setattr(loaded, field_name, value)
             finally:
                 owner.reset_for_testing()
