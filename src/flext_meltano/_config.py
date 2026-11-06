@@ -15,18 +15,21 @@ from typing import Annotated
 
 from flext_cli import FlextCliConfig, m
 
-from flext_meltano._models.config import FlextMeltanoModelsConfig
-
 
 class FlextMeltanoConfig(FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
+    class MeltanoNamespace(m.FrozenModel):
+        """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
+
+        model_config = m.ConfigDict(extra="allow", frozen=True)
+
     Meltano: Annotated[
-        FlextMeltanoModelsConfig.MeltanoNamespace,
+        MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = FlextMeltanoModelsConfig.MeltanoNamespace()
+    ] = MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()

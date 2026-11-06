@@ -62,7 +62,7 @@ documentation.
 
 ### Core Components
 
-```
+```text
 📚 Documentation Maintenance System
 ├── 🔍 scripts/documentation/audit.py      # Core audit engine (workspace SSOT)
 ├── ✅ scripts/documentation/validate.py    # Validation gate engine (workspace SSOT)
@@ -457,6 +457,15 @@ Extend the system with custom validation rules:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # scripts/custom_validators.py
 from docs_maintenance import DocumentationAuditor
 
@@ -511,4 +520,4 @@ auditor.generate_custom_report("api_quality.md")
 ---
 
 **Documentation Maintenance Framework v1.0.0**
-_Ensuring FLEXT-Meltano documentation excellence through automated quality assurance._
+*Ensuring FLEXT-Meltano documentation excellence through automated quality assurance.*

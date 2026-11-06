@@ -58,7 +58,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Problem**: Module import failures
 
-```
+```text
 ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
 ```
 
@@ -86,11 +86,20 @@ make check
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # Ensure proper type hints
 # Use concrete union types: t.JsonMapping | None
 
 
-def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
+def process_data(data: dict) -> p.Result[Optional[p.Dict]]:
     # Implementation
     pass
 ```
@@ -219,6 +228,15 @@ make check
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # ❌ Incorrect
 def risky_operation():
@@ -230,7 +248,7 @@ def risky_operation():
 
 
 # ✅ Correct
-def safe_operation() -> p.Result[m.Dict]:
+def safe_operation() -> p.Result[p.Dict]:
     try:
         # operation
         return r.ok(data)
@@ -245,6 +263,15 @@ def safe_operation() -> p.Result[m.Dict]:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # ❌ Incorrect
 class UtilityClass:
@@ -257,7 +284,7 @@ class UtilityClass:
 
 
 class FlextMeltanoUtilityService(s):
-    def do_something(self) -> p.Result[m.Dict]:
+    def do_something(self) -> p.Result[p.Dict]:
         # Implementation with proper error handling
         pass
 ```

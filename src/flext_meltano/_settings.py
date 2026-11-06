@@ -11,11 +11,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Annotated, ClassVar
 
+from flext_cli import c
 from flext_core import FlextSettings, m
-
-from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 
 class FlextMeltanoSettings(FlextSettings):
@@ -23,6 +23,20 @@ class FlextMeltanoSettings(FlextSettings):
 
     Fields under ``settings.Meltano.*``.
     """
+
+    ENVIRONMENT_ALIASES: ClassVar[MappingProxyType[str, str]] = MappingProxyType({
+        "dev": c.Environment.DEVELOPMENT.value,
+        "test": c.Environment.TESTING.value,
+        "prod": c.Environment.PRODUCTION.value,
+    })
+    """Short environment aliases accepted by the ``environment`` setting."""
+
+    SETTINGS_ENVIRONMENTS: ClassVar[tuple[str, ...]] = (
+        c.Environment.DEVELOPMENT.value,
+        c.Environment.TESTING.value,
+        c.Environment.PRODUCTION.value,
+    )
+    """Environment names the ``environment`` setting accepts."""
 
     # Why: pydantic_settings is owned by flext-core; route SettingsConfigDict
     # through the m facade instead of importing the third-party package
@@ -103,16 +117,12 @@ class FlextMeltanoSettings(FlextSettings):
         @classmethod
         def _validate_environment(cls, value: str) -> str:
             normalized = value.strip().lower()
-            aliased = FlextMeltanoConstantsSettings.ENVIRONMENT_ALIASES.get(normalized)
+            aliased = FlextMeltanoSettings.ENVIRONMENT_ALIASES.get(normalized)
             if aliased is not None:
-                return str(aliased.value)
-            if normalized in {
-                env.value for env in FlextMeltanoConstantsSettings.SETTINGS_ENVIRONMENTS
-            }:
+                return aliased
+            if normalized in FlextMeltanoSettings.SETTINGS_ENVIRONMENTS:
                 return normalized
-            allowed = ", ".join(
-                env.value for env in FlextMeltanoConstantsSettings.SETTINGS_ENVIRONMENTS
-            )
+            allowed = ", ".join(FlextMeltanoSettings.SETTINGS_ENVIRONMENTS)
             msg = f"Environment must be one of: {allowed}"
             raise ValueError(msg)
 

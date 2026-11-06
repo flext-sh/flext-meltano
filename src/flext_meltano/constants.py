@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano constants.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -6,14 +7,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliConstants
+from flext_cli import c as flext_cli_c
 
-from flext_meltano._constants._base_parts import FlextMeltanoConstantsEnums
-from flext_meltano._constants.base import FlextMeltanoConstantsBase
-from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
+from flext_meltano._constants import (
+    FlextMeltanoConstantsBase,
+    FlextMeltanoConstantsEnums,
+    FlextMeltanoConstantsSettings,
+)
 
 
-class FlextMeltanoConstants(FlextCliConstants):
+class FlextMeltanoConstants(
+    flext_cli_c,
+    FlextMeltanoConstantsBase,
+    FlextMeltanoConstantsEnums,
+):
     """Domain constants for the flext-meltano package."""
 
     class Meltano(

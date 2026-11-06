@@ -7,24 +7,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from flext_core.lazy import install_lazy_exports
 
-from flext_meltano.__version__ import __version__
-
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
 
-    from flext_meltano import (
-        _constants,
-        _models,
-        _protocols,
-        _typings,
-        _utilities,
-        services,
-    )
     from flext_meltano.__version__ import (
         FlextMeltanoVersion,
         __author__,
@@ -33,6 +22,7 @@ if TYPE_CHECKING:
         __license__,
         __title__,
         __url__,
+        __version__,
         __version_info__,
     )
     from flext_meltano._config import FlextMeltanoConfig, config
@@ -45,9 +35,12 @@ if TYPE_CHECKING:
     from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
     from flext_meltano.protocols import FlextMeltanoProtocols, p
     from flext_meltano.service_bases import (
+        FlextMeltanoAbstractions,
         FlextMeltanoDbtServiceBase,
         FlextMeltanoLibraryRunner,
+        FlextMeltanoSingerTapAdapter,
         FlextMeltanoTapServiceBase,
+        FlextMeltanoTargetAbstractions,
         FlextMeltanoTargetServiceBase,
     )
     from flext_meltano.typings import FlextMeltanoTypes, t
@@ -56,6 +49,7 @@ if TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "FlextMeltano",
+    "FlextMeltanoAbstractions",
     "FlextMeltanoCli",
     "FlextMeltanoConfig",
     "FlextMeltanoConstants",
@@ -66,7 +60,9 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoProtocols",
     "FlextMeltanoServiceBase",
     "FlextMeltanoSettings",
+    "FlextMeltanoSingerTapAdapter",
     "FlextMeltanoTapServiceBase",
+    "FlextMeltanoTargetAbstractions",
     "FlextMeltanoTargetServiceBase",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
@@ -79,11 +75,6 @@ __all__: tuple[str, ...] = (
     "__url__",
     "__version__",
     "__version_info__",
-    "_constants",
-    "_models",
-    "_protocols",
-    "_typings",
-    "_utilities",
     "c",
     "config",
     "d",
@@ -95,7 +86,6 @@ __all__: tuple[str, ...] = (
     "p",
     "r",
     "s",
-    "services",
     "settings",
     "t",
     "u",
@@ -105,8 +95,9 @@ __all__: tuple[str, ...] = (
 install_lazy_exports(
     __name__,
     globals(),
-    MappingProxyType({
+    {
         "FlextMeltano": ".api",
+        "FlextMeltanoAbstractions": ".service_bases",
         "FlextMeltanoCli": ".cli",
         "FlextMeltanoConfig": "._config",
         "FlextMeltanoConstants": ".constants",
@@ -117,7 +108,9 @@ install_lazy_exports(
         "FlextMeltanoProtocols": ".protocols",
         "FlextMeltanoServiceBase": ".base",
         "FlextMeltanoSettings": "._settings",
+        "FlextMeltanoSingerTapAdapter": ".service_bases",
         "FlextMeltanoTapServiceBase": ".service_bases",
+        "FlextMeltanoTargetAbstractions": ".service_bases",
         "FlextMeltanoTargetServiceBase": ".service_bases",
         "FlextMeltanoTypes": ".typings",
         "FlextMeltanoUtilities": ".utilities",
@@ -129,11 +122,6 @@ install_lazy_exports(
         "__title__": ".__version__",
         "__url__": ".__version__",
         "__version_info__": ".__version__",
-        "_constants": "._constants",
-        "_models": "._models",
-        "_protocols": "._protocols",
-        "_typings": "._typings",
-        "_utilities": "._utilities",
         "c": ".constants",
         "config": "._config",
         "d": "flext_cli",
@@ -145,11 +133,13 @@ install_lazy_exports(
         "p": ".protocols",
         "r": "flext_cli",
         "s": ".base",
-        "services": ".services",
         "settings": "._settings",
         "t": ".typings",
         "u": ".utilities",
         "x": "flext_cli",
-    }),
+    },
     public_exports=__all__,
 )
+
+if not TYPE_CHECKING:
+    from flext_meltano.__version__ import __version__

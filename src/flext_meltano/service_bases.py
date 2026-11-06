@@ -1,7 +1,7 @@
-"""Root re-exports of Singer/dbt consumer service bases.
+"""Root re-exports of the Singer/dbt service classes consumers build on.
 
 Consumer packages import these from ``flext_meltano`` (package root ABI).
-Implementations live under ``flext_meltano.services.consumer_bases``.
+Implementations live under ``flext_meltano.services``.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,20 +9,24 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano.services.consumer_bases.dbt_service_base import (
+from flext_meltano.services import (
+    FlextMeltanoAbstractions,
+    FlextMeltanoLibraryRunner,
+    FlextMeltanoSingerTapAdapter,
+    FlextMeltanoTargetAbstractions,
+)
+from flext_meltano.services.consumer_bases import (
     FlextMeltanoDbtServiceBase,
-)
-from flext_meltano.services.consumer_bases.tap_service_base import (
     FlextMeltanoTapServiceBase,
-)
-from flext_meltano.services.consumer_bases.target_service_base import (
     FlextMeltanoTargetServiceBase,
 )
-from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
 
 __all__: list[str] = [
+    "FlextMeltanoAbstractions",
     "FlextMeltanoDbtServiceBase",
     "FlextMeltanoLibraryRunner",
+    "FlextMeltanoSingerTapAdapter",
     "FlextMeltanoTapServiceBase",
+    "FlextMeltanoTargetAbstractions",
     "FlextMeltanoTargetServiceBase",
 ]

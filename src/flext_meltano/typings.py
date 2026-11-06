@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Meltano Types - Domain-specific Meltano type definitions.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -6,14 +7,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliTypes
+from flext_cli import t as flext_cli_t
 
-from flext_meltano._typings.base import FlextMeltanoTypingsBase
-from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
-from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+from flext_meltano._typings import (
+    FlextMeltanoTypingsBase,
+    FlextMeltanoTypingsDomains,
+    FlextMeltanoTypingsSinger,
+)
 
 
-class FlextMeltanoTypes(FlextCliTypes):
+class FlextMeltanoTypes(flext_cli_t):
     """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
@@ -23,11 +26,11 @@ class FlextMeltanoTypes(FlextCliTypes):
 
     class Meltano(
         FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsSinger,
         FlextMeltanoTypingsDomains,
+        FlextMeltanoTypingsSinger,
     ):
         """Meltano plugin complex types namespace."""
 
 
 t = FlextMeltanoTypes
-__all__ = ["FlextMeltanoTypes", "t"]
+__all__: list[str] = ["FlextMeltanoTypes", "t"]

@@ -113,7 +113,7 @@ Each module follows standardized documentation format:
 
 ### Primary Use Case: FLEXT Service Bridge
 
-```
+```text
 FLEXT Services → Python Bridge → Meltano CLI → Data Operations
 ```
 

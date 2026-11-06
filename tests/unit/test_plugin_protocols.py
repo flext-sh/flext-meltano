@@ -11,12 +11,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
-
-from tests import c, m, t, tm
+from tests import c, m, t, tm, u
 
 
-class TestsFlextMeltanoPluginProtocols:
+class TestsFlextMeltanoProtocolsPlugin:
     """Public-contract tests for the Meltano Singer catalog models."""
 
     # --- construction / return values -----------------------------------
@@ -25,7 +23,13 @@ class TestsFlextMeltanoPluginProtocols:
     def test_catalog_builds_entries_from_payload() -> None:
         """model_validate exposes stream identifiers on the built entries."""
         catalog = m.Meltano.SingerCatalog.model_validate({
-            "streams": [{"stream": "users", "tap_stream_id": "users", "schema": {}}],
+            "streams": [
+                {
+                    c.ProcessingMode.STREAM: "users",
+                    "tap_stream_id": "users",
+                    "schema": {},
+                }
+            ],
         })
 
         entry = catalog.streams[0]
@@ -47,17 +51,17 @@ class TestsFlextMeltanoPluginProtocols:
         tm.that(len(catalog.streams), eq=0)
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         "stream_names",
         [("users",), ("users", "orders"), ("a", "b", "c")],
     )
     def test_multiple_streams_preserve_input_order(
-        stream_names: t.VariadicTuple[str],
+        stream_names: tuple[str, ...],
     ) -> None:
         """Stream entries preserve the order of the validated payload."""
         payload: t.JsonMapping = {
             "streams": [
-                {"stream": name, "tap_stream_id": name, "schema": {}}
+                {c.ProcessingMode.STREAM: name, "tap_stream_id": name, "schema": {}}
                 for name in stream_names
             ],
         }
@@ -74,7 +78,7 @@ class TestsFlextMeltanoPluginProtocols:
         catalog = m.Meltano.SingerCatalog.model_validate({
             "streams": [
                 {
-                    "stream": "users",
+                    c.ProcessingMode.STREAM: "users",
                     "tap_stream_id": "users",
                     "schema": {"type": "object"},
                 },
@@ -87,7 +91,7 @@ class TestsFlextMeltanoPluginProtocols:
     def test_dump_by_alias_re_emits_schema_key() -> None:
         """Serializing by alias round-trips schema_definition back to 'schema'."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
-            "stream": "users",
+            c.ProcessingMode.STREAM: "users",
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         })
@@ -101,8 +105,16 @@ class TestsFlextMeltanoPluginProtocols:
         """Re-validating a by-alias dump reproduces the same public payload."""
         source: t.JsonMapping = {
             "streams": [
-                {"stream": "users", "tap_stream_id": "users", "schema": {}},
-                {"stream": "orders", "tap_stream_id": "orders", "schema": {}},
+                {
+                    c.ProcessingMode.STREAM: "users",
+                    "tap_stream_id": "users",
+                    "schema": {},
+                },
+                {
+                    c.ProcessingMode.STREAM: "orders",
+                    "tap_stream_id": "orders",
+                    "schema": {},
+                },
             ],
         }
 
@@ -117,7 +129,7 @@ class TestsFlextMeltanoPluginProtocols:
     def test_optional_entry_fields_default_to_none() -> None:
         """Unset optional entry fields expose None through the public API."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
-            "stream": "users",
+            c.ProcessingMode.STREAM: "users",
             "tap_stream_id": "users",
             "schema": {},
         })
@@ -131,7 +143,7 @@ class TestsFlextMeltanoPluginProtocols:
     def test_entry_accepts_replication_method_enum_value() -> None:
         """A supplied replication method surfaces as the typed enum value."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
-            "stream": "users",
+            c.ProcessingMode.STREAM: "users",
             "tap_stream_id": "users",
             "schema": {},
             "replication_method": "INCREMENTAL",
@@ -145,12 +157,12 @@ class TestsFlextMeltanoPluginProtocols:
     # --- error paths -----------------------------------------------------
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("omitted", "payload"),
         [
-            ("tap_stream_id", {"stream": "users", "schema": {}}),
-            ("stream", {"tap_stream_id": "users", "schema": {}}),
-            ("schema", {"stream": "users", "tap_stream_id": "users"}),
+            ("tap_stream_id", {c.ProcessingMode.STREAM: "users", "schema": {}}),
+            (c.ProcessingMode.STREAM, {"tap_stream_id": "users", "schema": {}}),
+            ("schema", {c.ProcessingMode.STREAM: "users", "tap_stream_id": "users"}),
         ],
     )
     def test_missing_required_entry_field_raises_validation_error(
@@ -158,7 +170,7 @@ class TestsFlextMeltanoPluginProtocols:
         payload: t.JsonMapping,
     ) -> None:
         """Omitting any required entry field fails validation for that field."""
-        with pytest.raises(m.ValidationError) as excinfo:
+        with u.Tests.raises(m.ValidationError) as excinfo:
             m.Meltano.SingerCatalogEntry.model_validate(payload)
 
         reported = {
@@ -189,4 +201,4 @@ class TestsFlextMeltanoPluginProtocols:
             "PluginCatalog",
             "PluginDefinition",
         ):
-            assert not hasattr(t.Meltano, legacy)
+            tm.that(not hasattr(t.Meltano, legacy), truth=True)

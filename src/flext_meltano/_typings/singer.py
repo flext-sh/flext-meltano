@@ -7,39 +7,20 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import singer_sdk.singerlib as singer_sdk_singerlib
-import singer_sdk.typing as singer_sdk_typing
-
-from flext_meltano import c
 
 
 class FlextMeltanoTypingsSinger:
     """Singer protocol type definitions.
 
-    All aliases are FLAT namespace with ``Singer`` prefix.
-    External library wrappers (singer_sdk.typing) are kept to prevent
-    direct imports by consumer projects.
+    All aliases are FLAT namespace with ``Singer`` prefix. The Singer SDK
+    typing wrappers live once on ``m.Meltano`` (flext-meltano owns singer_sdk).
     """
-
-    SingerReplicationMethod = c.Meltano.SingerReplicationMethod
 
     # Singer SDK wire-format schema. ``t.Meltano.SingerSchema`` is the PEP 695
     # alias for type positions; the tap-facing runtime class for ``isinstance``
     # and schema construction is ``m.Meltano.SingerSchema`` (flext-meltano owns
     # singer_sdk).
     type SingerSchema = singer_sdk_singerlib.Schema
-
-    # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
-    SingerArrayType = singer_sdk_typing.ArrayType
-    SingerBooleanType = singer_sdk_typing.BooleanType
-    SingerCustomType = singer_sdk_typing.CustomType
-    SingerDateTimeType = singer_sdk_typing.DateTimeType
-    SingerDateType = singer_sdk_typing.DateType
-    SingerDurationType = singer_sdk_typing.DurationType
-    SingerIntegerType = singer_sdk_typing.IntegerType
-    SingerNumberType = singer_sdk_typing.NumberType
-    SingerObjectType = singer_sdk_typing.ObjectType
-    SingerPropertiesList = singer_sdk_typing.PropertiesList
-    SingerTimeType = singer_sdk_typing.TimeType
 
 
 __all__: list[str] = ["FlextMeltanoTypingsSinger"]

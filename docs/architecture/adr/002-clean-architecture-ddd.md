@@ -68,18 +68,36 @@ between:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # Domain logic testable in isolation
 def test_pipeline_validation():
     validator = PipelineValidator()
     result = validator.validate_config(invalid_config)
-    assert result.failure
+    tm.fail(result)
 ```
 
 **Maintainability**: Changes to external systems don't affect business logic
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # Adapter pattern allows external system changes
@@ -190,6 +208,15 @@ src/flext_meltano/
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # api.py
 def create_pipeline(settings: dict) -> p.Result[Pipeline]:
@@ -200,6 +227,15 @@ def create_pipeline(settings: dict) -> p.Result[Pipeline]:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # services.py
@@ -213,6 +249,15 @@ def create_pipeline(self, settings: dict) -> p.Result[Pipeline]:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # services.py
 def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
@@ -223,6 +268,15 @@ def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # Service initialization with dependencies

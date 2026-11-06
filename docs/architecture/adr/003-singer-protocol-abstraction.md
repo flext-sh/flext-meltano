@@ -62,6 +62,15 @@ patterns
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # FLEXT pattern - Railway-oriented, type-safe
 class MyCustomTap(FlextMeltanoTap):
@@ -83,6 +92,15 @@ if result.failure:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 # Mock Singer SDK for unit testing
@@ -156,6 +174,15 @@ def mock_singer_sdk():
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # Base abstractions
 class FlextMeltanoSingerBase:
@@ -178,6 +205,15 @@ class FlextMeltanoStream(FlextMeltanoSingerBase):
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class FlextMeltanoTap(FlextMeltanoSingerBase):
@@ -206,6 +242,15 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class FlextMeltanoStream:

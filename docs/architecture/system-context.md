@@ -269,6 +269,15 @@ flext_meltano --> redis: Caching & queues
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
     r,  # Railway-oriented error handling
@@ -293,6 +302,15 @@ class FlextMeltanoService(s):
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class MeltanoAdapter:
@@ -341,6 +359,15 @@ class MeltanoAdapter:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
@@ -392,6 +419,15 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 # External system integration via adapters
 class ExternalSystemAdapter(Protocol):
@@ -424,6 +460,15 @@ class SingerAdapter(ExternalSystemAdapter):
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class PluginManager:
@@ -578,6 +623,15 @@ All FLEXT projects follow consistent integration patterns:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 # Standard FLEXT project structure
 from flext_meltano import FlextMeltanoTap, FlextMeltanoTarget
 
@@ -607,6 +661,15 @@ class MyFLEXTProject(s):
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class FLEXTPluginRegistry:
@@ -754,6 +817,15 @@ end note
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
@@ -788,6 +860,15 @@ class SynchronousIntegration:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class CircuitBreakerIntegration:
@@ -848,6 +929,15 @@ class CircuitBreakerIntegration:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 class EventDrivenIntegration:
     """Event-driven integration for asynchronous operations."""
@@ -905,6 +995,15 @@ class EventDrivenIntegration:
 
 ```text
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class MessageQueueIntegration:
