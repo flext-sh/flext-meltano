@@ -26,9 +26,7 @@ class FlextMeltanoConstantsSettings:
         c.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
         ),
-        c.Environment.TESTING.value: (
-            FlextMeltanoConstantsEnums.EnvironmentAlias.TEST
-        ),
+        c.Environment.TESTING.value: (FlextMeltanoConstantsEnums.EnvironmentAlias.TEST),
         c.Environment.PRODUCTION.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.PROD
         ),
