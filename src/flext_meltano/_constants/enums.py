@@ -72,16 +72,6 @@ class FlextMeltanoConstantsEnums:
         TIMEOUT = "timeout"
 
     @unique
-    class Environment(StrEnum):
-        """Deployment environments for Meltano pipelines."""
-
-        DEVELOPMENT = "development"
-        LOCAL = "local"
-        PRODUCTION = "production"
-        STAGING = "staging"
-        TESTING = "testing"
-
-    @unique
     class ProjectEnvironment(StrEnum):
         """Canonical environment names used in generated Meltano projects."""
 
