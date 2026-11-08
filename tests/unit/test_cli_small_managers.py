@@ -19,6 +19,7 @@ class TestsFlextMeltanoCliSmallManagers:
     """Exercise the public ``run`` contract of the Meltano CLI facade."""
 
     @u.Tests.fixture
+    @staticmethod
     def meltano_cli() -> FlextMeltanoCli:
         """Provide a freshly constructed CLI facade for each test.
 
