@@ -46,6 +46,7 @@ class TestsFlextMeltanoPipelineCliManagers:
         return result
 
     @u.Tests.fixture
+    @staticmethod
     def meltano_cli() -> FlextMeltanoCli:
         """Provide the public CLI facade used by every command scenario.
 
