@@ -116,7 +116,7 @@ class FlextMeltanoDeclarativeTap:
             def get_records(
                 self,
                 context: m.Meltano.SingerContext | None,
-            ) -> Iterable[m.Meltano.SingerRecord]:
+            ) -> Iterable[p.Meltano.SingerRecord]:
                 _ = context
                 request = m.Meltano.FetchRequest(
                     stream_name=self.name,
