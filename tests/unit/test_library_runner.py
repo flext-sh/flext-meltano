@@ -28,6 +28,7 @@ class TestsFlextMeltanoLibraryRunner:
     )
 
     @u.Tests.fixture(scope="class")
+    @staticmethod
     def dbt_result() -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run one DBT transformation once and share its typed outcome.
 
