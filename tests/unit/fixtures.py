@@ -13,12 +13,10 @@ from typing import TYPE_CHECKING
 import pytest
 from flext_tests.docker import FlextTestsDocker
 
-from tests import c, m, tf, tm, u
+from tests import c, m, t, tf, tm, u
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-
-from tests import t
 
 MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
     ("tap", "tap-csv", "source_name"),

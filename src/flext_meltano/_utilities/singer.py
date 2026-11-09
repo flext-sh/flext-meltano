@@ -14,9 +14,9 @@ from __future__ import annotations
 import sys
 from collections.abc import Sequence
 
-from flext_cli import e, r, u
+from flext_cli import u
 
-from flext_meltano import c, m, p, t
+from flext_meltano import c, e, m, p, r, t
 
 
 class FlextMeltanoUtilitiesSinger:
