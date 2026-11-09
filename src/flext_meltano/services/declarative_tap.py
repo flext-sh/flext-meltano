@@ -14,7 +14,7 @@ from __future__ import annotations
 import signal
 import threading
 from collections.abc import Iterable, Sequence
-from typing import override
+from typing import Any, override
 
 from singer_sdk import Stream, Tap
 
@@ -116,7 +116,7 @@ class FlextMeltanoDeclarativeTap:
             def get_records(
                 self,
                 context: m.Meltano.SingerContext | None,
-            ) -> Iterable[p.Meltano.SingerRecord]:
+            ) -> Iterable[dict[str, Any]]:
                 _ = context
                 request = m.Meltano.FetchRequest(
                     stream_name=self.name,
