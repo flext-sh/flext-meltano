@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import cast
 
 from jsonschema import Draft202012Validator, ValidationError
+from typing_extensions import TypeForm
 
 from examples import c, m, meltano, p, t, u
 from flext_meltano import FlextMeltanoSettings
@@ -51,7 +52,7 @@ class ExamplesFlextMeltanoSimple:
             "target_type": "target-serialization-consumer",
             "connection_config": connection,
         })
-        adapter = u.type_adapter(t.TypeForm(t.JsonMapping))
+        adapter = u.type_adapter(TypeForm(t.JsonMapping))
         for config in (tap, target):
             payloads = (
                 adapter.validate_python(config.model_dump(mode="json")),
@@ -66,7 +67,7 @@ class ExamplesFlextMeltanoSimple:
                     msg = "Serialization changed a non-sensitive input"
                     raise ValueError(msg)
                 database = adapter.validate_python(exported["database"])
-                options = u.type_adapter(t.TypeForm(t.JsonValue)).validate_python(
+                options = u.type_adapter(TypeForm(t.JsonValue)).validate_python(
                     exported["options"]
                 )
                 if database["password"] == marker:
@@ -101,7 +102,7 @@ class ExamplesFlextMeltanoSimple:
             ValueError: The serialized schema accepted an invalid record.
 
         """
-        adapter = u.type_adapter(t.TypeForm(t.JsonMapping))
+        adapter = u.type_adapter(TypeForm(t.JsonMapping))
         stream = m.Meltano.StreamDefinition.model_validate({
             "stream_name": "serialization-consumer",
             "source_type": "serialization-consumer",

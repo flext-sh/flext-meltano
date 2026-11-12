@@ -10,7 +10,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_meltano import p, t
+from flext_core import p
+
+from flext_meltano import t
+from flext_meltano._protocols import FlextMeltanoProtocolsResultsDbt
 
 
 class FlextMeltanoProtocolsBase:
@@ -25,7 +28,7 @@ class FlextMeltanoProtocolsBase:
             command: Sequence[str],
             timeout: int = ...,
             _cwd: Path | None = None,
-        ) -> p.Result[p.Meltano.CommandExecutionResult]:
+        ) -> p.Result[FlextMeltanoProtocolsResultsDbt.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
@@ -41,7 +44,7 @@ class FlextMeltanoProtocolsBase:
             self,
             dbt_command: str,
             args: Sequence[str] | None = None,
-        ) -> p.Result[p.Meltano.CommandExecutionResult]:
+        ) -> p.Result[FlextMeltanoProtocolsResultsDbt.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
