@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import c as flext_cli_c
+from flext_cli import FlextCliConstants
 
 from flext_meltano._constants import (
     FlextMeltanoConstantsBase,
@@ -17,7 +17,7 @@ from flext_meltano._constants import (
 
 
 class FlextMeltanoConstants(
-    flext_cli_c,
+    FlextCliConstants,
     FlextMeltanoConstantsBase,
     FlextMeltanoConstantsEnums,
 ):
