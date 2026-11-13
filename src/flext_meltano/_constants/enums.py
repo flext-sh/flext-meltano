@@ -109,7 +109,7 @@ class FlextMeltanoConstantsEnums:
         STATE = "STATE"
 
     @unique
-    class HandlerType(StrEnum):
+    class HandlerGroup(StrEnum):
         """Named handler groups exposed by the public API."""
 
         PIPELINE = "pipeline"

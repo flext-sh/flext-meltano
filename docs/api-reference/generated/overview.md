@@ -26,7 +26,7 @@
   `FlextMeltanoConfig`, `FlextMeltanoConstants`, `FlextMeltanoDbtServiceBase`,
   `FlextMeltanoLibraryRunner`, `FlextMeltanoModels`, `FlextMeltanoPipelineManager`,
   `FlextMeltanoProtocols` (+13 more)
-- Exported module shortcuts: _none_
+- Exported module shortcuts: *none*
 - Generated module pages: `10`
 
 ## Next Pages
