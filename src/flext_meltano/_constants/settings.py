@@ -67,10 +67,10 @@ class FlextMeltanoConstantsSettings:
     ] = (FlextMeltanoConstantsEnums.DbtCommand.GENERATE,)
 
     # Handlers
-    HANDLER_ALL: ClassVar[tuple[FlextMeltanoConstantsEnums.HandlerType, ...]] = (
-        FlextMeltanoConstantsEnums.HandlerType.SOURCE,
-        FlextMeltanoConstantsEnums.HandlerType.SINK,
-        FlextMeltanoConstantsEnums.HandlerType.PIPELINE,
+    HANDLER_ALL: ClassVar[tuple[FlextMeltanoConstantsEnums.HandlerGroup, ...]] = (
+        FlextMeltanoConstantsEnums.HandlerGroup.SOURCE,
+        FlextMeltanoConstantsEnums.HandlerGroup.SINK,
+        FlextMeltanoConstantsEnums.HandlerGroup.PIPELINE,
     )
 
     # BatchDefaults
