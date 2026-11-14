@@ -553,7 +553,7 @@ cloud "FLEXT Ecosystem" as ecosystem {
         }
 
         rectangle "Specialized Projects" as specialized {
-            component "algar-oud-mig" as flext [
+            component "External migration consumers" as flext [
                 Oracle Migration
                 Legacy System Integration
             ]
