@@ -9,7 +9,7 @@ from __future__ import annotations
 import tempfile
 from collections.abc import Mapping
 
-from flext_meltano.services import FlextMeltanoAbstractions
+from flext_meltano import FlextMeltanoAbstractions
 from tests import c, m, r, t, tm
 
 
