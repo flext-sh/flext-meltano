@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests.docker import FlextTestsDocker
+from flext_tests import FlextTestsDocker
 
 from tests import c, m, t, tf, tm, u
 
