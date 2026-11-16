@@ -59,12 +59,14 @@ class FlextMeltanoConstantsBase:
     PLUGIN_DBT_DEFAULT_NAME: ClassVar[str] = "dbt-postgres"
     PREFIX_TARGET: ClassVar[str] = "target"
 
-    OPERATION_ERRORS: Annotated[
-        ClassVar[tuple[type[Exception], ...]],
-        warnings.deprecated(
-            "compat: c.Meltano.OPERATION_ERRORS -> c.EXC_ATTR_KEY_OS_TYPE_VALUE; "
-            "fix: read c.EXC_ATTR_KEY_OS_TYPE_VALUE"
-        ),
+    OPERATION_ERRORS: ClassVar[
+        Annotated[
+            tuple[type[Exception], ...],
+            warnings.deprecated(
+                "compat: c.Meltano.OPERATION_ERRORS -> c.EXC_ATTR_KEY_OS_TYPE_VALUE; "
+                "fix: read c.EXC_ATTR_KEY_OS_TYPE_VALUE"
+            ),
+        ]
     ] = c.EXC_ATTR_KEY_OS_TYPE_VALUE
 
     # Singer
