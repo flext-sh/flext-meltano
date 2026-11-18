@@ -32,4 +32,9 @@ install_lazy_exports(
         "FlextMeltanoConstantsSettings": ".settings",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextMeltanoConstantsBase",
+        "FlextMeltanoConstantsEnums",
+        "FlextMeltanoConstantsSettings",
+    ),
 )

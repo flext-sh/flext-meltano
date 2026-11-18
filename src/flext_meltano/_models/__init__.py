@@ -62,4 +62,18 @@ install_lazy_exports(
         "FlextMeltanoModelsSourcesParams": ".sources_params",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextMeltanoModelsCliInputs",
+        "FlextMeltanoModelsConfig",
+        "FlextMeltanoModelsCore",
+        "FlextMeltanoModelsDiscovery",
+        "FlextMeltanoModelsInstances",
+        "FlextMeltanoModelsPayloadsData",
+        "FlextMeltanoModelsResultsDbt",
+        "FlextMeltanoModelsSinger",
+        "FlextMeltanoModelsSingerCatalog",
+        "FlextMeltanoModelsSingerSdk",
+        "FlextMeltanoModelsSources",
+        "FlextMeltanoModelsSourcesParams",
+    ),
 )
