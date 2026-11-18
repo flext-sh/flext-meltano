@@ -32,4 +32,9 @@ install_lazy_exports(
         "FlextMeltanoTypingsSinger": ".singer",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextMeltanoTypingsBase",
+        "FlextMeltanoTypingsDomains",
+        "FlextMeltanoTypingsSinger",
+    ),
 )

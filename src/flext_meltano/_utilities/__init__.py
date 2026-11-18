@@ -32,4 +32,8 @@ install_lazy_exports(
         "FlextMeltanoUtilitiesSinger": ".singer",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextMeltanoUtilitiesRuntime",
+        "FlextMeltanoUtilitiesSinger",
+    ),
 )

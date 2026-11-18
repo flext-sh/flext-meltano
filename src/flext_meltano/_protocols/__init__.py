@@ -63,4 +63,18 @@ install_lazy_exports(
         "FlextMeltanoProtocolsSourcesParams": ".sources_params",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextMeltanoProtocolsBase",
+        "FlextMeltanoProtocolsCliInputs",
+        "FlextMeltanoProtocolsConfig",
+        "FlextMeltanoProtocolsCore",
+        "FlextMeltanoProtocolsDiscovery",
+        "FlextMeltanoProtocolsInstances",
+        "FlextMeltanoProtocolsPayloadsData",
+        "FlextMeltanoProtocolsResultsDbt",
+        "FlextMeltanoProtocolsSinger",
+        "FlextMeltanoProtocolsSingerCatalog",
+        "FlextMeltanoProtocolsSources",
+        "FlextMeltanoProtocolsSourcesParams",
+    ),
 )
