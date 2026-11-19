@@ -12,16 +12,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from examples import (
-        ExamplesFlextMeltanoConstants,
-        ExamplesFlextMeltanoModels,
-        ExamplesFlextMeltanoProtocols,
-        ExamplesFlextMeltanoSimple,
-        ExamplesFlextMeltanoTargetService,
-        ExamplesFlextMeltanoTargetSink,
-        ExamplesFlextMeltanoTypes,
-        ExamplesFlextMeltanoUtilities,
-    )
     from flext_tests import api, d, e, h, r, td, tf, tk, tm, x
 
     from flext_meltano import (
@@ -59,14 +49,6 @@ if TYPE_CHECKING:
 
 
 __all__: tuple[str, ...] = (
-    "ExamplesFlextMeltanoConstants",
-    "ExamplesFlextMeltanoModels",
-    "ExamplesFlextMeltanoProtocols",
-    "ExamplesFlextMeltanoSimple",
-    "ExamplesFlextMeltanoTargetService",
-    "ExamplesFlextMeltanoTargetSink",
-    "ExamplesFlextMeltanoTypes",
-    "ExamplesFlextMeltanoUtilities",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoCli",
@@ -119,14 +101,6 @@ install_lazy_exports(
     __name__,
     globals(),
     {
-        "ExamplesFlextMeltanoConstants": "examples",
-        "ExamplesFlextMeltanoModels": "examples",
-        "ExamplesFlextMeltanoProtocols": "examples",
-        "ExamplesFlextMeltanoSimple": "examples",
-        "ExamplesFlextMeltanoTargetService": "examples",
-        "ExamplesFlextMeltanoTargetSink": "examples",
-        "ExamplesFlextMeltanoTypes": "examples",
-        "ExamplesFlextMeltanoUtilities": "examples",
         "FlextMeltano": "flext_meltano",
         "FlextMeltanoAbstractions": "flext_meltano",
         "FlextMeltanoCli": "flext_meltano",
