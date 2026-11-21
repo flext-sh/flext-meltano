@@ -33,11 +33,11 @@ class TestsFlextMeltanoDockerIntegration:
 
         """
         return psycopg2.connect(
-            host=c.Meltano.Tests.HOST,
-            port=c.Meltano.Tests.POSTGRES_PORT,
-            database=c.Meltano.Tests.POSTGRES_TEST_DATABASE,
-            user=c.Meltano.Tests.POSTGRES_TEST_USER,
-            password=c.Meltano.Tests.POSTGRES_TEST_VALUE,
+            host=c.Tests.HOST,
+            port=c.Tests.POSTGRES_PORT,
+            database=c.Tests.POSTGRES_TEST_DATABASE,
+            user=c.Tests.POSTGRES_TEST_USER,
+            password=c.Tests.POSTGRES_TEST_VALUE,
             connect_timeout=5,
         )
 
@@ -50,8 +50,8 @@ class TestsFlextMeltanoDockerIntegration:
 
         """
         return redis.Redis(
-            host=c.Meltano.Tests.HOST,
-            port=c.Meltano.Tests.REDIS_PORT,
+            host=c.Tests.HOST,
+            port=c.Tests.REDIS_PORT,
             db=0,
         )
 
@@ -62,14 +62,14 @@ class TestsFlextMeltanoDockerIntegration:
         postgres_service: str,
     ) -> None:
         """PostgreSQL fixture yields the published host:port endpoint."""
-        tm.that(postgres_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.POSTGRES_PORT}")
+        tm.that(postgres_service, eq=f"{c.LOCALHOST}:{c.Tests.POSTGRES_PORT}")
 
     @staticmethod
     @c.Tests.MARK.docker
     @c.Tests.MARK.integration
     def test_redis_service_endpoint_is_published(redis_service: str) -> None:
         """Redis fixture yields the published host:port endpoint."""
-        tm.that(redis_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.REDIS_PORT}")
+        tm.that(redis_service, eq=f"{c.LOCALHOST}:{c.Tests.REDIS_PORT}")
 
     @staticmethod
     @c.Tests.MARK.docker
@@ -79,7 +79,7 @@ class TestsFlextMeltanoDockerIntegration:
     ) -> None:
         """Meltano fixture yields an endpoint on the test host with a real port."""
         host, _, port = meltano_service.partition(":")
-        tm.that(host, eq=c.Meltano.Tests.HOST)
+        tm.that(host, eq=c.Tests.HOST)
         tm.that(int(port), gt=0)
 
     @staticmethod
@@ -89,8 +89,8 @@ class TestsFlextMeltanoDockerIntegration:
         docker_services: FlextTestsDocker,
     ) -> None:
         """`ready` yields an ``r[bool]`` per service port (observable contract)."""
-        postgres_ready = docker_services.ready(port=c.Meltano.Tests.POSTGRES_PORT)
-        redis_ready = docker_services.ready(port=c.Meltano.Tests.REDIS_PORT)
+        postgres_ready = docker_services.ready(port=c.Tests.POSTGRES_PORT)
+        redis_ready = docker_services.ready(port=c.Tests.REDIS_PORT)
         if postgres_ready.failure or redis_ready.failure:
             u.Tests.skip("Docker readiness probe unavailable")
         tm.that(postgres_ready.value, is_=bool)
@@ -110,7 +110,7 @@ class TestsFlextMeltanoDockerIntegration:
         tm.ok(start_result)
         should_assert_stop = True
         try:
-            postgres_ready = docker_manager.ready(port=c.Meltano.Tests.POSTGRES_PORT)
+            postgres_ready = docker_manager.ready(port=c.Tests.POSTGRES_PORT)
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 u.Tests.skip("PostgreSQL service not available")

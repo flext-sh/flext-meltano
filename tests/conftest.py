@@ -24,13 +24,11 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
         if "docker_services" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.docker)
         for fixture, port in (
-            ("postgres_service", c.Meltano.Tests.POSTGRES_PORT),
-            ("redis_service", c.Meltano.Tests.REDIS_PORT),
+            ("postgres_service", c.Tests.POSTGRES_PORT),
+            ("redis_service", c.Tests.REDIS_PORT),
         ):
             if fixture in getattr(item, "fixturenames", ()):
-                item.add_marker(
-                    pytest.mark.connectivity(host=c.Meltano.Tests.HOST, port=port)
-                )
+                item.add_marker(pytest.mark.connectivity(host=c.Tests.HOST, port=port))
 
 
 @pytest.fixture

@@ -8,17 +8,14 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsProtocols
 
-from flext_meltano import FlextMeltanoProtocols
+from tests import FlextMeltanoProtocols
 
 
 class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
     """Test protocols facade for flext-meltano."""
 
-    class Meltano(FlextMeltanoProtocols.Meltano):
-        """Meltano test protocols namespace."""
-
-        class Tests(FlextTestsProtocols.Tests):
-            """Meltano-specific test protocols."""
+    class Tests(FlextTestsProtocols.Tests):
+        """Meltano-specific test protocols."""
 
 
 p = TestsFlextMeltanoProtocols
