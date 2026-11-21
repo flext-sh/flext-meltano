@@ -11,14 +11,16 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping
-from typing import Annotated, Self, override
+from typing import Annotated, Self
 
 from flext_core import FlextService, FlextSettings
 
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
 
-class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
+class FlextMeltanoServiceBase[TDomainResult = t.JsonMapping](
+    FlextService[TDomainResult]
+):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -102,11 +104,6 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
         else:
             normalized["runtime_settings"] = FlextMeltanoSettings.fetch_global()
         return normalized
-
-    @override
-    def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute the service using the canonical JSON payload contract."""
-        raise NotImplementedError
 
 
 s = FlextMeltanoServiceBase
