@@ -39,6 +39,15 @@ if TYPE_CHECKING:
         meltano,
         settings,
     )
+    from flext_meltano.services import (
+        FlextMeltanoDeclarativeTap,
+        FlextMeltanoExecutor,
+        FlextMeltanoExecutorBase,
+        FlextMeltanoPluginDiscovery,
+        FlextMeltanoProjectService,
+        FlextMeltanoService,
+    )
+    from flext_meltano.services.consumer_bases import FlextMeltanoConsumerBases
     from tests.base import TestsFlextMeltanoServiceBase, s
     from tests.constants import TestsFlextMeltanoConstants, c
     from tests.models import TestsFlextMeltanoModels, m
@@ -54,11 +63,18 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoCli",
     "FlextMeltanoConfig",
     "FlextMeltanoConstants",
+    "FlextMeltanoConsumerBases",
     "FlextMeltanoDbtServiceBase",
+    "FlextMeltanoDeclarativeTap",
+    "FlextMeltanoExecutor",
+    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
     "FlextMeltanoPipelineManager",
+    "FlextMeltanoPluginDiscovery",
+    "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
+    "FlextMeltanoService",
     "FlextMeltanoServiceBase",
     "FlextMeltanoSettings",
     "FlextMeltanoSingerTapAdapter",
@@ -106,11 +122,18 @@ install_lazy_exports(
         "FlextMeltanoCli": "flext_meltano",
         "FlextMeltanoConfig": "flext_meltano",
         "FlextMeltanoConstants": "flext_meltano",
+        "FlextMeltanoConsumerBases": "flext_meltano.services.consumer_bases",
         "FlextMeltanoDbtServiceBase": "flext_meltano",
+        "FlextMeltanoDeclarativeTap": "flext_meltano.services",
+        "FlextMeltanoExecutor": "flext_meltano.services",
+        "FlextMeltanoExecutorBase": "flext_meltano.services",
         "FlextMeltanoLibraryRunner": "flext_meltano",
         "FlextMeltanoModels": "flext_meltano",
         "FlextMeltanoPipelineManager": "flext_meltano",
+        "FlextMeltanoPluginDiscovery": "flext_meltano.services",
+        "FlextMeltanoProjectService": "flext_meltano.services",
         "FlextMeltanoProtocols": "flext_meltano",
+        "FlextMeltanoService": "flext_meltano.services",
         "FlextMeltanoServiceBase": "flext_meltano",
         "FlextMeltanoSettings": "flext_meltano",
         "FlextMeltanoSingerTapAdapter": "flext_meltano",

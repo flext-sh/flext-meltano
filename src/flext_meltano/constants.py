@@ -18,8 +18,6 @@ from flext_meltano._constants import (
 
 class FlextMeltanoConstants(
     FlextCliConstants,
-    FlextMeltanoConstantsBase,
-    FlextMeltanoConstantsEnums,
 ):
     """Domain constants for the flext-meltano package."""
 
