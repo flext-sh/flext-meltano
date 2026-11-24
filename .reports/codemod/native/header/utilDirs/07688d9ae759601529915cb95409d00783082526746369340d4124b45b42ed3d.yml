@@ -1,0 +1,1 @@
+{"id":"own-package","language":"Python","rule":{"regex":"^(?:examples|flext_meltano|scripts|tests)(?:[.\\s]|$)"}}

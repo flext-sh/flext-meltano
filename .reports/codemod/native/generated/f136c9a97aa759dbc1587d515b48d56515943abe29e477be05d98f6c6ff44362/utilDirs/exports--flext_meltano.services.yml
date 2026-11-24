@@ -1,0 +1,1 @@
+{"id":"exports--flext_meltano.services","language":"Python","rule":{"regex":"^(?:FlextMeltanoAbstractions|FlextMeltanoDeclarativeTap|FlextMeltanoExecutor|FlextMeltanoExecutorBase|FlextMeltanoLibraryRunner|FlextMeltanoPluginDiscovery|FlextMeltanoProjectService|FlextMeltanoService|FlextMeltanoSingerTapAdapter|FlextMeltanoTargetAbstractions)$"}}

@@ -1,0 +1,1 @@
+{"id":"exports--flext_meltano._utilities","language":"Python","rule":{"regex":"^(?:FlextMeltanoUtilitiesBase|FlextMeltanoUtilitiesRuntime|FlextMeltanoUtilitiesSinger)$"}}

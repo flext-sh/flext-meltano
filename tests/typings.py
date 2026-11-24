@@ -20,17 +20,14 @@ from flext_meltano import FlextMeltanoTypes
 class TestsFlextMeltanoTypes(FlextTestsTypes, FlextMeltanoTypes):
     """Test type aliases for flext-meltano."""
 
-    class Meltano(FlextMeltanoTypes.Meltano):
-        """Meltano test types namespace."""
+    class Tests(FlextTestsTypes.Tests):
+        """Meltano-specific test type aliases."""
 
         type ComponentCase = tuple[str, str, str]
         """One canonical component-factory case: kind, name, selector field."""
 
         type ProjectEnv = Mapping[str, str | Path | t.JsonMapping]
         """Environment mapping exported for one test Meltano project."""
-
-        class Tests(FlextTestsTypes.Tests):
-            """Meltano-specific test type aliases."""
 
 
 t = TestsFlextMeltanoTypes

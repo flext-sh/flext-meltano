@@ -1,0 +1,1 @@
+{"id":"exports--flext_meltano.services.consumer_bases","language":"Python","rule":{"regex":"^(?:FlextMeltanoConsumerBases|FlextMeltanoDbtServiceBase|FlextMeltanoTapServiceBase|FlextMeltanoTargetServiceBase)$"}}

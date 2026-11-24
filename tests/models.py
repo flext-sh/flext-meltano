@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsModels
 
-from flext_meltano import FlextMeltanoModels
+from tests import FlextMeltanoModels
 
 
 class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
@@ -27,11 +27,8 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
     - m.Meltano.* - Production domain models (inherited)
     """
 
-    class Meltano(FlextMeltanoModels.Meltano):
-        """Meltano domain models test namespace."""
-
-        class Tests(FlextTestsModels.Tests):
-            """Canonical shared test model namespace for flext-meltano."""
+    class Tests(FlextTestsModels.Tests):
+        """Canonical shared test model namespace for flext-meltano."""
 
 
 m = TestsFlextMeltanoModels

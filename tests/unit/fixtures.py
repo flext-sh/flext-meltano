@@ -18,7 +18,7 @@ from tests import c, m, t, tf, tm, u
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-MELTANO_COMPONENT_CASES: tuple[t.Meltano.ComponentCase, ...] = (
+MELTANO_COMPONENT_CASES: tuple[t.Tests.ComponentCase, ...] = (
     ("tap", "tap-csv", "source_name"),
     ("target", "target-jsonl", "sink_name"),
     ("dbt", "analytics", "transformation_name"),
@@ -31,7 +31,7 @@ MELTANO_COMPONENT_IDS: Sequence[str] = ("tap", "target", "dbt")
     params=tuple(range(len(MELTANO_COMPONENT_CASES))),
     ids=MELTANO_COMPONENT_IDS,
 )
-def meltano_component_case(request: t.Tests.FixtureRequest) -> t.Meltano.ComponentCase:
+def meltano_component_case(request: t.Tests.FixtureRequest) -> t.Tests.ComponentCase:
     """Canonical public Meltano component factories with expected selectors.
 
     Returns:
@@ -134,11 +134,11 @@ def meltano_yml_config() -> t.JsonMapping:
 def meltano_project(
     meltano_project_dir: Path,
     meltano_yml_config: t.JsonMapping,
-) -> t.Meltano.ProjectEnv:
+) -> t.Tests.ProjectEnv:
     """Meltano project for testing.
 
     Returns:
-        The resulting ``t.Meltano.ProjectEnv``.
+        The resulting ``t.Tests.ProjectEnv``.
 
     """
     meltano_yml = meltano_project_dir / "pipeline.yml"
@@ -183,12 +183,12 @@ def docker_manager() -> FlextTestsDocker:
 
     """
     return FlextTestsDocker.stack(
-        c.Meltano.Tests.COMPOSE_FILE,
+        c.Tests.COMPOSE_FILE,
         target=m.Tests.ContainerConfig(
             container_name="flext-test-meltano",
-            service=c.Meltano.Tests.PRIMARY_SERVICE,
-            host=c.Meltano.Tests.HOST,
-            port=c.Meltano.Tests.MELTANO_PORT,
+            service=c.Tests.PRIMARY_SERVICE,
+            host=c.Tests.HOST,
+            port=c.Tests.MELTANO_PORT,
         ),
         repository_root=Path(__file__).resolve().parents[2],
     )
@@ -234,7 +234,7 @@ def require_docker_service(
     ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
         u.Tests.skip(f"{service_name} service not available")
-    return f"{c.Meltano.Tests.HOST}:{port}"
+    return f"{c.Tests.HOST}:{port}"
 
 
 @u.Tests.fixture
@@ -247,7 +247,7 @@ def postgres_service(docker_services: FlextTestsDocker) -> str:
     """
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.POSTGRES_PORT,
+        c.Tests.POSTGRES_PORT,
         "PostgreSQL",
     )
 
@@ -260,7 +260,7 @@ def redis_service(docker_services: FlextTestsDocker) -> str:
         The resulting ``str``.
 
     """
-    return require_docker_service(docker_services, c.Meltano.Tests.REDIS_PORT, "Redis")
+    return require_docker_service(docker_services, c.Tests.REDIS_PORT, "Redis")
 
 
 @u.Tests.fixture
@@ -271,13 +271,13 @@ def meltano_service(docker_services: FlextTestsDocker) -> str:
         The resulting ``str``.
 
     """
-    info = docker_services.fetch_container_info(c.Meltano.Tests.PRIMARY_CONTAINER_NAME)
+    info = docker_services.fetch_container_info(c.Tests.PRIMARY_CONTAINER_NAME)
     if info.failure:
         u.Tests.skip(f"Meltano container unavailable: {info.error}")
-    host_port = info.value.ports.get(f"{c.Meltano.Tests.MELTANO_PORT}/tcp")
+    host_port = info.value.ports.get(f"{c.Tests.MELTANO_PORT}/tcp")
     if host_port is None:
         u.Tests.skip("Meltano service host port is not published")
-    ready = docker_services.wait_for_port_ready(c.Meltano.Tests.HOST, int(host_port))
+    ready = docker_services.wait_for_port_ready(c.Tests.HOST, int(host_port))
     if ready.failure or not ready.value:
         u.Tests.skip("Meltano service not available")
-    return f"{c.Meltano.Tests.HOST}:{host_port}"
+    return f"{c.Tests.HOST}:{host_port}"

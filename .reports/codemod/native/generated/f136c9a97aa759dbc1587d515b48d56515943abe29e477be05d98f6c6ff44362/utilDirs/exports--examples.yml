@@ -1,0 +1,1 @@
+{"id":"exports--examples","language":"Python","rule":{"regex":"^(?:ExamplesFlextMeltanoConstants|ExamplesFlextMeltanoModels|ExamplesFlextMeltanoProtocols|ExamplesFlextMeltanoSimple|ExamplesFlextMeltanoTargetService|ExamplesFlextMeltanoTargetSink|ExamplesFlextMeltanoTypes|ExamplesFlextMeltanoUtilities|c|config|d|e|h|m|main|meltano|p|r|s|settings|t|u|x)$"}}

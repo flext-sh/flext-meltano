@@ -1,0 +1,1 @@
+{"id":"exports--flext_meltano._constants","language":"Python","rule":{"regex":"^(?:FlextMeltanoConstantsBase|FlextMeltanoConstantsEnums|FlextMeltanoConstantsSettings)$"}}
