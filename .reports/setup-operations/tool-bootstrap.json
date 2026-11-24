@@ -1,0 +1,1 @@
+{"root":".","operation":"tool-bootstrap","scope":["."],"receipts":[{"native_tool_qualifications":[],"runtime_context":null,"root":".","executed":true,"outcome":null,"native_exit_code":2,"stage":"lifecycle","completed":false,"applicability":"","files":[],"issues":[]}],"candidate_read_exit_code":0,"candidate_sha":"a70febae97dfbf1be4743f86aba7ccbb30b6b350"}

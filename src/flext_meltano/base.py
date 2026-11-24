@@ -18,7 +18,9 @@ from flext_core import FlextService, FlextSettings
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
 
-class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
+class FlextMeltanoServiceBase[TDomainResult = t.JsonMapping](
+    FlextService[TDomainResult]
+):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
