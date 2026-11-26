@@ -6,8 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import warnings
-from typing import Annotated, ClassVar
+from typing import ClassVar
 
 from flext_cli import c
 
@@ -58,16 +57,6 @@ class FlextMeltanoConstantsBase:
     # Plugin
     PLUGIN_DBT_DEFAULT_NAME: ClassVar[str] = "dbt-postgres"
     PREFIX_TARGET: ClassVar[str] = "target"
-
-    OPERATION_ERRORS: ClassVar[
-        Annotated[
-            tuple[type[Exception], ...],
-            warnings.deprecated(
-                "compat: c.Meltano.OPERATION_ERRORS -> c.EXC_ATTR_KEY_OS_TYPE_VALUE; "
-                "fix: read c.EXC_ATTR_KEY_OS_TYPE_VALUE"
-            ),
-        ]
-    ] = c.EXC_ATTR_KEY_OS_TYPE_VALUE
 
     # Singer
     SINGER_SAFE_EXCEPTIONS: ClassVar[tuple[type[Exception], ...]] = (
